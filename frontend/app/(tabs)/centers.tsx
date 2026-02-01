@@ -129,7 +129,6 @@ export default function CentersScreen() {
           <ActivityIndicator size="large" color="#10B981" />
           <Text style={styles.loadingText}>Cargando centros actualizados...</Text>
         </View>
-        <BottomNavigation />
       </SafeAreaView>
     );
   }
