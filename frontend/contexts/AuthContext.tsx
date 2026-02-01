@@ -169,6 +169,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loginWithEmail = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
+      console.log('Attempting login with email:', email);
+      console.log('Backend URL:', BACKEND_URL);
+      
       const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
@@ -178,11 +181,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         credentials: 'include',
       });
 
+      console.log('Login response status:', response.status);
       const data = await response.json();
+      console.log('Login response data:', data);
 
       if (response.ok) {
         // Store token for all platforms
         if (data.session_token) {
+          console.log('Storing session token');
           await AsyncStorage.setItem('session_token', data.session_token);
         }
         await refreshUser();
