@@ -30,21 +30,14 @@ export default function HomeScreen() {
 
   const loadData = async () => {
     try {
-      const token = await AsyncStorage.getItem('session_token');
-      if (!token) return;
-
       // Load dashboard stats
-      const statsResponse = await fetch(`${BACKEND_URL}/api/dashboard/stats`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
+      const statsResponse = await authenticatedFetch(`${BACKEND_URL}/api/dashboard/stats`);
       if (statsResponse.ok) {
         setStats(await statsResponse.json());
       }
 
       // Load habits
-      const habitsResponse = await fetch(`${BACKEND_URL}/api/habits`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
+      const habitsResponse = await authenticatedFetch(`${BACKEND_URL}/api/habits`);
       if (habitsResponse.ok) {
         setHabits(await habitsResponse.json());
       }
@@ -63,15 +56,8 @@ export default function HomeScreen() {
 
   const toggleHabit = async (habitId: string, currentStatus: boolean) => {
     try {
-      const token = await AsyncStorage.getItem('session_token');
-      if (!token) return;
-
-      await fetch(`${BACKEND_URL}/api/habits/${habitId}/log`, {
+      await authenticatedFetch(`${BACKEND_URL}/api/habits/${habitId}/log`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ completed: !currentStatus }),
       });
 
