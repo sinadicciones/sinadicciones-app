@@ -552,16 +552,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
   },
-  callButton: {
+  whatsappButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#10B981',
+    backgroundColor: '#25D366',
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 8,
     gap: 6,
   },
-  callButtonText: {
+  whatsappButtonText: {
     fontSize: 14,
     fontWeight: '600',
     color: '#FFFFFF',
