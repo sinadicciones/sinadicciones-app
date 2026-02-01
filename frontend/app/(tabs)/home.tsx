@@ -105,16 +105,16 @@ export default function HomeScreen() {
       // Preparar mensaje de WhatsApp
       const message = 'Paso por un mal momento, ¿podemos hablar?';
       const phoneNumber = firstContact.phone.replace(/[^0-9]/g, ''); // Limpiar número
-      const whatsappUrl = `whatsapp://send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
-
-      // Intentar abrir WhatsApp
-      const canOpen = await Linking.canOpenURL(whatsappUrl);
       
-      if (canOpen) {
+      // Usar URL de WhatsApp Web que funciona en todos los contextos
+      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+
+      try {
         await Linking.openURL(whatsappUrl);
-      } else {
+      } catch (linkError) {
+        // Si falla, ofrecer llamada telefónica
         Alert.alert(
-          'WhatsApp no disponible',
+          'No se pudo abrir WhatsApp',
           `¿Deseas llamar a ${firstContact.name} (${firstContact.relationship})?`,
           [
             { text: 'Cancelar', style: 'cancel' },
