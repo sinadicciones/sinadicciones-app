@@ -700,6 +700,33 @@ async def update_profile(profile_data: dict, current_user: User = Depends(get_cu
     
     return {"success": True}
 
+class ProfilePhotoRequest(BaseModel):
+    photo: str
+
+@app.post("/api/profile/photo")
+async def update_profile_photo(data: ProfilePhotoRequest, current_user: User = Depends(get_current_user)):
+    """Update user's profile photo (base64 encoded)"""
+    # Validate that photo is base64
+    if not data.photo.startswith('data:image/'):
+        raise HTTPException(status_code=400, detail="Formato de imagen no válido")
+    
+    # Update profile with photo
+    result = await db.user_profiles.update_one(
+        {"user_id": current_user.user_id},
+        {"$set": {"profile_photo": data.photo, "updated_at": datetime.now(timezone.utc)}}
+    )
+    
+    if result.modified_count == 0 and result.matched_count == 0:
+        # Profile doesn't exist, create it with photo
+        await db.user_profiles.insert_one({
+            "user_id": current_user.user_id,
+            "profile_photo": data.photo,
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc)
+        })
+    
+    return {"success": True, "message": "Foto de perfil actualizada"}
+
 # ============== DASHBOARD STATS ==============
 
 @app.get("/api/dashboard/stats")
