@@ -761,4 +761,143 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  // Estilos para la sección de cuenta
+  accountSection: {
+    backgroundColor: '#FFFFFF',
+    margin: 16,
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  accountHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+    marginBottom: 16,
+  },
+  avatarContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#10B981',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  avatarText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  accountInfo: {
+    flex: 1,
+  },
+  accountName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1F2937',
+  },
+  accountEmail: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+  accountActions: {
+    gap: 8,
+  },
+  accountButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    gap: 12,
+  },
+  accountButtonText: {
+    flex: 1,
+    fontSize: 16,
+    color: '#374151',
+  },
+  logoutButton: {
+    backgroundColor: '#FEF2F2',
+  },
+  logoutText: {
+    color: '#EF4444',
+  },
+  // Estilos para el modal de contraseña
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+    paddingBottom: 40,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1F2937',
+  },
+  passwordError: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF2F2',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+    gap: 8,
+  },
+  passwordErrorText: {
+    color: '#EF4444',
+    fontSize: 14,
+    flex: 1,
+  },
+  passwordInputGroup: {
+    marginBottom: 16,
+  },
+  passwordLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 8,
+  },
+  passwordInput: {
+    backgroundColor: '#F9FAFB',
+    padding: 14,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    fontSize: 16,
+  },
+  savePasswordButton: {
+    backgroundColor: '#10B981',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  savePasswordButtonDisabled: {
+    backgroundColor: '#9CA3AF',
+  },
+  savePasswordButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });
