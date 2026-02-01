@@ -17,6 +17,7 @@ import { useRouter } from 'expo-router';
 import { authenticatedFetch, getBackendURL } from '../../utils/api';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
+import { useAuth } from '../../contexts/AuthContext';
 
 const BACKEND_URL = getBackendURL();
 
