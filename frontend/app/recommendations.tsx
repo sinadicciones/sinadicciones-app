@@ -403,6 +403,52 @@ export default function RecommendationsScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
+
+      {/* Modal de información detallada */}
+      <Modal
+        visible={showInfoModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowInfoModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.detailedModalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>
+                {selectedRecommendation?.detailedInfo?.title}
+              </Text>
+              <TouchableOpacity onPress={() => setShowInfoModal(false)}>
+                <Ionicons name="close" size={28} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView style={styles.modalScroll}>
+              <Text style={styles.modalContent}>
+                {selectedRecommendation?.detailedInfo?.content}
+              </Text>
+              
+              {selectedRecommendation?.detailedInfo?.actions && (
+                <View style={styles.actionsSection}>
+                  <Text style={styles.actionsSectionTitle}>Próximos pasos:</Text>
+                  {selectedRecommendation.detailedInfo.actions.map((action: string, index: number) => (
+                    <View key={index} style={styles.actionItem}>
+                      <Ionicons name="checkmark-circle" size={20} color="#10B981" />
+                      <Text style={styles.actionText}>{action}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </ScrollView>
+            
+            <TouchableOpacity
+              style={styles.modalCloseButton}
+              onPress={() => setShowInfoModal(false)}
+            >
+              <Text style={styles.modalCloseButtonText}>Entendido</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
