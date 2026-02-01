@@ -15,6 +15,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { authenticatedFetch, getBackendURL } from '../../utils/api';
+import BottomNavigation from '../../components/BottomNavigation';
 
 const BACKEND_URL = getBackendURL();
 
