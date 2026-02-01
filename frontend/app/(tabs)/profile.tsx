@@ -316,7 +316,17 @@ export default function ProfileScreen() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // En web, usar confirm nativo
+    if (Platform.OS === 'web') {
+      const confirmed = window.confirm('¿Estás seguro que quieres cerrar sesión?');
+      if (confirmed) {
+        await logout();
+        router.replace('/');
+      }
+      return;
+    }
+    
     Alert.alert(
       'Cerrar sesión',
       '¿Estás seguro que quieres cerrar sesión?',
