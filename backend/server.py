@@ -198,6 +198,7 @@ async def create_session(request: Request, response: Response):
             "life_story": None,
             "emergency_contacts": [],
             "my_why": None,
+            "profile_completed": False,
             "updated_at": datetime.now(timezone.utc)
         })
     
