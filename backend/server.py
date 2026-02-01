@@ -14,10 +14,17 @@ load_dotenv()
 
 app = FastAPI()
 
-# CORS Configuration
+# CORS Configuration - Allow specific origins with credentials
+origins = [
+    "http://localhost:3000",
+    "https://sober-tracks.preview.emergentagent.com",
+    "https://preview.emergentagent.com",
+    "exp://",  # For Expo Go
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
