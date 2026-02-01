@@ -896,6 +896,155 @@ async def get_purpose_stats(current_user: User = Depends(get_current_user)):
         "days_working_on_vision": days_working
     }
 
+# ============== CENTERS SCRAPING ==============
+
+import re
+from bs4 import BeautifulSoup
+
+# Cache for centers data
+centers_cache = {
+    "data": None,
+    "last_updated": None,
+    "cache_duration": 300  # 5 minutes cache
+}
+
+@app.get("/api/centers")
+async def get_centers():
+    """Fetch rehabilitation centers from sinadicciones.cl"""
+    
+    # Check cache
+    now = datetime.now(timezone.utc)
+    if (centers_cache["data"] is not None and 
+        centers_cache["last_updated"] is not None and
+        (now - centers_cache["last_updated"]).seconds < centers_cache["cache_duration"]):
+        return {"centers": centers_cache["data"], "cached": True, "last_updated": centers_cache["last_updated"].isoformat()}
+    
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.get(
+                "https://sinadicciones.cl/explore-no-map/?type=place&sort=latest",
+                headers={
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+                }
+            )
+            
+            if response.status_code != 200:
+                raise HTTPException(status_code=502, detail="Error fetching centers")
+            
+            html = response.text
+            soup = BeautifulSoup(html, 'html.parser')
+            
+            centers = []
+            
+            # Find all listing items
+            listings = soup.find_all('div', class_='listing-preview')
+            
+            for listing in listings:
+                try:
+                    center = {}
+                    
+                    # Get name and URL
+                    title_elem = listing.find('h2', class_='listing-title') or listing.find('h3', class_='listing-title')
+                    if title_elem:
+                        link = title_elem.find('a')
+                        if link:
+                            center['name'] = link.get_text(strip=True)
+                            center['url'] = link.get('href', '')
+                    
+                    # Get description/tagline
+                    tagline = listing.find('div', class_='listing-tagline') or listing.find('p', class_='listing-tagline')
+                    if tagline:
+                        center['description'] = tagline.get_text(strip=True)
+                    else:
+                        center['description'] = ''
+                    
+                    # Get address
+                    address_elem = listing.find('li', class_='address') or listing.find('span', class_='address')
+                    if address_elem:
+                        center['address'] = address_elem.get_text(strip=True)
+                    else:
+                        center['address'] = ''
+                    
+                    # Get phone
+                    phone_elem = listing.find('li', class_='phone') or listing.find('a', href=re.compile(r'^tel:'))
+                    if phone_elem:
+                        phone_text = phone_elem.get_text(strip=True)
+                        center['phone'] = phone_text
+                    else:
+                        center['phone'] = ''
+                    
+                    # Get image
+                    img_elem = listing.find('img')
+                    if img_elem:
+                        center['image'] = img_elem.get('src', '') or img_elem.get('data-src', '')
+                    else:
+                        center['image'] = ''
+                    
+                    # Get categories/modalities
+                    categories = listing.find_all('span', class_='category-name') or listing.find_all('a', class_='listing-category')
+                    center['modalities'] = [cat.get_text(strip=True) for cat in categories if cat.get_text(strip=True)]
+                    
+                    # Get price if available
+                    price_elem = listing.find('span', class_='price') or listing.find('div', class_='listing-price')
+                    if price_elem:
+                        center['price'] = price_elem.get_text(strip=True)
+                    else:
+                        center['price'] = 'Consultar'
+                    
+                    # Only add if we have a name
+                    if center.get('name'):
+                        centers.append(center)
+                        
+                except Exception as e:
+                    print(f"Error parsing listing: {e}")
+                    continue
+            
+            # If we couldn't parse any listings, try alternative parsing
+            if not centers:
+                # Try finding article elements
+                articles = soup.find_all('article')
+                for article in articles:
+                    try:
+                        center = {}
+                        title = article.find(['h2', 'h3', 'h4'])
+                        if title:
+                            link = title.find('a') or article.find('a')
+                            if link:
+                                center['name'] = title.get_text(strip=True)
+                                center['url'] = link.get('href', '')
+                                center['description'] = ''
+                                center['address'] = ''
+                                center['phone'] = ''
+                                center['modalities'] = []
+                                center['price'] = 'Consultar'
+                                if center.get('name') and center.get('url'):
+                                    centers.append(center)
+                    except:
+                        continue
+            
+            # Update cache
+            centers_cache["data"] = centers
+            centers_cache["last_updated"] = now
+            
+            return {
+                "centers": centers, 
+                "cached": False, 
+                "last_updated": now.isoformat(),
+                "count": len(centers)
+            }
+            
+    except httpx.RequestError as e:
+        print(f"Request error: {e}")
+        # Return cached data if available
+        if centers_cache["data"]:
+            return {
+                "centers": centers_cache["data"], 
+                "cached": True, 
+                "error": "Using cached data due to connection error",
+                "last_updated": centers_cache["last_updated"].isoformat() if centers_cache["last_updated"] else None
+            }
+        raise HTTPException(status_code=502, detail="Error connecting to sinadicciones.cl")
+
 # ============== HEALTH CHECK ==============
 
 @app.get("/api/health")
