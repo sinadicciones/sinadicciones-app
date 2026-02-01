@@ -801,10 +801,20 @@ async def get_integrated_dashboard(current_user: User = Depends(get_current_user
     clean_since = None
     if profile and profile.get("clean_since"):
         try:
-            clean_date = datetime.fromisoformat(profile["clean_since"].replace("Z", "+00:00"))
+            clean_since_str = profile["clean_since"]
+            # Handle different date formats
+            if "T" in clean_since_str:
+                # ISO format with time
+                clean_date = datetime.fromisoformat(clean_since_str.replace("Z", "+00:00"))
+            else:
+                # Simple date format YYYY-MM-DD
+                clean_date = datetime.strptime(clean_since_str, "%Y-%m-%d")
+                clean_date = clean_date.replace(tzinfo=timezone.utc)
+            
             days_clean = (now - clean_date).days
-            clean_since = profile["clean_since"]
-        except:
+            clean_since = clean_since_str
+        except Exception as e:
+            print(f"Error parsing clean_since: {e}")
             pass
     
     # Próximo hito
