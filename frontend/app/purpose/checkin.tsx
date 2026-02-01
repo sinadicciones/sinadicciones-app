@@ -262,6 +262,8 @@ export default function WeeklyCheckin() {
           )}
         </TouchableOpacity>
       </View>
+
+      <BottomNavigation />
     </SafeAreaView>
   );
 }
