@@ -721,6 +721,15 @@ export default function PurposeDashboard() {
             </View>
             <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
           </TouchableOpacity>
+
+          {/* Restart Purpose Button */}
+          <TouchableOpacity
+            style={styles.restartButton}
+            onPress={handleRestartPurpose}
+          >
+            <Ionicons name="refresh" size={20} color="#6B7280" />
+            <Text style={styles.restartButtonText}>Reiniciar mi sentido</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={{ height: 40 }} />
