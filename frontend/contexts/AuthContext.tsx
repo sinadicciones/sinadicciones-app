@@ -148,6 +148,64 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const loginWithEmail = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store token for mobile
+        if (Platform.OS !== 'web' && data.session_token) {
+          await AsyncStorage.setItem('session_token', data.session_token);
+        }
+        await refreshUser();
+        return { success: true };
+      } else {
+        return { success: false, error: data.detail || 'Error al iniciar sesión' };
+      }
+    } catch (error) {
+      console.error('Email login failed:', error);
+      return { success: false, error: 'Error de conexión' };
+    }
+  };
+
+  const registerWithEmail = async (email: string, password: string, name: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password, name }),
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store token for mobile
+        if (Platform.OS !== 'web' && data.session_token) {
+          await AsyncStorage.setItem('session_token', data.session_token);
+        }
+        await refreshUser();
+        return { success: true };
+      } else {
+        return { success: false, error: data.detail || 'Error al registrarse' };
+      }
+    } catch (error) {
+      console.error('Email registration failed:', error);
+      return { success: false, error: 'Error de conexión' };
+    }
+  };
+
   const refreshUser = async () => {
     try {
       const token = await AsyncStorage.getItem('session_token');
