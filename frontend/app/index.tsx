@@ -36,6 +36,7 @@ export default function WelcomeScreen() {
   }, [user, isLoading]);
 
   const handleEmailSubmit = async () => {
+    console.log('handleEmailSubmit called');
     setError('');
     
     if (!email.trim()) {
@@ -55,6 +56,7 @@ export default function WelcomeScreen() {
       return;
     }
 
+    console.log('Validation passed, submitting...');
     setIsSubmitting(true);
     
     try {
