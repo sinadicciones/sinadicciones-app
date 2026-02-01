@@ -6,18 +6,18 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#10B981',
+        tabBarActiveTintColor: '#F59E0B',
         tabBarInactiveTintColor: '#9CA3AF',
         tabBarStyle: {
           backgroundColor: '#FFFFFF',
           borderTopWidth: 1,
           borderTopColor: '#E5E7EB',
-          height: 60,
+          height: 70,
           paddingBottom: 8,
           paddingTop: 8,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: '600',
         },
       }}
@@ -46,6 +46,15 @@ export default function TabsLayout() {
           title: 'Emocional',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="heart" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="purpose"
+        options={{
+          title: 'Propósito',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="star" size={size} color={color} />
           ),
         }}
       />
