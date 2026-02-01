@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { authenticatedFetch, getBackendURL } from '../../utils/api';
+import BottomNavigation from '../../components/BottomNavigation';
 
 const BACKEND_URL = getBackendURL();
 
