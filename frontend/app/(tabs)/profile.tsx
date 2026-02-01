@@ -195,6 +195,15 @@ export default function ProfileScreen() {
   };
 
   const handleDateChange = (event: any, date?: Date) => {
+    if (Platform.OS === 'web') {
+      // En web, el evento tiene la fecha en event.target.value
+      const dateValue = event?.target?.value || event;
+      if (dateValue && typeof dateValue === 'string') {
+        setFormData({ ...formData, clean_since: dateValue });
+      }
+      return;
+    }
+    
     setShowDatePicker(Platform.OS === 'ios'); // En iOS mantener abierto
     
     if (date) {
@@ -206,6 +215,14 @@ export default function ProfileScreen() {
   };
 
   const openDatePicker = () => {
+    if (Platform.OS === 'web') {
+      // En web, disparar click en el input de fecha oculto
+      const dateInput = document.getElementById('date-picker-input');
+      if (dateInput) {
+        dateInput.click();
+      }
+      return;
+    }
     setShowDatePicker(true);
   };
 
