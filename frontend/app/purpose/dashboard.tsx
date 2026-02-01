@@ -7,10 +7,12 @@ import {
   TouchableOpacity,
   Dimensions,
   RefreshControl,
+  Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { authenticatedFetch, getBackendURL } from '../../utils/api';
 import { Svg, Polygon, Circle, Line as SvgLine, Text as SvgText } from 'react-native-svg';
 
@@ -26,12 +28,72 @@ const AREAS = [
   { key: 'finances', label: 'Finanzas', icon: 'cash', color: '#EF4444' },
 ];
 
+// Definiciones de tipos de propósito
+const PURPOSE_TYPES: { [key: string]: { description: string; strengths: string[]; tips: string[] } } = {
+  'Cuidador': {
+    description: 'Tu propósito se centra en el servicio y cuidado de otros. Encuentras significado en ayudar, proteger y apoyar a quienes te rodean. Tu empatía y compasión son tus mayores fortalezas.',
+    strengths: ['Empatía profunda', 'Capacidad de escucha', 'Generosidad natural', 'Conexión emocional'],
+    tips: [
+      'Recuerda cuidarte a ti mismo primero para poder cuidar a otros',
+      'Establece límites saludables para evitar el agotamiento',
+      'Tu recuperación te permite ser un mejor apoyo para otros',
+    ],
+  },
+  'Creador': {
+    description: 'Tu propósito está en la expresión creativa y la innovación. Encuentras significado al crear, diseñar y dar vida a nuevas ideas. Tu imaginación y originalidad son tus mayores dones.',
+    strengths: ['Pensamiento innovador', 'Expresión artística', 'Visión única', 'Resolución creativa'],
+    tips: [
+      'Usa la creatividad como herramienta de sanación',
+      'Documenta tus ideas y proyectos creativos',
+      'La sobriedad libera tu verdadero potencial creativo',
+    ],
+  },
+  'Líder': {
+    description: 'Tu propósito es guiar, inspirar y empoderar a otros. Tienes una capacidad natural para tomar decisiones y motivar al cambio positivo.',
+    strengths: ['Visión clara', 'Capacidad de influencia', 'Toma de decisiones', 'Inspirar a otros'],
+    tips: [
+      'Lidera con el ejemplo en tu recuperación',
+      'Usa tu influencia para crear impacto positivo',
+      'Tu historia puede inspirar a otros en su camino',
+    ],
+  },
+  'Explorador': {
+    description: 'Tu propósito está en el descubrimiento y la aventura. Buscas nuevas experiencias, conocimiento y crecimiento constante.',
+    strengths: ['Curiosidad infinita', 'Adaptabilidad', 'Apertura mental', 'Valentía'],
+    tips: [
+      'Explora nuevas formas saludables de vivir',
+      'Tu curiosidad te llevará a descubrir tu mejor versión',
+      'Cada día en sobriedad es una nueva aventura',
+    ],
+  },
+  'Sabio': {
+    description: 'Tu propósito es buscar y compartir conocimiento. Valoras la verdad, el aprendizaje y la comprensión profunda.',
+    strengths: ['Análisis profundo', 'Búsqueda de verdad', 'Reflexión', 'Compartir sabiduría'],
+    tips: [
+      'Aprende de tu experiencia para ayudar a otros',
+      'La reflexión es clave en tu recuperación',
+      'Comparte tu conocimiento con quienes lo necesitan',
+    ],
+  },
+  'Guerrero': {
+    description: 'Tu propósito es superar desafíos y proteger lo que valoras. Tienes una fuerza interior extraordinaria y determinación.',
+    strengths: ['Resiliencia', 'Determinación', 'Valentía', 'Protección'],
+    tips: [
+      'Tu fortaleza te ha traído hasta aquí',
+      'Canaliza tu energía en batallas que valen la pena',
+      'Cada día limpio es una victoria',
+    ],
+  },
+};
+
 export default function PurposeDashboard() {
   const router = useRouter();
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [areaRatings, setAreaRatings] = useState<any>({});
+  const [showPurposeModal, setShowPurposeModal] = useState(false);
+  const [showGuideModal, setShowGuideModal] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -58,13 +120,17 @@ export default function PurposeDashboard() {
     loadData();
   };
 
+  const getPurposeInfo = () => {
+    if (!stats?.purpose_type) return null;
+    return PURPOSE_TYPES[stats.purpose_type] || PURPOSE_TYPES['Cuidador'];
+  };
+
   const WheelOfLife = () => {
     const centerX = 150;
     const centerY = 150;
     const maxRadius = 120;
     const numSides = 6;
     
-    // Create polygon points based on ratings
     const createPolygonPoints = () => {
       const points: string[] = [];
       AREAS.forEach((area, index) => {
@@ -78,7 +144,6 @@ export default function PurposeDashboard() {
       return points.join(' ');
     };
 
-    // Create guide circles
     const guideCircles = [2, 4, 6, 8, 10].map((value) => {
       const radius = (value / 10) * maxRadius;
       return (
@@ -94,7 +159,6 @@ export default function PurposeDashboard() {
       );
     });
 
-    // Create axis lines
     const axisLines = AREAS.map((area, index) => {
       const angle = (Math.PI * 2 * index) / numSides - Math.PI / 2;
       const x = centerX + maxRadius * Math.cos(angle);
@@ -112,7 +176,6 @@ export default function PurposeDashboard() {
       );
     });
 
-    // Create labels
     const labels = AREAS.map((area, index) => {
       const angle = (Math.PI * 2 * index) / numSides - Math.PI / 2;
       const labelRadius = maxRadius + 30;
@@ -160,13 +223,16 @@ export default function PurposeDashboard() {
   // If test not completed, show prompt
   if (!stats?.test_completed) {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top']}>
         <LinearGradient
           colors={['#F59E0B', '#EF4444']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.header}
         >
+          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
           <Text style={styles.headerTitle}>Sobriedad con Sentido</Text>
           <Text style={styles.headerSubtitle}>Construye tu vida con propósito</Text>
         </LinearGradient>
@@ -185,18 +251,28 @@ export default function PurposeDashboard() {
             <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
           </TouchableOpacity>
         </ScrollView>
-      </View>
+      </SafeAreaView>
     );
   }
 
+  const purposeInfo = getPurposeInfo();
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <LinearGradient
         colors={['#F59E0B', '#EF4444']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.header}
       >
+        <View style={styles.headerRow}>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.helpButton} onPress={() => setShowGuideModal(true)}>
+            <Ionicons name="help-circle-outline" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
         <Text style={styles.headerTitle}>Sobriedad con Sentido</Text>
         <Text style={styles.headerSubtitle}>Tu camino hacia una vida significativa</Text>
       </LinearGradient>
@@ -221,19 +297,31 @@ export default function PurposeDashboard() {
           </View>
         )}
 
-        {/* Purpose Type Badge */}
+        {/* Purpose Type Badge - Now expandable */}
         {stats.purpose_type && (
-          <View style={styles.purposeCard}>
-            <Text style={styles.purposeLabel}>Tu tipo de propósito:</Text>
-            <Text style={styles.purposeType}>{stats.purpose_type}</Text>
+          <TouchableOpacity 
+            style={styles.purposeCard}
+            onPress={() => setShowPurposeModal(true)}
+            activeOpacity={0.8}
+          >
+            <View style={styles.purposeHeader}>
+              <View>
+                <Text style={styles.purposeLabel}>Tu tipo de propósito:</Text>
+                <Text style={styles.purposeType}>{stats.purpose_type}</Text>
+              </View>
+              <View style={styles.expandButton}>
+                <Text style={styles.expandButtonText}>Ver más</Text>
+                <Ionicons name="chevron-forward" size={16} color="#F59E0B" />
+              </View>
+            </View>
             <View style={styles.valuesContainer}>
-              {stats.top_values.map((value: string) => (
+              {stats.top_values?.map((value: string) => (
                 <View key={value} style={styles.valueBadge}>
                   <Text style={styles.valueText}>{value}</Text>
                 </View>
               ))}
             </View>
-          </View>
+          </TouchableOpacity>
         )}
 
         {/* Wheel of Life */}
@@ -246,7 +334,7 @@ export default function PurposeDashboard() {
             <WheelOfLife />
           </View>
           <Text style={styles.wheelHelper}>
-            Toca las áreas abajo para ver detalles y objetivos
+            Toca las áreas abajo para ver detalles y crear objetivos SMART
           </Text>
         </View>
 
@@ -285,8 +373,11 @@ export default function PurposeDashboard() {
             style={styles.actionButton}
             onPress={() => router.push('/purpose/goals')}
           >
-            <Ionicons name="list" size={24} color="#F59E0B" />
-            <Text style={styles.actionButtonText}>Ver todos mis objetivos</Text>
+            <Ionicons name="flag" size={24} color="#F59E0B" />
+            <View style={styles.actionContent}>
+              <Text style={styles.actionButtonText}>Mis objetivos SMART</Text>
+              <Text style={styles.actionButtonSubtext}>Específicos, Medibles, Alcanzables</Text>
+            </View>
             <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
           </TouchableOpacity>
           <TouchableOpacity
@@ -294,7 +385,10 @@ export default function PurposeDashboard() {
             onPress={() => router.push('/purpose/checkin')}
           >
             <Ionicons name="checkmark-circle" size={24} color="#10B981" />
-            <Text style={styles.actionButtonText}>Check-in semanal</Text>
+            <View style={styles.actionContent}>
+              <Text style={styles.actionButtonText}>Check-in semanal</Text>
+              <Text style={styles.actionButtonSubtext}>Evalúa tu progreso</Text>
+            </View>
             <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
           </TouchableOpacity>
           <TouchableOpacity
@@ -302,14 +396,148 @@ export default function PurposeDashboard() {
             onPress={() => router.push('/purpose/inspiration')}
           >
             <Ionicons name="bulb" size={24} color="#8B5CF6" />
-            <Text style={styles.actionButtonText}>Biblioteca de inspiración</Text>
+            <View style={styles.actionContent}>
+              <Text style={styles.actionButtonText}>Biblioteca de inspiración</Text>
+              <Text style={styles.actionButtonSubtext}>Frases, historias y ejercicios</Text>
+            </View>
             <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
           </TouchableOpacity>
         </View>
 
         <View style={{ height: 40 }} />
       </ScrollView>
-    </View>
+
+      {/* Purpose Type Modal */}
+      <Modal visible={showPurposeModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Tu Tipo: {stats?.purpose_type}</Text>
+              <TouchableOpacity onPress={() => setShowPurposeModal(false)}>
+                <Ionicons name="close" size={24} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {purposeInfo && (
+                <>
+                  <Text style={styles.modalDescription}>{purposeInfo.description}</Text>
+                  
+                  <Text style={styles.modalSectionTitle}>💪 Tus Fortalezas</Text>
+                  <View style={styles.strengthsContainer}>
+                    {purposeInfo.strengths.map((strength, index) => (
+                      <View key={index} style={styles.strengthBadge}>
+                        <Ionicons name="star" size={14} color="#F59E0B" />
+                        <Text style={styles.strengthText}>{strength}</Text>
+                      </View>
+                    ))}
+                  </View>
+
+                  <Text style={styles.modalSectionTitle}>💡 Consejos para tu Recuperación</Text>
+                  {purposeInfo.tips.map((tip, index) => (
+                    <View key={index} style={styles.tipCard}>
+                      <Ionicons name="checkmark-circle" size={20} color="#10B981" />
+                      <Text style={styles.tipText}>{tip}</Text>
+                    </View>
+                  ))}
+
+                  <Text style={styles.modalSectionTitle}>🎯 Valores que te definen</Text>
+                  <View style={styles.valuesModalContainer}>
+                    {stats?.top_values?.map((value: string) => (
+                      <View key={value} style={styles.valueModalBadge}>
+                        <Text style={styles.valueModalText}>{value}</Text>
+                      </View>
+                    ))}
+                  </View>
+                </>
+              )}
+            </ScrollView>
+
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => setShowPurposeModal(false)}
+            >
+              <Text style={styles.modalButtonText}>Entendido</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Guide Modal - How to use */}
+      <Modal visible={showGuideModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>¿Cómo usar esta sección?</Text>
+              <TouchableOpacity onPress={() => setShowGuideModal(false)}>
+                <Ionicons name="close" size={24} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <View style={styles.guideSection}>
+                <View style={styles.guideIcon}>
+                  <Ionicons name="compass" size={32} color="#F59E0B" />
+                </View>
+                <Text style={styles.guideTitle}>1. Descubre tu Propósito</Text>
+                <Text style={styles.guideText}>
+                  El test inicial identifica tu tipo de propósito, valores y fortalezas. Esto te ayuda a entender qué te motiva en la vida.
+                </Text>
+              </View>
+
+              <View style={styles.guideSection}>
+                <View style={styles.guideIcon}>
+                  <Ionicons name="pie-chart" size={32} color="#3B82F6" />
+                </View>
+                <Text style={styles.guideTitle}>2. Rueda de la Vida</Text>
+                <Text style={styles.guideText}>
+                  Visualiza tu equilibrio en 6 áreas clave. Identifica qué áreas necesitan más atención para una vida balanceada.
+                </Text>
+              </View>
+
+              <View style={styles.guideSection}>
+                <View style={styles.guideIcon}>
+                  <Ionicons name="flag" size={32} color="#10B981" />
+                </View>
+                <Text style={styles.guideTitle}>3. Objetivos SMART</Text>
+                <Text style={styles.guideText}>
+                  Crea objetivos en cada área que sean:{'\n'}
+                  • <Text style={styles.bold}>S</Text>pecíficos{'\n'}
+                  • <Text style={styles.bold}>M</Text>edibles{'\n'}
+                  • <Text style={styles.bold}>A</Text>lcanzables{'\n'}
+                  • <Text style={styles.bold}>R</Text>elevantes{'\n'}
+                  • <Text style={styles.bold}>T</Text>emporales
+                </Text>
+              </View>
+
+              <View style={styles.guideSection}>
+                <View style={styles.guideIcon}>
+                  <Ionicons name="calendar" size={32} color="#8B5CF6" />
+                </View>
+                <Text style={styles.guideTitle}>4. Check-in Semanal</Text>
+                <Text style={styles.guideText}>
+                  Cada semana evalúa tu progreso, celebra logros y ajusta tu plan. La consistencia es clave en la recuperación.
+                </Text>
+              </View>
+
+              <View style={styles.guideHighlight}>
+                <Ionicons name="heart" size={24} color="#EF4444" />
+                <Text style={styles.guideHighlightText}>
+                  "Sobriedad con Sentido" te ayuda a construir una vida que vale la pena vivir, no solo evitar el uso de sustancias.
+                </Text>
+              </View>
+            </ScrollView>
+
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => setShowGuideModal(false)}
+            >
+              <Text style={styles.modalButtonText}>¡Comenzar!</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </SafeAreaView>
   );
 }
 
@@ -324,9 +552,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   header: {
-    paddingTop: 60,
+    paddingTop: 10,
     paddingBottom: 24,
     paddingHorizontal: 24,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  backButton: {
+    padding: 4,
+  },
+  helpButton: {
+    padding: 4,
   },
   headerTitle: {
     fontSize: 28,
@@ -413,16 +653,35 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
+  purposeHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
   purposeLabel: {
     fontSize: 14,
     color: '#6B7280',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   purposeType: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#F59E0B',
-    marginBottom: 12,
+  },
+  expandButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF3C7',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    gap: 4,
+  },
+  expandButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#F59E0B',
   },
   valuesContainer: {
     flexDirection: 'row',
@@ -546,10 +805,167 @@ const styles = StyleSheet.create({
     elevation: 2,
     gap: 12,
   },
-  actionButtonText: {
+  actionContent: {
     flex: 1,
+  },
+  actionButtonText: {
     fontSize: 16,
     color: '#1F2937',
-    fontWeight: '500',
+    fontWeight: '600',
+  },
+  actionButtonSubtext: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    marginTop: 2,
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+    maxHeight: '85%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#1F2937',
+  },
+  modalDescription: {
+    fontSize: 16,
+    color: '#4B5563',
+    lineHeight: 24,
+    marginBottom: 24,
+  },
+  modalSectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    marginBottom: 12,
+    marginTop: 8,
+  },
+  strengthsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 20,
+  },
+  strengthBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF3C7',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    gap: 6,
+  },
+  strengthText: {
+    fontSize: 14,
+    color: '#D97706',
+    fontWeight: '600',
+  },
+  tipCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: '#F0FDF4',
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 8,
+    gap: 12,
+  },
+  tipText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#166534',
+    lineHeight: 20,
+  },
+  valuesModalContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 20,
+  },
+  valueModalBadge: {
+    backgroundColor: '#EDE9FE',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  valueModalText: {
+    fontSize: 14,
+    color: '#7C3AED',
+    fontWeight: '600',
+  },
+  modalButton: {
+    backgroundColor: '#F59E0B',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  // Guide modal styles
+  guideSection: {
+    alignItems: 'center',
+    marginBottom: 24,
+    paddingHorizontal: 8,
+  },
+  guideIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#F3F4F6',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  guideTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  guideText: {
+    fontSize: 14,
+    color: '#6B7280',
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  bold: {
+    fontWeight: 'bold',
+    color: '#F59E0B',
+  },
+  guideHighlight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF2F2',
+    padding: 16,
+    borderRadius: 12,
+    gap: 12,
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  guideHighlightText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#991B1B',
+    fontStyle: 'italic',
+    lineHeight: 20,
   },
 });
