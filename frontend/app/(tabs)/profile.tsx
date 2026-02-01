@@ -514,6 +514,79 @@ export default function ProfileScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
+
+      {/* Modal de Cambio de Contraseña */}
+      <Modal
+        visible={showPasswordModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowPasswordModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Cambiar contraseña</Text>
+              <TouchableOpacity onPress={() => {
+                setShowPasswordModal(false);
+                setPasswordError('');
+                setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+              }}>
+                <Ionicons name="close" size={24} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
+
+            {passwordError ? (
+              <View style={styles.passwordError}>
+                <Ionicons name="alert-circle" size={18} color="#EF4444" />
+                <Text style={styles.passwordErrorText}>{passwordError}</Text>
+              </View>
+            ) : null}
+
+            <View style={styles.passwordInputGroup}>
+              <Text style={styles.passwordLabel}>Contraseña actual</Text>
+              <TextInput
+                style={styles.passwordInput}
+                placeholder="Ingresa tu contraseña actual"
+                secureTextEntry
+                value={passwordData.currentPassword}
+                onChangeText={(text) => setPasswordData({ ...passwordData, currentPassword: text })}
+              />
+            </View>
+
+            <View style={styles.passwordInputGroup}>
+              <Text style={styles.passwordLabel}>Nueva contraseña</Text>
+              <TextInput
+                style={styles.passwordInput}
+                placeholder="Mínimo 6 caracteres"
+                secureTextEntry
+                value={passwordData.newPassword}
+                onChangeText={(text) => setPasswordData({ ...passwordData, newPassword: text })}
+              />
+            </View>
+
+            <View style={styles.passwordInputGroup}>
+              <Text style={styles.passwordLabel}>Confirmar nueva contraseña</Text>
+              <TextInput
+                style={styles.passwordInput}
+                placeholder="Repite tu nueva contraseña"
+                secureTextEntry
+                value={passwordData.confirmPassword}
+                onChangeText={(text) => setPasswordData({ ...passwordData, confirmPassword: text })}
+              />
+            </View>
+
+            <TouchableOpacity 
+              style={[styles.savePasswordButton, changingPassword && styles.savePasswordButtonDisabled]}
+              onPress={handleChangePassword}
+              disabled={changingPassword}
+            >
+              <Text style={styles.savePasswordButtonText}>
+                {changingPassword ? 'Guardando...' : 'Guardar contraseña'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
