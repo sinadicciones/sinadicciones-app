@@ -473,6 +473,7 @@ async def get_profile(current_user: User = Depends(get_current_user)):
             "life_story": None,
             "emergency_contacts": [],
             "my_why": None,
+            "profile_completed": False,
             "updated_at": datetime.now(timezone.utc)
         }
         await db.user_profiles.insert_one(profile_data)
