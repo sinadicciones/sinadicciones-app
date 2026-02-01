@@ -287,7 +287,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     try {
-      const token = await AsyncStorage.getItem('session_token');
+      const token = await getToken();
       if (token) {
         await fetch(`${BACKEND_URL}/api/auth/logout`, {
           method: 'POST',
@@ -297,7 +297,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
       }
       
-      await AsyncStorage.removeItem('session_token');
+      await removeToken();
       setUser(null);
     } catch (error) {
       console.error('Logout failed:', error);
