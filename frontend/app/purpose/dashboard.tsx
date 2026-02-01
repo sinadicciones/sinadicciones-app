@@ -1186,6 +1186,23 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
     marginTop: 2,
   },
+  restartButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderStyle: 'dashed',
+    marginTop: 8,
+    gap: 8,
+  },
+  restartButtonText: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
   // Modal styles
   modalOverlay: {
     flex: 1,
