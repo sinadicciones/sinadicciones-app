@@ -403,18 +403,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1F2937',
-    marginBottom: 8,
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 12,
   },
-  sectionDescription: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginBottom: 16,
-  },
-  editButton: {
+  actionButton: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -426,7 +420,10 @@ const styles = StyleSheet.create({
   editButtonActive: {
     backgroundColor: '#10B981',
   },
-  editButtonText: {
+  recommendationsButton: {
+    backgroundColor: '#8B5CF6',
+  },
+  actionButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
