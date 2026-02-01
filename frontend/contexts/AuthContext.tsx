@@ -30,7 +30,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     checkExistingSession();
-    setupDeepLinkListener();
+    
+    if (Platform.OS === 'web') {
+      // Check for session_id in URL hash on web
+      const hash = window.location.hash;
+      if (hash.includes('session_id=')) {
+        const sessionId = hash.split('session_id=')[1]?.split('&')[0];
+        if (sessionId) {
+          handleDeepLink(window.location.href);
+          // Clean the URL
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      }
+    } else {
+      setupDeepLinkListener();
+    }
   }, []);
 
   const setupDeepLinkListener = () => {
