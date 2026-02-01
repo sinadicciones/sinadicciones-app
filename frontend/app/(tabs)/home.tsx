@@ -579,9 +579,9 @@ export default function HomeScreen() {
                 colors={['#F59E0B', '#D97706']}
                 style={styles.quickActionIcon}
               >
-                <Ionicons name="briefcase" size={24} color="#FFFFFF" />
+                <Ionicons name="person" size={24} color="#FFFFFF" />
               </LinearGradient>
-              <Text style={styles.quickActionText}>Caja de herramientas</Text>
+              <Text style={styles.quickActionText}>Mi Perfil</Text>
             </TouchableOpacity>
             
             <TouchableOpacity 
