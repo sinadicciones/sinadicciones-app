@@ -31,12 +31,7 @@ export default function HabitsScreen() {
 
   const loadHabits = async () => {
     try {
-      const token = await AsyncStorage.getItem('session_token');
-      if (!token) return;
-
-      const response = await fetch(`${BACKEND_URL}/api/habits`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
+      const response = await authenticatedFetch(`${BACKEND_URL}/api/habits`);
 
       if (response.ok) {
         const data = await response.json();
@@ -56,15 +51,8 @@ export default function HabitsScreen() {
     }
 
     try {
-      const token = await AsyncStorage.getItem('session_token');
-      if (!token) return;
-
-      const response = await fetch(`${BACKEND_URL}/api/habits`, {
+      const response = await authenticatedFetch(`${BACKEND_URL}/api/habits`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           name: habitName,
           color: selectedColor,
@@ -86,15 +74,8 @@ export default function HabitsScreen() {
 
   const toggleHabit = async (habitId: string, currentStatus: boolean) => {
     try {
-      const token = await AsyncStorage.getItem('session_token');
-      if (!token) return;
-
-      await fetch(`${BACKEND_URL}/api/habits/${habitId}/log`, {
+      await authenticatedFetch(`${BACKEND_URL}/api/habits/${habitId}/log`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ completed: !currentStatus }),
       });
 
@@ -115,12 +96,8 @@ export default function HabitsScreen() {
           style: 'destructive',
           onPress: async () => {
             try {
-              const token = await AsyncStorage.getItem('session_token');
-              if (!token) return;
-
-              await fetch(`${BACKEND_URL}/api/habits/${habitId}`, {
+              await authenticatedFetch(`${BACKEND_URL}/api/habits/${habitId}`, {
                 method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` },
               });
 
               loadHabits();
