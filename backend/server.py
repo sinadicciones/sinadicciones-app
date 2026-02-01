@@ -91,6 +91,7 @@ class UserProfile(BaseModel):
     life_story: Optional[str] = None
     emergency_contacts: List[dict] = []  # [{name, phone, relationship}]
     my_why: Optional[str] = None
+    profile_completed: bool = False
     updated_at: datetime
 
 # ============== AUTH HELPERS ==============
