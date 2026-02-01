@@ -818,7 +818,7 @@ async def get_integrated_dashboard(current_user: User = Depends(get_current_user
             pass
     
     # Próximo hito
-    milestones = [7, 14, 30, 60, 90, 180, 365]
+    milestones = [7, 14, 30, 60, 90, 180, 365, 500, 730, 1000, 1095, 1825]
     next_milestone = None
     days_to_milestone = None
     for m in milestones:
