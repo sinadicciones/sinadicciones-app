@@ -114,9 +114,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const checkExistingSession = async () => {
     try {
+      // Check for stored token first
       const token = await AsyncStorage.getItem('session_token');
+      
       if (token) {
-        await refreshUser();
+        // Token found, verify it's still valid
+        const headers: any = {};
+        
+        if (Platform.OS !== 'web') {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const response = await fetch(`${BACKEND_URL}/api/auth/me`, {
+          headers,
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+        } else {
+          // Token invalid, clear it
+          await AsyncStorage.removeItem('session_token');
+          setUser(null);
+        }
+      } else {
+        // No stored token, try cookies (web)
+        if (Platform.OS === 'web') {
+          const response = await fetch(`${BACKEND_URL}/api/auth/me`, {
+            credentials: 'include',
+          });
+
+          if (response.ok) {
+            const userData = await response.json();
+            setUser(userData);
+          }
+        }
       }
     } catch (error) {
       console.error('Failed to check session:', error);
