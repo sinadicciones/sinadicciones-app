@@ -503,24 +503,50 @@ export default function ProfileScreen() {
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Limpio desde</Text>
-            <TouchableOpacity
-              style={styles.datePickerButton}
-              onPress={openDatePicker}
-              disabled={!editing}
-            >
-              <Ionicons name="calendar" size={20} color="#10B981" />
-              <Text style={styles.datePickerText}>
-                {formData.clean_since || 'Seleccionar fecha'}
-              </Text>
-            </TouchableOpacity>
-            {showDatePicker && (
-              <DateTimePicker
-                value={selectedDate}
-                mode="date"
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={handleDateChange}
-                maximumDate={new Date()}
-              />
+            {Platform.OS === 'web' ? (
+              <View style={styles.datePickerButton}>
+                <Ionicons name="calendar" size={20} color="#10B981" />
+                <input
+                  id="date-picker-input"
+                  type="date"
+                  value={formData.clean_since || ''}
+                  onChange={(e) => handleDateChange(e)}
+                  disabled={!editing}
+                  max={new Date().toISOString().split('T')[0]}
+                  style={{
+                    flex: 1,
+                    border: 'none',
+                    background: 'transparent',
+                    fontSize: 16,
+                    color: '#1F2937',
+                    marginLeft: 8,
+                    cursor: editing ? 'pointer' : 'not-allowed',
+                    opacity: editing ? 1 : 0.6,
+                  }}
+                />
+              </View>
+            ) : (
+              <>
+                <TouchableOpacity
+                  style={styles.datePickerButton}
+                  onPress={openDatePicker}
+                  disabled={!editing}
+                >
+                  <Ionicons name="calendar" size={20} color="#10B981" />
+                  <Text style={styles.datePickerText}>
+                    {formData.clean_since || 'Seleccionar fecha'}
+                  </Text>
+                </TouchableOpacity>
+                {showDatePicker && (
+                  <DateTimePicker
+                    value={selectedDate}
+                    mode="date"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    onChange={handleDateChange}
+                    maximumDate={new Date()}
+                  />
+                )}
+              </>
             )}
           </View>
         </View>
