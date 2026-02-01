@@ -318,8 +318,6 @@ export default function CentersScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
-
-      <BottomNavigation />
     </SafeAreaView>
   );
 }
