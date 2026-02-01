@@ -258,7 +258,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const refreshUser = async () => {
     try {
-      const token = await AsyncStorage.getItem('session_token');
+      const token = await getToken();
       
       const headers: any = {};
       
@@ -277,7 +277,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(userData);
       } else {
         setUser(null);
-        await AsyncStorage.removeItem('session_token');
+        await removeToken();
       }
     } catch (error) {
       console.error('Failed to refresh user:', error);
