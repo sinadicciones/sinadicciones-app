@@ -64,10 +64,94 @@ export default function ProfileScreen() {
         if (data.clean_since) {
           setSelectedDate(new Date(data.clean_since));
         }
+        
+        // Cargar foto de perfil si existe
+        if (data.profile_photo) {
+          setProfilePhoto(data.profile_photo);
+        }
       }
     } catch (error) {
       console.error('Failed to load profile:', error);
     }
+  };
+
+  const pickImage = async () => {
+    // Pedir permisos
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permiso denegado', 'Necesitamos acceso a tu galería para cambiar la foto de perfil');
+      return;
+    }
+
+    // Abrir selector de imagen
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      const base64Image = `data:image/jpeg;base64,${result.assets[0].base64}`;
+      await uploadProfilePhoto(base64Image);
+    }
+  };
+
+  const takePhoto = async () => {
+    // Pedir permisos de cámara
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permiso denegado', 'Necesitamos acceso a tu cámara para tomar una foto');
+      return;
+    }
+
+    // Abrir cámara
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      const base64Image = `data:image/jpeg;base64,${result.assets[0].base64}`;
+      await uploadProfilePhoto(base64Image);
+    }
+  };
+
+  const uploadProfilePhoto = async (base64Image: string) => {
+    setUploadingPhoto(true);
+    try {
+      const response = await authenticatedFetch(`${BACKEND_URL}/api/profile/photo`, {
+        method: 'POST',
+        body: JSON.stringify({ photo: base64Image }),
+      });
+
+      if (response.ok) {
+        setProfilePhoto(base64Image);
+        Alert.alert('Éxito', 'Foto de perfil actualizada');
+      } else {
+        Alert.alert('Error', 'No se pudo actualizar la foto');
+      }
+    } catch (error) {
+      console.error('Failed to upload photo:', error);
+      Alert.alert('Error', 'Error de conexión');
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
+  const showPhotoOptions = () => {
+    Alert.alert(
+      'Cambiar foto de perfil',
+      'Elige una opción',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Tomar foto', onPress: takePhoto },
+        { text: 'Elegir de galería', onPress: pickImage },
+      ]
+    );
   };
 
   const handleDateChange = (event: any, date?: Date) => {
