@@ -589,6 +589,174 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
         "recent_mood": recent_mood["mood_scale"] if recent_mood else None
     }
 
+# ============== PURPOSE (SOBRIEDAD CON SENTIDO) ENDPOINTS ==============
+
+@app.post("/api/purpose/test")
+async def save_purpose_test(test_data: dict, current_user: User = Depends(get_current_user)):
+    test_id = f"purpose_{uuid.uuid4().hex[:12]}"
+    
+    test_record = {
+        "test_id": test_id,
+        "user_id": current_user.user_id,
+        "answers": test_data.get("answers", {}),
+        "profile": test_data.get("profile", {}),
+        "completed_at": datetime.now(timezone.utc)
+    }
+    
+    await db.purpose_tests.insert_one(test_record)
+    
+    return {"success": True, "test_id": test_id}
+
+@app.get("/api/purpose/test")
+async def get_purpose_test(current_user: User = Depends(get_current_user)):
+    test = await db.purpose_tests.find_one(
+        {"user_id": current_user.user_id},
+        {"_id": 0}
+    ).sort("completed_at", -1)
+    
+    return test if test else None
+
+@app.get("/api/purpose/goals")
+async def get_purpose_goals(current_user: User = Depends(get_current_user)):
+    goals = await db.purpose_goals.find(
+        {"user_id": current_user.user_id, "status": {"$ne": "deleted"}},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    return goals
+
+@app.post("/api/purpose/goals")
+async def create_purpose_goal(goal_data: dict, current_user: User = Depends(get_current_user)):
+    goal_id = f"goal_{uuid.uuid4().hex[:12]}"
+    
+    goal = {
+        "goal_id": goal_id,
+        "user_id": current_user.user_id,
+        "area": goal_data["area"],
+        "title": goal_data["title"],
+        "description": goal_data.get("description"),
+        "target_date": goal_data.get("target_date"),
+        "status": "active",
+        "progress": 0,
+        "steps": goal_data.get("steps", []),
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc)
+    }
+    
+    await db.purpose_goals.insert_one(goal)
+    
+    return {"success": True, "goal_id": goal_id}
+
+@app.put("/api/purpose/goals/{goal_id}")
+async def update_purpose_goal(goal_id: str, goal_data: dict, current_user: User = Depends(get_current_user)):
+    goal_data["updated_at"] = datetime.now(timezone.utc)
+    
+    result = await db.purpose_goals.update_one(
+        {"goal_id": goal_id, "user_id": current_user.user_id},
+        {"$set": goal_data}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Goal not found")
+    
+    return {"success": True}
+
+@app.delete("/api/purpose/goals/{goal_id}")
+async def delete_purpose_goal(goal_id: str, current_user: User = Depends(get_current_user)):
+    result = await db.purpose_goals.update_one(
+        {"goal_id": goal_id, "user_id": current_user.user_id},
+        {"$set": {"status": "deleted", "updated_at": datetime.now(timezone.utc)}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Goal not found")
+    
+    return {"success": True}
+
+@app.get("/api/purpose/checkins")
+async def get_weekly_checkins(current_user: User = Depends(get_current_user)):
+    checkins = await db.weekly_checkins.find(
+        {"user_id": current_user.user_id},
+        {"_id": 0}
+    ).sort("week_start", -1).to_list(52)  # Last year
+    
+    return checkins
+
+@app.post("/api/purpose/checkins")
+async def create_weekly_checkin(checkin_data: dict, current_user: User = Depends(get_current_user)):
+    checkin_id = f"checkin_{uuid.uuid4().hex[:12]}"
+    
+    checkin = {
+        "checkin_id": checkin_id,
+        "user_id": current_user.user_id,
+        "week_start": checkin_data["week_start"],
+        "area_ratings": checkin_data.get("area_ratings", {}),
+        "achievements": checkin_data.get("achievements", []),
+        "challenges": checkin_data.get("challenges", []),
+        "next_week_plan": checkin_data.get("next_week_plan"),
+        "created_at": datetime.now(timezone.utc)
+    }
+    
+    await db.weekly_checkins.insert_one(checkin)
+    
+    return {"success": True, "checkin_id": checkin_id}
+
+@app.get("/api/purpose/stats")
+async def get_purpose_stats(current_user: User = Depends(get_current_user)):
+    # Get test profile
+    test = await db.purpose_tests.find_one(
+        {"user_id": current_user.user_id},
+        {"_id": 0}
+    ).sort("completed_at", -1)
+    
+    # Get goals by area
+    goals = await db.purpose_goals.find(
+        {"user_id": current_user.user_id, "status": "active"},
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Calculate stats
+    goals_by_area = {}
+    total_progress = 0
+    
+    for goal in goals:
+        area = goal["area"]
+        if area not in goals_by_area:
+            goals_by_area[area] = {"count": 0, "avg_progress": 0, "total_progress": 0}
+        
+        goals_by_area[area]["count"] += 1
+        goals_by_area[area]["total_progress"] += goal.get("progress", 0)
+        total_progress += goal.get("progress", 0)
+    
+    for area in goals_by_area:
+        if goals_by_area[area]["count"] > 0:
+            goals_by_area[area]["avg_progress"] = goals_by_area[area]["total_progress"] / goals_by_area[area]["count"]
+    
+    # Get latest checkin
+    latest_checkin = await db.weekly_checkins.find_one(
+        {"user_id": current_user.user_id},
+        {"_id": 0}
+    ).sort("week_start", -1)
+    
+    # Calculate days working on vision
+    days_working = 0
+    if test:
+        completed_date = test["completed_at"]
+        if completed_date.tzinfo is None:
+            completed_date = completed_date.replace(tzinfo=timezone.utc)
+        days_working = (datetime.now(timezone.utc) - completed_date).days
+    
+    return {
+        "test_completed": test is not None,
+        "purpose_type": test["profile"].get("purpose_type") if test else None,
+        "top_values": test["profile"].get("top_values", []) if test else [],
+        "goals_by_area": goals_by_area,
+        "total_goals": len(goals),
+        "avg_overall_progress": round(total_progress / len(goals), 1) if len(goals) > 0 else 0,
+        "latest_area_ratings": latest_checkin.get("area_ratings", {}) if latest_checkin else {},
+        "days_working_on_vision": days_working
+    }
+
 # ============== HEALTH CHECK ==============
 
 @app.get("/api/health")
