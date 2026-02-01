@@ -704,10 +704,12 @@ async def create_weekly_checkin(checkin_data: dict, current_user: User = Depends
 @app.get("/api/purpose/stats")
 async def get_purpose_stats(current_user: User = Depends(get_current_user)):
     # Get test profile
-    test = await db.purpose_tests.find_one(
+    tests = await db.purpose_tests.find(
         {"user_id": current_user.user_id},
         {"_id": 0}
-    ).sort("completed_at", -1)
+    ).sort("completed_at", -1).to_list(1)
+    
+    test = tests[0] if tests else None
     
     # Get goals by area
     goals = await db.purpose_goals.find(
