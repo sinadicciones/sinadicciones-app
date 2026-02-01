@@ -211,6 +211,20 @@ export default function RecommendationsScreen() {
         end={{ x: 1, y: 1 }}
         style={styles.header}
       >
+        <View style={styles.headerTop}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => router.back()}
+          >
+            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.homeButton}
+            onPress={() => router.push('/(tabs)/home')}
+          >
+            <Ionicons name="home" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
         <Text style={styles.headerTitle}>Tu Perfil de Recuperación</Text>
         <Text style={styles.headerSubtitle}>Análisis y recomendaciones personalizadas</Text>
       </LinearGradient>
