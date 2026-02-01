@@ -609,12 +609,12 @@ async def save_purpose_test(test_data: dict, current_user: User = Depends(get_cu
 
 @app.get("/api/purpose/test")
 async def get_purpose_test(current_user: User = Depends(get_current_user)):
-    test = await db.purpose_tests.find_one(
+    tests = await db.purpose_tests.find(
         {"user_id": current_user.user_id},
         {"_id": 0}
-    ).sort("completed_at", -1)
+    ).sort("completed_at", -1).to_list(1)
     
-    return test if test else None
+    return tests[0] if tests else None
 
 @app.get("/api/purpose/goals")
 async def get_purpose_goals(current_user: User = Depends(get_current_user)):
