@@ -256,7 +256,7 @@ export default function PurposeDashboard() {
             <TouchableOpacity
               key={area.key}
               style={styles.areaCard}
-              onPress={() => router.push(`/purpose/area?area=${area.key}`)}
+              onPress={() => router.push(`/purpose/${area.key}`)}
             >
               <View style={[styles.areaIconContainer, { backgroundColor: area.color + '20' }]}>
                 <Ionicons name={area.icon as any} size={24} color={area.color} />
