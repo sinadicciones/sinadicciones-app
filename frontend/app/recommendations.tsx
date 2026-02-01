@@ -140,6 +140,11 @@ export default function RecommendationsScreen() {
         title: 'Tratamiento Profesional Recomendado',
         description: 'Basado en tu perfil, es altamente recomendable que busques apoyo profesional especializado en adicciones.',
         priority: 'high',
+        detailedInfo: {
+          title: 'Por qué necesitas tratamiento profesional',
+          content: `Basándome en tu perfil:\n\n• Años de consumo: ${profile.years_using || 0} años\n• Patología dual: ${profile.dual_diagnosis ? 'Sí' : 'No'}\n• Gatillos identificados: ${profile.triggers.length}\n• Factores protectores: ${profile.protective_factors.length}\n\nUn profesional puede ayudarte con:\n\n1. **Evaluación completa**: Diagnóstico preciso de tu situación\n2. **Plan de tratamiento personalizado**: Adaptado a tus necesidades específicas\n3. **Terapia individual**: Espacio seguro para trabajar traumas y patrones\n4. **Manejo de síntomas**: Control de ansiedad, depresión y craving\n5. **Prevención de recaídas**: Estrategias específicas para tu perfil\n6. **Medicación si es necesaria**: Especialmente en patología dual\n\nRecuerda: Pedir ayuda es un signo de fortaleza, no de debilidad.`,
+          actions: ['Agenda tu primera sesión', 'Busca centros especializados cercanos'],
+        },
       });
     }
 
@@ -150,6 +155,11 @@ export default function RecommendationsScreen() {
       title: 'Grupos de Apoyo',
       description: 'Considera unirte a grupos como Alcohólicos Anónimos (AA), Narcóticos Anónimos (NA) o grupos de apoyo específicos para tu adicción.',
       priority: 'high',
+      detailedInfo: {
+        title: 'Beneficios de los grupos de apoyo',
+        content: `Los grupos de apoyo son fundamentales en la recuperación:\n\n**Beneficios principales:**\n\n1. **Sentido de pertenencia**: No estás solo en esto\n2. **Experiencias compartidas**: Aprende de quienes han pasado por lo mismo\n3. **Apoyo 24/7**: Siempre hay alguien disponible\n4. **Accountability**: Te ayuda a mantenerte comprometido\n5. **Herramientas prácticas**: Aprende estrategias que funcionan\n6. **Padrinos/Mentores**: Guía de alguien con más tiempo limpio\n\n**Grupos recomendados en Chile:**\n\n• Alcohólicos Anónimos (AA): www.aa.cl\n• Narcóticos Anónimos (NA): www.na.org.ar\n• Jugadores Anónimos: Para adicción al juego\n• Al-Anon: Para familiares\n\n**Cómo empezar:**\n1. Busca reuniones cerca de tu ubicación\n2. Asiste a varias para encontrar donde te sientas cómodo\n3. No tienes que hablar la primera vez, solo escucha\n4. Considera conseguir un padrino después de algunas semanas`,
+        actions: ['Buscar reuniones cercanas', 'Asistir a tu primera reunión'],
+      },
     });
 
     // Si tiene patología dual
@@ -160,6 +170,11 @@ export default function RecommendationsScreen() {
         title: 'Atención de Salud Mental',
         description: 'Es fundamental que recibas tratamiento paralelo para tus condiciones de salud mental. Un psiquiatra o psicólogo especializado puede ayudarte.',
         priority: 'high',
+        detailedInfo: {
+          title: 'Tratamiento integral de patología dual',
+          content: `Has identificado las siguientes condiciones: ${profile.diagnoses.join(', ')}\n\n**Por qué es crucial tratar ambos:**\n\nLa adicción y los trastornos mentales se alimentan mutuamente. Tratar solo uno no es suficiente.\n\n**Lo que necesitas:**\n\n1. **Psiquiatra**: Para evaluación y medicación si es necesaria\n   - Antidepresivos\n   - Estabilizadores del ánimo\n   - Medicación para ansiedad\n   - Control del craving\n\n2. **Psicólogo/Terapeuta**: Para terapia regular\n   - Terapia Cognitivo-Conductual (TCC)\n   - Terapia Dialéctico-Conductual (TDC)\n   - EMDR para trauma\n\n3. **Seguimiento continuo**: No es algo de una vez\n\n**Señales de alerta:**\n• Pensamientos de hacerte daño\n• Ideación suicida\n• Crisis de pánico\n• Episodios de ira incontrolable\n• Aislamiento extremo\n\n⚠️ Si experimentas alguna de estas, busca ayuda inmediata.`,
+          actions: ['Agendar evaluación psiquiátrica', 'Llamar a Salud Responde: 600 360 7777'],
+        },
       });
     }
 
@@ -170,6 +185,11 @@ export default function RecommendationsScreen() {
       title: 'Actividad Física',
       description: 'El ejercicio regular ayuda a reducir la ansiedad, mejorar el estado de ánimo y fortalecer tu recuperación.',
       priority: 'medium',
+      detailedInfo: {
+        title: 'Ejercicio como herramienta de recuperación',
+        content: `El ejercicio es una de las mejores herramientas naturales:\n\n**Beneficios científicamente comprobados:**\n\n1. **Produce endorfinas**: El "high natural"\n2. **Reduce el craving**: Disminuye el deseo de consumir\n3. **Mejora el sueño**: Fundamental en recuperación\n4. **Reduce ansiedad y depresión**: Tan efectivo como medicación\n5. **Estructura tu día**: Crea rutina saludable\n6. **Mejora autoestima**: Te ves y sientes mejor\n\n**Recomendaciones prácticas:**\n\n• Caminar 30 minutos diarios\n• Trotar/correr 3 veces por semana\n• Yoga o Pilates para mindfulness\n• Natación (muy terapéutica)\n• Gimnasio con rutina estructurada\n• Deportes de equipo (fútbol, básquet)\n\n**Tips para empezar:**\n1. Empieza pequeño: 10 minutos es suficiente\n2. Hazlo a la misma hora cada día\n3. Encuentra algo que disfrutes\n4. Consigue un compañero de ejercicio\n5. Celebra cada logro pequeño`,
+        actions: ['Hacer caminata de 10 minutos hoy', 'Buscar gimnasio o parque cercano'],
+      },
     });
 
     recommendations.push({
@@ -178,6 +198,11 @@ export default function RecommendationsScreen() {
       title: 'Rutinas Saludables',
       description: 'Establece horarios regulares de sueño, alimentación y actividades. La estructura ayuda en la recuperación.',
       priority: 'medium',
+      detailedInfo: {
+        title: 'La importancia de la rutina',
+        content: `La estructura es tu aliada en la recuperación:\n\n**Por qué las rutinas son cruciales:**\n\n1. **Reducen decisiones**: Menos espacio para autosabotaje\n2. **Crean estabilidad**: Tu cerebro necesita predictibilidad\n3. **Evitan tiempos muertos**: Los momentos peligrosos\n4. **Construyen disciplina**: Fortaleza mental\n\n**Rutina recomendada:**\n\n**Mañana (6:00-9:00)**\n• Despierta a la misma hora\n• Hidratación inmediata (2 vasos de agua)\n• Ejercicio ligero o meditación\n• Desayuno nutritivo\n• Revisar tu "Para Qué"\n\n**Día (9:00-18:00)**\n• Trabajo/estudio estructurado\n• Comidas a horas fijas\n• Pausas activas cada 2 horas\n• Evitar lugares/personas gatillo\n\n**Tarde (18:00-21:00)**\n• Ejercicio o actividad recreativa\n• Cena saludable\n• Tiempo con familia/amigos\n• Reunión de apoyo si es tu día\n\n**Noche (21:00-22:00)**\n• Sin pantallas 1 hora antes de dormir\n• Registro del día (app)\n• Gratitud: 3 cosas buenas del día\n• Lectura o relajación\n\n**Sueño (22:00-6:00)**\n• 7-8 horas no negociables\n• Ambiente oscuro y fresco\n• Misma hora siempre`,
+        actions: ['Crear horario de sueño', 'Planificar semana'],
+      },
     });
 
     if (profile.triggers.includes('Soledad') || profile.triggers.includes('soledad')) {
@@ -187,6 +212,11 @@ export default function RecommendationsScreen() {
         title: 'Conexión Social',
         description: 'Has identificado la soledad como gatillo. Mantén contacto regular con tu red de apoyo y busca actividades grupales.',
         priority: 'high',
+        detailedInfo: {
+          title: 'Combatiendo la soledad',
+          content: `La soledad es un gatillo muy común y peligroso:\n\n**Por qué la soledad es peligrosa:**\n• Tiempo para pensar en consumir\n• Nadie que te detenga\n• Pensamientos negativos se amplifican\n• Falta de accountability\n\n**Estrategias inmediatas (cuando te sientes solo):**\n\n1. **Llamar a alguien**: No importa la hora\n   - Tu padrino/mentor\n   - Familiar de confianza\n   - Línea de ayuda 1412\n\n2. **Salir de casa**: Ir a un lugar público\n   - Café\n   - Biblioteca\n   - Parque\n   - Centro comercial\n\n3. **Reunión virtual o presencial**: Siempre hay una\n\n**Estrategias a largo plazo:**\n\n• Voluntariado regular\n• Clases grupales (yoga, idiomas, cocina)\n• Deportes de equipo\n• Grupos de interés (lectura, senderismo)\n• Comunidad religiosa/espiritual\n• Adoptar una mascota (responsabilidad)\n\n**Red de apoyo:**\nAsegúrate de tener al menos:\n• 1 padrino/mentor\n• 2-3 amigos en recuperación\n• 1 familiar de confianza\n• 1 profesional (terapeuta)\n\n**Activar tu red:**\n• Envía mensaje diario a alguien\n• Programa llamadas semanales\n• Comparte tus logros\n• Pide ayuda cuando la necesites`,
+          actions: ['Llamar a un amigo ahora', 'Unirse a grupo social'],
+        },
       });
     }
 
