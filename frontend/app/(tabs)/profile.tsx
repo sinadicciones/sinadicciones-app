@@ -493,6 +493,20 @@ const styles = StyleSheet.create({
     borderColor: '#E5E7EB',
     fontSize: 16,
   },
+  datePickerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    gap: 8,
+  },
+  datePickerText: {
+    fontSize: 16,
+    color: '#1F2937',
+  },
   textArea: {
     minHeight: 100,
   },
