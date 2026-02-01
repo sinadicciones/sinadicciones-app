@@ -452,4 +452,10 @@ const styles = StyleSheet.create({
     marginTop: 8,
     textAlign: 'center',
   },
+  sosCard: {
+    backgroundColor: '#EF4444',
+  },
+  sosText: {
+    color: '#FFFFFF',
+  },
 });
