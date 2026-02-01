@@ -403,12 +403,6 @@ const PURPOSE_TYPES: { [key: string]: { emoji: string; description: string; stre
     ],
     affirmation: 'En mi búsqueda constante, me encuentro a mí mismo.',
   },
-    tips: [
-      'Tu fortaleza te ha traído hasta aquí',
-      'Canaliza tu energía en batallas que valen la pena',
-      'Cada día limpio es una victoria',
-    ],
-  },
 };
 
 export default function PurposeDashboard() {
