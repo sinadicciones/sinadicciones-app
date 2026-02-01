@@ -785,6 +785,297 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
         "recent_mood": recent_mood["mood_scale"] if recent_mood else None
     }
 
+@app.get("/api/dashboard/integrated")
+async def get_integrated_dashboard(current_user: User = Depends(get_current_user)):
+    """Get comprehensive integrated dashboard data"""
+    now = datetime.now(timezone.utc)
+    today = now.strftime("%Y-%m-%d")
+    
+    # ============== SOBRIEDAD ==============
+    profile = await db.user_profiles.find_one(
+        {"user_id": current_user.user_id},
+        {"_id": 0}
+    )
+    
+    days_clean = 0
+    clean_since = None
+    if profile and profile.get("clean_since"):
+        try:
+            clean_date = datetime.fromisoformat(profile["clean_since"].replace("Z", "+00:00"))
+            days_clean = (now - clean_date).days
+            clean_since = profile["clean_since"]
+        except:
+            pass
+    
+    # Próximo hito
+    milestones = [7, 14, 30, 60, 90, 180, 365]
+    next_milestone = None
+    days_to_milestone = None
+    for m in milestones:
+        if days_clean < m:
+            next_milestone = m
+            days_to_milestone = m - days_clean
+            break
+    
+    # ============== HÁBITOS ==============
+    habits = await db.habits.find(
+        {"user_id": current_user.user_id, "is_active": True},
+        {"_id": 0}
+    ).to_list(100)
+    
+    total_habits = len(habits)
+    
+    # Logs de hoy
+    today_logs = await db.habit_logs.find(
+        {"user_id": current_user.user_id, "date": today, "completed": True},
+        {"_id": 0}
+    ).to_list(100)
+    
+    habits_completed_today = len(today_logs)
+    habits_completion_rate = round((habits_completed_today / total_habits * 100) if total_habits > 0 else 0, 1)
+    
+    # Racha más larga y días sin registrar
+    longest_streak = 0
+    last_habit_date = None
+    
+    for habit in habits:
+        logs = await db.habit_logs.find(
+            {"habit_id": habit["habit_id"], "completed": True},
+            {"_id": 0}
+        ).sort("date", -1).to_list(365)
+        
+        if logs:
+            log_date = logs[0]["date"]
+            if not last_habit_date or log_date > last_habit_date:
+                last_habit_date = log_date
+        
+        streak = 0
+        check_date = now
+        for log in logs:
+            if log["date"] == check_date.strftime("%Y-%m-%d"):
+                streak += 1
+                check_date = check_date - timedelta(days=1)
+            else:
+                break
+        
+        if streak > longest_streak:
+            longest_streak = streak
+    
+    # Calcular días sin registrar hábitos
+    days_without_habits = 0
+    if last_habit_date:
+        try:
+            last_date = datetime.strptime(last_habit_date, "%Y-%m-%d")
+            days_without_habits = (now.replace(tzinfo=None) - last_date).days
+        except:
+            pass
+    
+    # ============== EMOCIONAL ==============
+    # Últimos 7 días de ánimo
+    week_ago = (now - timedelta(days=7)).strftime("%Y-%m-%d")
+    emotional_logs = await db.emotional_logs.find(
+        {"user_id": current_user.user_id, "date": {"$gte": week_ago}},
+        {"_id": 0}
+    ).sort("date", 1).to_list(7)
+    
+    mood_data = []
+    mood_sum = 0
+    for log in emotional_logs:
+        mood_data.append({
+            "date": log["date"],
+            "mood": log.get("mood_scale", 5)
+        })
+        mood_sum += log.get("mood_scale", 5)
+    
+    avg_mood = round(mood_sum / len(emotional_logs), 1) if emotional_logs else 0
+    
+    # Último registro emocional
+    last_emotional = await db.emotional_logs.find(
+        {"user_id": current_user.user_id},
+        {"_id": 0}
+    ).sort("date", -1).limit(1).to_list(1)
+    
+    last_emotional_date = last_emotional[0]["date"] if last_emotional else None
+    days_without_emotional = 0
+    if last_emotional_date:
+        try:
+            last_date = datetime.strptime(last_emotional_date, "%Y-%m-%d")
+            days_without_emotional = (now.replace(tzinfo=None) - last_date).days
+        except:
+            pass
+    
+    # Tendencia de ánimo (comparar últimos 3 días con 3 anteriores)
+    mood_trend = "stable"
+    if len(emotional_logs) >= 4:
+        recent_moods = [l.get("mood_scale", 5) for l in emotional_logs[-3:]]
+        older_moods = [l.get("mood_scale", 5) for l in emotional_logs[-6:-3]] if len(emotional_logs) >= 6 else [l.get("mood_scale", 5) for l in emotional_logs[:3]]
+        
+        recent_avg = sum(recent_moods) / len(recent_moods)
+        older_avg = sum(older_moods) / len(older_moods)
+        
+        if recent_avg > older_avg + 0.5:
+            mood_trend = "up"
+        elif recent_avg < older_avg - 0.5:
+            mood_trend = "down"
+    
+    # ============== PROPÓSITO ==============
+    purpose_test = await db.purpose_tests.find(
+        {"user_id": current_user.user_id},
+        {"_id": 0}
+    ).sort("completed_at", -1).limit(1).to_list(1)
+    
+    purpose_profile = purpose_test[0].get("profile", {}) if purpose_test else None
+    
+    # Check-ins de propósito (goals)
+    goals = await db.purpose_goals.find(
+        {"user_id": current_user.user_id},
+        {"_id": 0}
+    ).to_list(100)
+    
+    total_goals = len(goals)
+    completed_goals = len([g for g in goals if g.get("status") == "completed"])
+    
+    # ============== ALERTAS ==============
+    alerts = []
+    
+    # Alerta de hábitos
+    if days_without_habits >= 2:
+        alerts.append({
+            "type": "habits",
+            "severity": "warning" if days_without_habits >= 3 else "info",
+            "title": f"¡No has registrado hábitos en {days_without_habits} días!",
+            "message": "Mantener la constancia es clave para tu recuperación",
+            "action": "habits",
+            "icon": "checkmark-circle"
+        })
+    
+    # Alerta emocional
+    if days_without_emotional >= 2:
+        alerts.append({
+            "type": "emotional",
+            "severity": "info",
+            "title": f"Llevas {days_without_emotional} días sin registrar tu estado emocional",
+            "message": "Expresar tus emociones te ayuda a procesarlas",
+            "action": "emotional",
+            "icon": "heart"
+        })
+    
+    # Alerta de ánimo bajo
+    if mood_trend == "down":
+        alerts.append({
+            "type": "mood_down",
+            "severity": "warning",
+            "title": "Tu ánimo ha bajado esta semana",
+            "message": "Revisa tu caja de herramientas para encontrar apoyo",
+            "action": "profile",
+            "icon": "sad"
+        })
+    
+    # Alerta de propósito
+    if not purpose_profile:
+        alerts.append({
+            "type": "purpose",
+            "severity": "info",
+            "title": "Descubre tu propósito de vida",
+            "message": "Completar el test te ayudará a encontrar motivación",
+            "action": "purpose",
+            "icon": "compass"
+        })
+    
+    # ============== INSIGHTS ==============
+    insights = []
+    
+    # Insight de correlación hábitos-ánimo
+    if habits_completion_rate > 70 and avg_mood >= 6:
+        insights.append({
+            "type": "positive",
+            "message": "¡Cuando completas tus hábitos, tu ánimo mejora! Sigue así 💪"
+        })
+    elif habits_completion_rate < 30 and avg_mood < 5:
+        insights.append({
+            "type": "suggestion",
+            "message": "Completar pequeños hábitos puede ayudarte a sentirte mejor"
+        })
+    
+    # Insight de racha
+    if longest_streak >= 7:
+        insights.append({
+            "type": "achievement",
+            "message": f"¡Increíble! Llevas {longest_streak} días de racha. ¡No te detengas!"
+        })
+    
+    # Insight de sobriedad
+    if days_clean > 0 and days_clean % 7 == 0:
+        weeks = days_clean // 7
+        insights.append({
+            "type": "milestone",
+            "message": f"¡Felicidades! Completas {weeks} semana{'s' if weeks > 1 else ''} de sobriedad"
+        })
+    
+    # ============== FRASES MOTIVACIONALES ==============
+    motivational_quotes = [
+        {"quote": "Un día a la vez. Un paso a la vez.", "author": "Anónimo"},
+        {"quote": "El cambio es difícil al principio, caótico en el medio y hermoso al final.", "author": "Robin Sharma"},
+        {"quote": "No tienes que ver toda la escalera, solo da el primer paso.", "author": "Martin Luther King Jr."},
+        {"quote": "La recuperación es un proceso, no un evento.", "author": "Anne Wilson Schaef"},
+        {"quote": "Cada día es una nueva oportunidad para cambiar tu vida.", "author": "Anónimo"},
+        {"quote": "Tu adicción no define quién eres, tu recuperación sí.", "author": "Anónimo"},
+        {"quote": "El coraje no es la ausencia del miedo, sino la decisión de que algo más es más importante.", "author": "Ambrose Redmoon"},
+    ]
+    
+    # Seleccionar frase basada en el día
+    quote_index = now.timetuple().tm_yday % len(motivational_quotes)
+    daily_quote = motivational_quotes[quote_index]
+    
+    # ============== SCORES DE BIENESTAR ==============
+    # Calcular scores para la rueda de bienestar (0-100)
+    habits_score = min(100, habits_completion_rate + (longest_streak * 2))
+    emotional_score = min(100, (avg_mood / 10) * 100) if avg_mood > 0 else 50
+    purpose_score = 100 if purpose_profile else 30
+    if total_goals > 0:
+        purpose_score = min(100, 30 + (completed_goals / total_goals * 70))
+    
+    # Score general
+    overall_score = round((habits_score + emotional_score + purpose_score) / 3, 1)
+    
+    return {
+        "sobriety": {
+            "days_clean": days_clean,
+            "clean_since": clean_since,
+            "next_milestone": next_milestone,
+            "days_to_milestone": days_to_milestone
+        },
+        "habits": {
+            "total": total_habits,
+            "completed_today": habits_completed_today,
+            "completion_rate": habits_completion_rate,
+            "longest_streak": longest_streak,
+            "days_without_logging": days_without_habits
+        },
+        "emotional": {
+            "avg_mood": avg_mood,
+            "mood_trend": mood_trend,
+            "mood_data": mood_data,
+            "days_without_logging": days_without_emotional,
+            "last_mood": emotional_logs[-1].get("mood_scale") if emotional_logs else None
+        },
+        "purpose": {
+            "has_profile": purpose_profile is not None,
+            "profile_type": purpose_profile.get("type") if purpose_profile else None,
+            "total_goals": total_goals,
+            "completed_goals": completed_goals
+        },
+        "wellness_scores": {
+            "habits": round(habits_score),
+            "emotional": round(emotional_score),
+            "purpose": round(purpose_score),
+            "overall": overall_score
+        },
+        "alerts": alerts,
+        "insights": insights,
+        "daily_quote": daily_quote
+    }
+
 # ============== PURPOSE (SOBRIEDAD CON SENTIDO) ENDPOINTS ==============
 
 @app.post("/api/purpose/test")
