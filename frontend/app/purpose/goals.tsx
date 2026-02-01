@@ -383,10 +383,19 @@ export default function AllGoals() {
                 ))}
               </View>
 
-              <Text style={styles.inputLabel}>2. Define tu objetivo</Text>
+              <View style={styles.inputLabelRow}>
+                <Text style={styles.inputLabel}>2. Define tu objetivo</Text>
+                <TouchableOpacity 
+                  style={styles.guideButton}
+                  onPress={() => setShowGuideModal(true)}
+                >
+                  <Ionicons name="help-circle" size={22} color="#F59E0B" />
+                  <Text style={styles.guideButtonText}>Guía</Text>
+                </TouchableOpacity>
+              </View>
               <TextInput
                 style={styles.input}
-                placeholder="Ej: Meditar 10 minutos cada mañana"
+                placeholder="Ej: Meditar 10 minutos cada mañana durante 30 días"
                 value={newGoal.title}
                 onChangeText={(text) => setNewGoal({ ...newGoal, title: text })}
               />
