@@ -18,6 +18,8 @@ export default function RecommendationsScreen() {
   const router = useRouter();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  const [selectedRecommendation, setSelectedRecommendation] = useState<any>(null);
 
   useEffect(() => {
     loadProfile();
