@@ -81,7 +81,7 @@ export default function ProfileScreen() {
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = 'image/*';
-      input.onchange = async (e: any) => {
+      input.onchange = async (e) => {
         const file = e.target.files[0];
         if (file) {
           const reader = new FileReader();
