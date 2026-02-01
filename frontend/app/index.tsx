@@ -1,25 +1,79 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  ImageBackground,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Alert,
 } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function WelcomeScreen() {
-  const { user, isLoading, login } = useAuth();
+  const { user, isLoading, login, loginWithEmail, registerWithEmail } = useAuth();
   const router = useRouter();
+  
+  const [showEmailForm, setShowEmailForm] = useState(false);
+  const [isRegister, setIsRegister] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (user && !isLoading) {
       router.replace('/(tabs)/home');
     }
   }, [user, isLoading]);
+
+  const handleEmailSubmit = async () => {
+    setError('');
+    
+    if (!email.trim()) {
+      setError('Por favor ingresa tu email');
+      return;
+    }
+    if (!password.trim()) {
+      setError('Por favor ingresa tu contraseña');
+      return;
+    }
+    if (isRegister && !name.trim()) {
+      setError('Por favor ingresa tu nombre');
+      return;
+    }
+    if (password.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      let result;
+      if (isRegister) {
+        result = await registerWithEmail(email, password, name);
+      } else {
+        result = await loginWithEmail(email, password);
+      }
+      
+      if (!result.success) {
+        setError(result.error || 'Error al procesar la solicitud');
+      }
+    } catch (err) {
+      setError('Error de conexión. Intenta de nuevo.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -30,43 +84,211 @@ export default function WelcomeScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView 
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
       <LinearGradient
-        colors={['#10B981', '#3B82F6']}
+        colors={['#10B981', '#059669', '#047857']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.gradient}
       >
-        <View style={styles.content}>
-          <View style={styles.header}>
-            <Text style={styles.logo}>🌱</Text>
-            <Text style={styles.title}>SinAdicciones</Text>
-            <Text style={styles.subtitle}>Tu camino hacia la recuperación</Text>
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.content}>
+            {/* Header */}
+            <View style={styles.header}>
+              <Text style={styles.logo}>🌱</Text>
+              <Text style={styles.title}>SinAdicciones</Text>
+              <Text style={styles.subtitle}>Tu camino hacia una vida con propósito</Text>
+            </View>
+
+            {!showEmailForm ? (
+              <>
+                {/* Features - Updated with new functionalities */}
+                <View style={styles.features}>
+                  <View style={styles.feature}>
+                    <View style={styles.featureIconContainer}>
+                      <Ionicons name="calendar" size={22} color="#10B981" />
+                    </View>
+                    <View style={styles.featureTextContainer}>
+                      <Text style={styles.featureTitle}>Seguimiento diario</Text>
+                      <Text style={styles.featureText}>Hábitos, emociones y días limpio</Text>
+                    </View>
+                  </View>
+                  
+                  <View style={styles.feature}>
+                    <View style={styles.featureIconContainer}>
+                      <Ionicons name="star" size={22} color="#F59E0B" />
+                    </View>
+                    <View style={styles.featureTextContainer}>
+                      <Text style={styles.featureTitle}>Sobriedad con Sentido</Text>
+                      <Text style={styles.featureText}>Descubre tu propósito y objetivos SMART</Text>
+                    </View>
+                  </View>
+                  
+                  <View style={styles.feature}>
+                    <View style={styles.featureIconContainer}>
+                      <Ionicons name="search" size={22} color="#3B82F6" />
+                    </View>
+                    <View style={styles.featureTextContainer}>
+                      <Text style={styles.featureTitle}>Directorio de centros</Text>
+                      <Text style={styles.featureText}>Busca tratamientos en sinadicciones.cl</Text>
+                    </View>
+                  </View>
+                  
+                  <View style={styles.feature}>
+                    <View style={styles.featureIconContainer}>
+                      <Ionicons name="call" size={22} color="#EF4444" />
+                    </View>
+                    <View style={styles.featureTextContainer}>
+                      <Text style={styles.featureTitle}>Botón SOS</Text>
+                      <Text style={styles.featureText}>Contacto de emergencia inmediato</Text>
+                    </View>
+                  </View>
+                </View>
+
+                {/* Auth Buttons */}
+                <View style={styles.authButtons}>
+                  <TouchableOpacity style={styles.googleButton} onPress={login}>
+                    <Ionicons name="logo-google" size={20} color="#FFFFFF" />
+                    <Text style={styles.googleButtonText}>Continuar con Google</Text>
+                  </TouchableOpacity>
+                  
+                  <View style={styles.divider}>
+                    <View style={styles.dividerLine} />
+                    <Text style={styles.dividerText}>o</Text>
+                    <View style={styles.dividerLine} />
+                  </View>
+                  
+                  <TouchableOpacity 
+                    style={styles.emailButton} 
+                    onPress={() => {
+                      setShowEmailForm(true);
+                      setIsRegister(false);
+                    }}
+                  >
+                    <Ionicons name="mail" size={20} color="#10B981" />
+                    <Text style={styles.emailButtonText}>Continuar con Email</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            ) : (
+              <>
+                {/* Email Form */}
+                <View style={styles.emailForm}>
+                  <TouchableOpacity 
+                    style={styles.backButton}
+                    onPress={() => {
+                      setShowEmailForm(false);
+                      setError('');
+                      setEmail('');
+                      setPassword('');
+                      setName('');
+                    }}
+                  >
+                    <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+                    <Text style={styles.backButtonText}>Volver</Text>
+                  </TouchableOpacity>
+
+                  <Text style={styles.formTitle}>
+                    {isRegister ? 'Crear cuenta' : 'Iniciar sesión'}
+                  </Text>
+                  
+                  {error ? (
+                    <View style={styles.errorContainer}>
+                      <Ionicons name="alert-circle" size={18} color="#EF4444" />
+                      <Text style={styles.errorText}>{error}</Text>
+                    </View>
+                  ) : null}
+
+                  {isRegister && (
+                    <View style={styles.inputContainer}>
+                      <Ionicons name="person" size={20} color="#9CA3AF" style={styles.inputIcon} />
+                      <TextInput
+                        style={styles.input}
+                        placeholder="Tu nombre"
+                        placeholderTextColor="#9CA3AF"
+                        value={name}
+                        onChangeText={setName}
+                        autoCapitalize="words"
+                      />
+                    </View>
+                  )}
+
+                  <View style={styles.inputContainer}>
+                    <Ionicons name="mail" size={20} color="#9CA3AF" style={styles.inputIcon} />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Email"
+                      placeholderTextColor="#9CA3AF"
+                      value={email}
+                      onChangeText={setEmail}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                    />
+                  </View>
+
+                  <View style={styles.inputContainer}>
+                    <Ionicons name="lock-closed" size={20} color="#9CA3AF" style={styles.inputIcon} />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Contraseña"
+                      placeholderTextColor="#9CA3AF"
+                      value={password}
+                      onChangeText={setPassword}
+                      secureTextEntry={!showPassword}
+                    />
+                    <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                      <Ionicons 
+                        name={showPassword ? "eye-off" : "eye"} 
+                        size={20} 
+                        color="#9CA3AF" 
+                      />
+                    </TouchableOpacity>
+                  </View>
+
+                  <TouchableOpacity 
+                    style={[styles.submitButton, isSubmitting && styles.submitButtonDisabled]}
+                    onPress={handleEmailSubmit}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <ActivityIndicator size="small" color="#FFFFFF" />
+                    ) : (
+                      <Text style={styles.submitButtonText}>
+                        {isRegister ? 'Crear cuenta' : 'Iniciar sesión'}
+                      </Text>
+                    )}
+                  </TouchableOpacity>
+
+                  <TouchableOpacity 
+                    style={styles.switchModeButton}
+                    onPress={() => {
+                      setIsRegister(!isRegister);
+                      setError('');
+                    }}
+                  >
+                    <Text style={styles.switchModeText}>
+                      {isRegister 
+                        ? '¿Ya tienes cuenta? Inicia sesión' 
+                        : '¿No tienes cuenta? Regístrate'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
+
+            <Text style={styles.privacy}>
+              🔒 Tus datos están seguros y son privados
+            </Text>
           </View>
-
-          <View style={styles.features}>
-            <View style={styles.feature}>
-              <Text style={styles.featureIcon}>✓</Text>
-              <Text style={styles.featureText}>Registra tus hábitos diarios</Text>
-            </View>
-            <View style={styles.feature}>
-              <Text style={styles.featureIcon}>📊</Text>
-              <Text style={styles.featureText}>Monitorea tu estado emocional</Text>
-            </View>
-            <View style={styles.feature}>
-              <Text style={styles.featureIcon}>🎯</Text>
-              <Text style={styles.featureText}>Construye tu caja de herramientas</Text>
-            </View>
-          </View>
-
-          <TouchableOpacity style={styles.button} onPress={login}>
-            <Text style={styles.buttonText}>Comenzar con Google</Text>
-          </TouchableOpacity>
-
-          <Text style={styles.privacy}>Tus datos están seguros y privados</Text>
-        </View>
+        </ScrollView>
       </LinearGradient>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -83,72 +305,201 @@ const styles = StyleSheet.create({
   gradient: {
     flex: 1,
   },
+  scrollContent: {
+    flexGrow: 1,
+  },
   content: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
+    paddingTop: 60,
+    paddingBottom: 40,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 64,
+    marginBottom: 40,
   },
   logo: {
-    fontSize: 80,
-    marginBottom: 16,
+    fontSize: 70,
+    marginBottom: 12,
   },
   title: {
-    fontSize: 36,
+    fontSize: 34,
     fontWeight: 'bold',
     color: '#FFFFFF',
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: 18,
-    color: '#F0FDFA',
+    fontSize: 16,
+    color: '#D1FAE5',
     textAlign: 'center',
   },
   features: {
     width: '100%',
-    marginBottom: 48,
+    marginBottom: 32,
   },
   feature: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    padding: 16,
+    marginBottom: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    padding: 14,
     borderRadius: 12,
   },
-  featureIcon: {
-    fontSize: 24,
+  featureIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 12,
   },
-  featureText: {
-    fontSize: 16,
-    color: '#FFFFFF',
-    fontWeight: '500',
+  featureTextContainer: {
+    flex: 1,
   },
-  button: {
-    backgroundColor: '#FFFFFF',
+  featureTitle: {
+    fontSize: 15,
+    color: '#FFFFFF',
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  featureText: {
+    fontSize: 13,
+    color: '#D1FAE5',
+  },
+  authButtons: {
+    width: '100%',
+    marginBottom: 24,
+  },
+  googleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#4285F4',
     paddingVertical: 16,
-    paddingHorizontal: 48,
     borderRadius: 12,
-    marginBottom: 16,
+    gap: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
   },
-  buttonText: {
+  googleButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 16,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  dividerText: {
+    color: '#D1FAE5',
+    marginHorizontal: 16,
+    fontSize: 14,
+  },
+  emailButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 16,
+    borderRadius: 12,
+    gap: 10,
+  },
+  emailButtonText: {
     color: '#10B981',
-    fontSize: 18,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  emailForm: {
+    width: '100%',
+    marginBottom: 24,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    gap: 8,
+  },
+  backButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+  },
+  formTitle: {
+    fontSize: 24,
     fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(239, 68, 68, 0.2)',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+    gap: 8,
+  },
+  errorText: {
+    color: '#FCA5A5',
+    fontSize: 14,
+    flex: 1,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    marginBottom: 12,
+  },
+  inputIcon: {
+    marginRight: 12,
+  },
+  input: {
+    flex: 1,
+    paddingVertical: 16,
+    fontSize: 16,
+    color: '#1F2937',
+  },
+  submitButton: {
+    backgroundColor: '#047857',
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  submitButtonDisabled: {
+    opacity: 0.7,
+  },
+  submitButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  switchModeButton: {
+    marginTop: 16,
+    alignItems: 'center',
+  },
+  switchModeText: {
+    color: '#D1FAE5',
+    fontSize: 14,
+    textDecorationLine: 'underline',
   },
   privacy: {
     fontSize: 14,
-    color: '#F0FDFA',
+    color: '#D1FAE5',
     textAlign: 'center',
   },
 });
