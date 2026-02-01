@@ -202,6 +202,22 @@ export default function HomeScreen() {
               <Text style={styles.actionText}>Caja de herramientas</Text>
             </TouchableOpacity>
           </View>
+          <View style={styles.actionsGrid}>
+            <TouchableOpacity
+              style={styles.actionCard}
+              onPress={() => router.push('/stats')}
+            >
+              <Ionicons name="stats-chart" size={32} color="#3B82F6" />
+              <Text style={styles.actionText}>Ver estadísticas</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.actionCard, styles.sosCard]}
+              onPress={handleSOS}
+            >
+              <Ionicons name="warning" size={32} color="#FFFFFF" />
+              <Text style={[styles.actionText, styles.sosText]}>SOS Ayuda</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </View>
