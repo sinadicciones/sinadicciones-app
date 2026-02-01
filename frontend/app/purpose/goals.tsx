@@ -44,6 +44,7 @@ export default function AllGoals() {
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showGuideModal, setShowGuideModal] = useState(false);
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
   const [newGoal, setNewGoal] = useState({ title: '', description: '' });
 
