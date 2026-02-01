@@ -140,6 +140,9 @@ export default function PurposeTestScreen() {
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
             <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push('/(tabs)/home')} style={styles.homeButton}>
+            <Ionicons name="home" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
         </View>
         <Text style={styles.headerTitle}>Test de Descubrimiento</Text>
         <Text style={styles.headerSubtitle}>Paso {step} de {totalSteps}</Text>
