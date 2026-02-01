@@ -28,56 +28,381 @@ const AREAS = [
   { key: 'finances', label: 'Finanzas', icon: 'cash', color: '#EF4444' },
 ];
 
-// Definiciones de tipos de propósito
-const PURPOSE_TYPES: { [key: string]: { description: string; strengths: string[]; tips: string[] } } = {
+// Definiciones completas de tipos de propósito
+const PURPOSE_TYPES: { [key: string]: { emoji: string; description: string; strengths: string[]; tips: string[]; affirmation: string } } = {
+  // === TIPOS ORIENTADOS AL SERVICIO ===
   'Cuidador': {
-    description: 'Tu propósito se centra en el servicio y cuidado de otros. Encuentras significado en ayudar, proteger y apoyar a quienes te rodean. Tu empatía y compasión son tus mayores fortalezas.',
+    emoji: '💝',
+    description: 'Tu propósito se centra en el servicio y cuidado de otros. Encuentras significado profundo en ayudar, proteger y apoyar a quienes te rodean. Tu empatía y compasión son tus mayores fortalezas, y tu presencia reconforta a los demás.',
     strengths: ['Empatía profunda', 'Capacidad de escucha', 'Generosidad natural', 'Conexión emocional'],
     tips: [
       'Recuerda cuidarte a ti mismo primero para poder cuidar a otros',
-      'Establece límites saludables para evitar el agotamiento',
+      'Establece límites saludables para evitar el agotamiento emocional',
       'Tu recuperación te permite ser un mejor apoyo para otros',
     ],
+    affirmation: 'Mi capacidad de amar y cuidar es un regalo que comparto desde mi sobriedad.',
   },
+  'Sanador': {
+    emoji: '🩺',
+    description: 'Tu propósito es aliviar el sufrimiento y promover la sanación en otros. Tienes un don natural para detectar el dolor ajeno y una vocación profunda por restaurar el bienestar físico, emocional o espiritual.',
+    strengths: ['Intuición sanadora', 'Presencia calmante', 'Conocimiento terapéutico', 'Paciencia infinita'],
+    tips: [
+      'Tu propia sanación te da autoridad para ayudar a otros',
+      'Practica técnicas de autocuidado diariamente',
+      'Tu experiencia con el dolor te hace un sanador más compasivo',
+    ],
+    affirmation: 'Mis heridas sanadas son mi mayor herramienta de sanación.',
+  },
+  'Servidor': {
+    emoji: '🙏',
+    description: 'Tu propósito está en el servicio desinteresado a la comunidad. Encuentras paz y significado al contribuir al bienestar colectivo, sin esperar reconocimiento. Tu humildad es tu mayor virtud.',
+    strengths: ['Humildad genuina', 'Dedicación constante', 'Espíritu de servicio', 'Trabajo en equipo'],
+    tips: [
+      'El servicio a otros fortalece tu propia recuperación',
+      'Busca oportunidades de voluntariado que te llenen',
+      'Recuerda que servir también incluye dejarte ayudar',
+    ],
+    affirmation: 'En el servicio a otros encuentro mi propio camino de sanación.',
+  },
+  'Protector': {
+    emoji: '🛡️',
+    description: 'Tu propósito es defender y proteger a quienes amas y a los más vulnerables. Tienes un instinto natural de justicia y una valentía que te impulsa a dar la cara por otros.',
+    strengths: ['Instinto protector', 'Valentía inquebrantable', 'Sentido de justicia', 'Lealtad profunda'],
+    tips: [
+      'Protégete a ti mismo primero manteniendo tu sobriedad',
+      'Canaliza tu energía protectora de forma constructiva',
+      'Tu fortaleza inspira seguridad en quienes te rodean',
+    ],
+    affirmation: 'Mi sobriedad me hace un protector más fuerte y presente.',
+  },
+
+  // === TIPOS ORIENTADOS A LA CREATIVIDAD ===
   'Creador': {
-    description: 'Tu propósito está en la expresión creativa y la innovación. Encuentras significado al crear, diseñar y dar vida a nuevas ideas. Tu imaginación y originalidad son tus mayores dones.',
+    emoji: '🎨',
+    description: 'Tu propósito está en la expresión creativa y la innovación. Encuentras significado al crear, diseñar y dar vida a nuevas ideas. Tu imaginación y originalidad transforman el mundo a tu alrededor.',
     strengths: ['Pensamiento innovador', 'Expresión artística', 'Visión única', 'Resolución creativa'],
     tips: [
-      'Usa la creatividad como herramienta de sanación',
+      'Usa la creatividad como herramienta de sanación emocional',
       'Documenta tus ideas y proyectos creativos',
       'La sobriedad libera tu verdadero potencial creativo',
     ],
+    affirmation: 'Mi creatividad florece en claridad mental.',
   },
+  'Artista': {
+    emoji: '🎭',
+    description: 'Tu propósito es expresar la belleza y las emociones profundas a través del arte. Tienes una sensibilidad especial que te permite capturar y transmitir experiencias humanas de manera única.',
+    strengths: ['Sensibilidad estética', 'Expresión emocional', 'Originalidad', 'Percepción profunda'],
+    tips: [
+      'El arte puede ser tu terapia y tu refugio',
+      'Expresa tus emociones difíciles a través de tu arte',
+      'Tu sensibilidad es un don, no una debilidad',
+    ],
+    affirmation: 'Mi arte es más auténtico cuando creo desde mi verdadero yo.',
+  },
+  'Constructor': {
+    emoji: '🏗️',
+    description: 'Tu propósito es edificar cosas duraderas: proyectos, negocios, relaciones, legados. Tienes la paciencia y visión para crear estructuras que perduren en el tiempo.',
+    strengths: ['Visión a largo plazo', 'Persistencia', 'Planificación', 'Creación de legado'],
+    tips: [
+      'Construye tu recuperación día a día, ladrillo a ladrillo',
+      'Tu capacidad de construir ahora se enfoca en cosas valiosas',
+      'Cada día limpio es un cimiento más de tu nueva vida',
+    ],
+    affirmation: 'Construyo mi nueva vida con cada decisión consciente.',
+  },
+  'Innovador': {
+    emoji: '💡',
+    description: 'Tu propósito es encontrar nuevas soluciones y mejores formas de hacer las cosas. Ves posibilidades donde otros ven obstáculos y tu mente siempre busca optimizar y revolucionar.',
+    strengths: ['Pensamiento disruptivo', 'Resolución de problemas', 'Visión futurista', 'Adaptabilidad'],
+    tips: [
+      'Aplica tu capacidad innovadora a tu recuperación',
+      'Busca nuevas estrategias cuando las antiguas no funcionan',
+      'Tu mente creativa es un recurso valioso en sobriedad',
+    ],
+    affirmation: 'Mi mente innovadora encuentra nuevos caminos hacia el bienestar.',
+  },
+
+  // === TIPOS ORIENTADOS AL LIDERAZGO ===
   'Líder': {
-    description: 'Tu propósito es guiar, inspirar y empoderar a otros. Tienes una capacidad natural para tomar decisiones y motivar al cambio positivo.',
+    emoji: '👑',
+    description: 'Tu propósito es guiar, inspirar y empoderar a otros. Tienes una capacidad natural para tomar decisiones, motivar al cambio positivo y llevar a grupos hacia objetivos comunes.',
     strengths: ['Visión clara', 'Capacidad de influencia', 'Toma de decisiones', 'Inspirar a otros'],
     tips: [
       'Lidera con el ejemplo en tu recuperación',
       'Usa tu influencia para crear impacto positivo',
       'Tu historia puede inspirar a otros en su camino',
     ],
+    affirmation: 'Lidero mi vida con propósito y claridad.',
   },
-  'Explorador': {
-    description: 'Tu propósito está en el descubrimiento y la aventura. Buscas nuevas experiencias, conocimiento y crecimiento constante.',
-    strengths: ['Curiosidad infinita', 'Adaptabilidad', 'Apertura mental', 'Valentía'],
+  'Maestro': {
+    emoji: '📚',
+    description: 'Tu propósito es educar, guiar y transmitir conocimiento. Tienes el don de hacer que otros comprendan y crezcan, transformando información en sabiduría práctica.',
+    strengths: ['Claridad al explicar', 'Paciencia pedagógica', 'Conocimiento profundo', 'Inspirar aprendizaje'],
     tips: [
-      'Explora nuevas formas saludables de vivir',
-      'Tu curiosidad te llevará a descubrir tu mejor versión',
-      'Cada día en sobriedad es una nueva aventura',
+      'Enseña lo que has aprendido en tu recuperación',
+      'Tu experiencia es una lección valiosa para otros',
+      'Aprende constantemente para tener más que compartir',
     ],
+    affirmation: 'Mi experiencia se convierte en sabiduría que comparto.',
   },
+  'Mentor': {
+    emoji: '🌟',
+    description: 'Tu propósito es acompañar el crecimiento individual de otros. No solo enseñas, sino que guías, apoyas y crees en el potencial de cada persona que acompañas.',
+    strengths: ['Guía personalizada', 'Fe en otros', 'Escucha activa', 'Desarrollo de potencial'],
+    tips: [
+      'Considera ser padrino/madrina en un programa de recuperación',
+      'Tu presencia constante puede cambiar vidas',
+      'Acompañar a otros fortalece tu propio camino',
+    ],
+    affirmation: 'Al guiar a otros, también me guío a mí mismo.',
+  },
+  'Motivador': {
+    emoji: '🔥',
+    description: 'Tu propósito es encender la chispa de la acción en otros. Tienes una energía contagiosa que impulsa a las personas a superar sus límites y creer en sí mismas.',
+    strengths: ['Energía contagiosa', 'Optimismo', 'Comunicación poderosa', 'Inspiración'],
+    tips: [
+      'Tu energía positiva es un regalo para quienes luchan',
+      'Mantén tu propia motivación cuidando tu bienestar',
+      'Comparte tu historia para inspirar a otros',
+    ],
+    affirmation: 'Mi energía positiva ilumina mi camino y el de otros.',
+  },
+
+  // === TIPOS ORIENTADOS AL CONOCIMIENTO ===
   'Sabio': {
-    description: 'Tu propósito es buscar y compartir conocimiento. Valoras la verdad, el aprendizaje y la comprensión profunda.',
+    emoji: '🦉',
+    description: 'Tu propósito es buscar y compartir conocimiento profundo. Valoras la verdad, el aprendizaje continuo y la comprensión de los misterios de la vida.',
     strengths: ['Análisis profundo', 'Búsqueda de verdad', 'Reflexión', 'Compartir sabiduría'],
     tips: [
       'Aprende de tu experiencia para ayudar a otros',
-      'La reflexión es clave en tu recuperación',
+      'La reflexión diaria es clave en tu recuperación',
       'Comparte tu conocimiento con quienes lo necesitan',
     ],
+    affirmation: 'La sabiduría de mi experiencia guía mis pasos.',
   },
+  'Investigador': {
+    emoji: '🔬',
+    description: 'Tu propósito es comprender profundamente cómo funcionan las cosas. Tu mente analítica busca respuestas, patrones y verdades ocultas en todo lo que te rodea.',
+    strengths: ['Mente analítica', 'Atención al detalle', 'Pensamiento crítico', 'Curiosidad científica'],
+    tips: [
+      'Investiga sobre la ciencia de la adicción y recuperación',
+      'Analiza tus patrones para entender tus triggers',
+      'Tu capacidad analítica es una herramienta de autoconocimiento',
+    ],
+    affirmation: 'Mi mente analítica me ayuda a entenderme mejor.',
+  },
+  'Filósofo': {
+    emoji: '🤔',
+    description: 'Tu propósito es reflexionar sobre las grandes preguntas de la vida. Buscas sentido, propósito y comprensión del lugar del ser humano en el universo.',
+    strengths: ['Pensamiento profundo', 'Cuestionamiento', 'Búsqueda de sentido', 'Perspectiva amplia'],
+    tips: [
+      'Reflexiona sobre el significado de tu recuperación',
+      'Las preguntas difíciles pueden llevar a respuestas sanadoras',
+      'Tu capacidad de reflexión te da perspectiva en momentos difíciles',
+    ],
+    affirmation: 'En la reflexión encuentro claridad y propósito.',
+  },
+  'Visionario': {
+    emoji: '🔮',
+    description: 'Tu propósito es ver más allá del presente y visualizar futuros posibles. Tienes la capacidad de imaginar lo que podría ser y trabajar para hacerlo realidad.',
+    strengths: ['Visión futurista', 'Imaginación', 'Pensamiento estratégico', 'Inspiración de cambio'],
+    tips: [
+      'Visualiza tu vida en sobriedad a largo plazo',
+      'Tus sueños pueden guiar tu recuperación',
+      'Comparte tu visión para inspirar a otros',
+    ],
+    affirmation: 'Visualizo y creo el futuro que deseo.',
+  },
+
+  // === TIPOS ORIENTADOS A LA AVENTURA ===
+  'Explorador': {
+    emoji: '🧭',
+    description: 'Tu propósito está en el descubrimiento y la aventura. Buscas nuevas experiencias, lugares, ideas y formas de ver el mundo. La rutina te asfixia y lo nuevo te da vida.',
+    strengths: ['Curiosidad infinita', 'Adaptabilidad', 'Apertura mental', 'Valentía ante lo desconocido'],
+    tips: [
+      'Explora nuevas formas saludables de vivir aventuras',
+      'Tu curiosidad te llevará a descubrir tu mejor versión',
+      'Cada día en sobriedad es una nueva aventura',
+    ],
+    affirmation: 'Exploro la vida con ojos nuevos y mente clara.',
+  },
+  'Aventurero': {
+    emoji: '⛰️',
+    description: 'Tu propósito es vivir intensamente y buscar experiencias que te hagan sentir vivo. Necesitas desafíos, adrenalina y la emoción de superar tus límites.',
+    strengths: ['Valentía', 'Búsqueda de intensidad', 'Superación de límites', 'Vitalidad'],
+    tips: [
+      'Busca deportes extremos o actividades que te den adrenalina sana',
+      'La recuperación es la mayor aventura de tu vida',
+      'Canaliza tu necesidad de intensidad de forma positiva',
+    ],
+    affirmation: 'Encuentro aventura y emoción en una vida plena y sobria.',
+  },
+  'Nómada': {
+    emoji: '🌍',
+    description: 'Tu propósito es la libertad y el movimiento. No te atas a un lugar ni a una forma de vida. Encuentras paz en el cambio y el descubrimiento de nuevos horizontes.',
+    strengths: ['Libertad interior', 'Desapego sano', 'Adaptabilidad extrema', 'Independencia'],
+    tips: [
+      'Tu recuperación puede acompañarte a donde vayas',
+      'Encuentra comunidades de apoyo en cada lugar',
+      'La libertad verdadera viene de la sobriedad',
+    ],
+    affirmation: 'Soy libre para ir a donde mi corazón sobrio me guíe.',
+  },
+
+  // === TIPOS ORIENTADOS A LA FORTALEZA ===
   'Guerrero': {
-    description: 'Tu propósito es superar desafíos y proteger lo que valoras. Tienes una fuerza interior extraordinaria y determinación.',
-    strengths: ['Resiliencia', 'Determinación', 'Valentía', 'Protección'],
+    emoji: '⚔️',
+    description: 'Tu propósito es superar desafíos y proteger lo que valoras. Tienes una fuerza interior extraordinaria, determinación inquebrantable y no te rindes ante la adversidad.',
+    strengths: ['Resiliencia', 'Determinación', 'Valentía', 'Disciplina'],
+    tips: [
+      'Tu fortaleza te ha traído hasta aquí',
+      'Canaliza tu energía en batallas que valen la pena',
+      'Cada día limpio es una victoria que celebrar',
+    ],
+    affirmation: 'Soy un guerrero de mi propia recuperación.',
+  },
+  'Superviviente': {
+    emoji: '🦅',
+    description: 'Tu propósito nace de haber superado lo imposible. Has sobrevivido tormentas que otros no comprenden, y esa experiencia te da una perspectiva única sobre la vida.',
+    strengths: ['Resiliencia extrema', 'Perspectiva de vida', 'Gratitud profunda', 'Fortaleza emocional'],
+    tips: [
+      'Tu historia de supervivencia puede salvar vidas',
+      'Cada día es un regalo que sabes apreciar',
+      'Tu capacidad de sobrevivir te hace imparable',
+    ],
+    affirmation: 'He sobrevivido lo peor; puedo construir lo mejor.',
+  },
+  'Luchador': {
+    emoji: '🥊',
+    description: 'Tu propósito es nunca rendirte, sin importar cuántas veces caigas. Tienes un espíritu de lucha que te hace levantarte una y otra vez, más fuerte cada vez.',
+    strengths: ['Perseverancia', 'Espíritu indomable', 'Capacidad de levantarse', 'Tenacidad'],
+    tips: [
+      'Las recaídas no te definen, levantarte sí',
+      'Cada caída te enseña algo nuevo',
+      'Tu espíritu de lucha es tu mayor activo',
+    ],
+    affirmation: 'Cada vez que me levanto, me hago más fuerte.',
+  },
+  'Transformador': {
+    emoji: '🦋',
+    description: 'Tu propósito es la transformación constante. Crees profundamente en el poder del cambio y en que cualquier persona puede reinventarse y renacer de las cenizas.',
+    strengths: ['Capacidad de cambio', 'Reinvención', 'Crecimiento continuo', 'Inspirar transformación'],
+    tips: [
+      'Tu transformación es prueba de que el cambio es posible',
+      'Abraza cada etapa de tu metamorfosis',
+      'Tu historia de cambio inspira esperanza en otros',
+    ],
+    affirmation: 'Me transformo cada día en una mejor versión de mí.',
+  },
+
+  // === TIPOS ORIENTADOS A LA CONEXIÓN ===
+  'Conector': {
+    emoji: '🔗',
+    description: 'Tu propósito es unir personas, ideas y recursos. Tienes un don natural para ver cómo las piezas encajan y crear redes de apoyo y colaboración.',
+    strengths: ['Networking natural', 'Visión de conjunto', 'Facilitación', 'Crear comunidad'],
+    tips: [
+      'Conecta a personas en recuperación que puedan apoyarse',
+      'Tu red de contactos puede ser tu red de seguridad',
+      'Construye puentes, no muros, en tu recuperación',
+    ],
+    affirmation: 'Conecto con otros para crecer juntos.',
+  },
+  'Pacificador': {
+    emoji: '☮️',
+    description: 'Tu propósito es crear armonía y resolver conflictos. Tienes un don para ver todos los lados de una situación y encontrar puntos de encuentro entre personas diferentes.',
+    strengths: ['Mediación', 'Empatía múltiple', 'Calma en el conflicto', 'Diplomacia'],
+    tips: [
+      'Haz las paces contigo mismo primero',
+      'Tu capacidad de mediar puede ayudar en grupos de apoyo',
+      'La paz interior es el fundamento de la paz exterior',
+    ],
+    affirmation: 'Cultivo la paz en mi interior y la comparto con el mundo.',
+  },
+  'Comunicador': {
+    emoji: '🗣️',
+    description: 'Tu propósito es expresar y conectar a través de las palabras. Tienes el don de articular ideas, emociones y experiencias de manera que otros las comprendan profundamente.',
+    strengths: ['Elocuencia', 'Empatía verbal', 'Claridad de expresión', 'Escucha activa'],
+    tips: [
+      'Comparte tu historia; tus palabras pueden salvar vidas',
+      'Practica expresar tus emociones de forma saludable',
+      'Tu voz es una herramienta poderosa de recuperación',
+    ],
+    affirmation: 'Mi voz tiene poder para sanar y conectar.',
+  },
+
+  // === TIPOS ORIENTADOS AL EMPRENDIMIENTO ===
+  'Emprendedor': {
+    emoji: '🚀',
+    description: 'Tu propósito es crear valor y construir proyectos desde cero. Ves oportunidades donde otros ven problemas y tienes la energía para convertir ideas en realidad.',
+    strengths: ['Iniciativa', 'Tolerancia al riesgo', 'Visión de negocio', 'Determinación'],
+    tips: [
+      'Emprende tu recuperación con la misma energía',
+      'Construye una vida que no necesites escapar',
+      'Tu capacidad de crear puede transformar tu futuro',
+    ],
+    affirmation: 'Emprendo cada día la aventura de vivir plenamente.',
+  },
+  'Estratega': {
+    emoji: '♟️',
+    description: 'Tu propósito es planificar y ejecutar con precisión. Ves varios pasos adelante y sabes cómo mover las piezas para alcanzar objetivos complejos.',
+    strengths: ['Pensamiento estratégico', 'Planificación', 'Análisis de situaciones', 'Ejecución precisa'],
+    tips: [
+      'Diseña una estrategia clara para tu recuperación',
+      'Anticipa situaciones de riesgo y planifica respuestas',
+      'Tu mente estratégica es tu aliada contra la adicción',
+    ],
+    affirmation: 'Planifico mi bienestar con intención y claridad.',
+  },
+
+  // === TIPOS ORIENTADOS A LA ESPIRITUALIDAD ===
+  'Místico': {
+    emoji: '✨',
+    description: 'Tu propósito es conectar con lo trascendente y lo sagrado. Sientes una conexión profunda con dimensiones de la existencia que van más allá de lo material.',
+    strengths: ['Conexión espiritual', 'Intuición profunda', 'Sensibilidad energética', 'Fe inquebrantable'],
+    tips: [
+      'Tu espiritualidad puede ser tu ancla en la recuperación',
+      'Practica meditación u oración diariamente',
+      'Confía en tu conexión con algo mayor que tú',
+    ],
+    affirmation: 'Mi conexión espiritual me sostiene en cada paso.',
+  },
+  'Contemplativo': {
+    emoji: '🧘',
+    description: 'Tu propósito está en la quietud, la meditación y la presencia. Encuentras significado en el silencio interior y la observación profunda del momento presente.',
+    strengths: ['Presencia plena', 'Paz interior', 'Autoconocimiento', 'Serenidad'],
+    tips: [
+      'La meditación puede ser tu herramienta principal de recuperación',
+      'Practica la atención plena en cada momento',
+      'En la quietud encontrarás las respuestas que buscas',
+    ],
+    affirmation: 'En la quietud encuentro mi fuerza y claridad.',
+  },
+
+  // === TIPOS ORIENTADOS A LA NATURALEZA ===
+  'Guardián de la Tierra': {
+    emoji: '🌱',
+    description: 'Tu propósito es proteger y cuidar el planeta y todos sus seres. Sientes una conexión profunda con la naturaleza y te duele su destrucción.',
+    strengths: ['Conexión con la naturaleza', 'Conciencia ecológica', 'Cuidado del entorno', 'Visión holística'],
+    tips: [
+      'Pasa tiempo en la naturaleza para tu sanación',
+      'Conectar con la tierra te ayuda a conectar contigo',
+      'Cuidar el planeta puede dar sentido a tu vida',
+    ],
+    affirmation: 'Mi conexión con la naturaleza me sana y me da propósito.',
+  },
+
+  // === TIPO COMODÍN ===
+  'Buscador': {
+    emoji: '🔍',
+    description: 'Tu propósito está en constante evolución. Eres alguien que busca activamente su lugar en el mundo, probando diferentes caminos hasta encontrar el que resuena con tu esencia.',
+    strengths: ['Apertura', 'Flexibilidad', 'Autoexploración', 'Humildad'],
+    tips: [
+      'Está bien no tener todas las respuestas todavía',
+      'Tu búsqueda es parte del viaje, no un defecto',
+      'Mantente abierto a descubrir quién eres realmente',
+    ],
+    affirmation: 'En mi búsqueda constante, me encuentro a mí mismo.',
+  },
     tips: [
       'Tu fortaleza te ha traído hasta aquí',
       'Canaliza tu energía en batallas que valen la pena',
