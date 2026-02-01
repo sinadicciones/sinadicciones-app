@@ -267,6 +267,135 @@ async def logout(request: Request, response: Response):
     
     return {"success": True}
 
+# ============== EMAIL AUTH ENDPOINTS ==============
+
+import hashlib
+
+def hash_password(password: str) -> str:
+    """Simple password hashing - in production use bcrypt"""
+    return hashlib.sha256(password.encode()).hexdigest()
+
+class EmailRegisterRequest(BaseModel):
+    email: str
+    password: str
+    name: str
+
+class EmailLoginRequest(BaseModel):
+    email: str
+    password: str
+
+@app.post("/api/auth/register")
+async def register_with_email(data: EmailRegisterRequest, response: Response):
+    """Register a new user with email and password"""
+    # Check if email already exists
+    existing_user = await db.users.find_one({"email": data.email.lower()})
+    
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Este email ya está registrado")
+    
+    # Validate email format
+    if "@" not in data.email or "." not in data.email:
+        raise HTTPException(status_code=400, detail="Email inválido")
+    
+    # Validate password length
+    if len(data.password) < 6:
+        raise HTTPException(status_code=400, detail="La contraseña debe tener al menos 6 caracteres")
+    
+    # Create new user
+    user_id = f"user_{uuid.uuid4().hex[:12]}"
+    session_token = f"sess_{uuid.uuid4().hex}"
+    
+    await db.users.insert_one({
+        "user_id": user_id,
+        "email": data.email.lower(),
+        "name": data.name,
+        "password_hash": hash_password(data.password),
+        "picture": None,
+        "auth_type": "email",
+        "created_at": datetime.now(timezone.utc)
+    })
+    
+    # Create default profile
+    await db.user_profiles.insert_one({
+        "user_id": user_id,
+        "addiction_type": None,
+        "secondary_addictions": [],
+        "years_using": None,
+        "clean_since": None,
+        "dual_diagnosis": False,
+        "diagnoses": [],
+        "triggers": [],
+        "protective_factors": [],
+        "addictive_beliefs": [],
+        "permissive_beliefs": [],
+        "life_story": None,
+        "emergency_contacts": [],
+        "my_why": None,
+        "profile_completed": False,
+        "updated_at": datetime.now(timezone.utc)
+    })
+    
+    # Create session
+    await db.user_sessions.insert_one({
+        "user_id": user_id,
+        "session_token": session_token,
+        "expires_at": datetime.now(timezone.utc) + timedelta(days=7),
+        "created_at": datetime.now(timezone.utc)
+    })
+    
+    # Set cookie
+    response.set_cookie(
+        key="session_token",
+        value=session_token,
+        httponly=True,
+        secure=False,
+        samesite="lax",
+        max_age=7 * 24 * 60 * 60,
+        path="/"
+    )
+    
+    return {"success": True, "user_id": user_id, "session_token": session_token}
+
+@app.post("/api/auth/login")
+async def login_with_email(data: EmailLoginRequest, response: Response):
+    """Login with email and password"""
+    # Find user
+    user = await db.users.find_one({"email": data.email.lower()})
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Email o contraseña incorrectos")
+    
+    # Check if user has password (might be Google-only user)
+    if "password_hash" not in user:
+        raise HTTPException(status_code=401, detail="Esta cuenta usa inicio de sesión con Google")
+    
+    # Verify password
+    if user["password_hash"] != hash_password(data.password):
+        raise HTTPException(status_code=401, detail="Email o contraseña incorrectos")
+    
+    # Create new session
+    session_token = f"sess_{uuid.uuid4().hex}"
+    
+    await db.user_sessions.insert_one({
+        "user_id": user["user_id"],
+        "session_token": session_token,
+        "expires_at": datetime.now(timezone.utc) + timedelta(days=7),
+        "created_at": datetime.now(timezone.utc)
+    })
+    
+    # Set cookie
+    response.set_cookie(
+        key="session_token",
+        value=session_token,
+        httponly=True,
+        secure=False,
+        samesite="lax",
+        max_age=7 * 24 * 60 * 60,
+        path="/"
+    )
+    
+    return {"success": True, "user_id": user["user_id"], "session_token": session_token}
+
 # ============== HABIT ENDPOINTS ==============
 
 @app.get("/api/habits")
