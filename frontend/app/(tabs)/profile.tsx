@@ -12,11 +12,13 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 import { authenticatedFetch, getBackendURL } from '../../utils/api';
 
 const BACKEND_URL = getBackendURL();
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const [profile, setProfile] = useState<any>(null);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState<any>({});
