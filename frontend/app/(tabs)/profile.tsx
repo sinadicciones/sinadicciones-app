@@ -217,16 +217,26 @@ export default function ProfileScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Limpio desde (YYYY-MM-DD)</Text>
-            <TextInput
-              style={styles.input}
-              value={formData.clean_since || ''}
-              onChangeText={(text) =>
-                setFormData({ ...formData, clean_since: text })
-              }
-              placeholder="2024-01-01"
-              editable={editing}
-            />
+            <Text style={styles.label}>Limpio desde</Text>
+            <TouchableOpacity
+              style={styles.datePickerButton}
+              onPress={openDatePicker}
+              disabled={!editing}
+            >
+              <Ionicons name="calendar" size={20} color="#10B981" />
+              <Text style={styles.datePickerText}>
+                {formData.clean_since || 'Seleccionar fecha'}
+              </Text>
+            </TouchableOpacity>
+            {showDatePicker && (
+              <DateTimePicker
+                value={selectedDate}
+                mode="date"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                onChange={handleDateChange}
+                maximumDate={new Date()}
+              />
+            )}
           </View>
         </View>
 
