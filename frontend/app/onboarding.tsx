@@ -108,7 +108,7 @@ export default function OnboardingScreen() {
       });
 
       if (response.ok) {
-        router.replace('/(tabs)/home');
+        router.replace('/recommendations');
       }
     } catch (error) {
       console.error('Failed to save profile:', error);
