@@ -81,13 +81,23 @@ export default function ProfileScreen() {
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = 'image/*';
-      input.onchange = async (e) => {
-        const file = e.target.files[0];
+      input.onchange = async (e: any) => {
+        const file = e.target?.files?.[0];
         if (file) {
+          // Validar tamaño (max 5MB)
+          if (file.size > 5 * 1024 * 1024) {
+            alert('La imagen es muy grande. Máximo 5MB.');
+            return;
+          }
+          
           const reader = new FileReader();
           reader.onloadend = async () => {
-            const base64Image = reader.result;
+            const base64Image = reader.result as string;
+            console.log('Image loaded, uploading...');
             await uploadProfilePhoto(base64Image);
+          };
+          reader.onerror = () => {
+            alert('Error al leer la imagen');
           };
           reader.readAsDataURL(file);
         }
