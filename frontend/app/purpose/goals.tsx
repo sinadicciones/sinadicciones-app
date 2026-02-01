@@ -548,6 +548,8 @@ export default function AllGoals() {
           </View>
         </View>
       </Modal>
+
+      <BottomNavigation />
     </SafeAreaView>
   );
 }
