@@ -12,7 +12,6 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import BottomNavigation from '../../components/BottomNavigation';
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_API_URL || '';
 const SINADICCIONES_URL = 'https://sinadicciones.cl';
