@@ -6,6 +6,9 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
+  Modal,
+  TextInput,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -14,6 +17,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { authenticatedFetch, getBackendURL } from '../../utils/api';
 
 const BACKEND_URL = getBackendURL();
+
+const AREAS_LIST = [
+  { key: 'health', label: 'Salud Física', icon: 'fitness', color: '#10B981' },
+  { key: 'relationships', label: 'Relaciones', icon: 'people', color: '#3B82F6' },
+  { key: 'work', label: 'Trabajo/Carrera', icon: 'briefcase', color: '#8B5CF6' },
+  { key: 'personal', label: 'Desarrollo Personal', icon: 'school', color: '#EC4899' },
+  { key: 'spiritual', label: 'Espiritualidad', icon: 'sparkles', color: '#F59E0B' },
+  { key: 'finances', label: 'Finanzas', icon: 'cash', color: '#EF4444' },
+];
 
 const AREAS: { [key: string]: { label: string; icon: string; color: string } } = {
   health: { label: 'Salud Física', icon: 'fitness', color: '#10B981' },
@@ -30,6 +42,10 @@ export default function AllGoals() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedArea, setSelectedArea] = useState<string | null>(null);
+  const [newGoal, setNewGoal] = useState({ title: '', description: '' });
 
   useEffect(() => {
     loadGoals();
@@ -53,6 +69,39 @@ export default function AllGoals() {
   const onRefresh = () => {
     setRefreshing(true);
     loadGoals();
+  };
+
+  const handleCreateGoal = async () => {
+    if (!selectedArea) {
+      Alert.alert('Error', 'Por favor selecciona un área de vida');
+      return;
+    }
+    if (!newGoal.title.trim()) {
+      Alert.alert('Error', 'Por favor ingresa un título para tu objetivo');
+      return;
+    }
+
+    try {
+      const response = await authenticatedFetch(`${BACKEND_URL}/api/purpose/goals`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          area: selectedArea,
+          title: newGoal.title,
+          description: newGoal.description,
+        }),
+      });
+
+      if (response.ok) {
+        setNewGoal({ title: '', description: '' });
+        setSelectedArea(null);
+        setShowAddModal(false);
+        loadGoals();
+        Alert.alert('¡Éxito!', 'Tu objetivo SMART ha sido creado');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'No se pudo crear el objetivo');
+    }
   };
 
   const filteredGoals = goals.filter((g) => {
@@ -80,10 +129,21 @@ export default function AllGoals() {
         end={{ x: 1, y: 1 }}
         style={styles.header}
       >
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Mis Objetivos</Text>
+        <View style={styles.headerRow}>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.infoButton} onPress={() => setShowInfoModal(true)}>
+            <Ionicons name="information-circle-outline" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.headerTitleRow}>
+          <Text style={styles.headerTitle}>Mis Objetivos SMART</Text>
+          <View style={styles.smartBadge}>
+            <Ionicons name="bulb" size={14} color="#F59E0B" />
+            <Text style={styles.smartBadgeText}>SMART</Text>
+          </View>
+        </View>
         <Text style={styles.headerSubtitle}>
           {completedCount} de {totalGoals} completados ({progressPercent}%)
         </Text>
@@ -108,19 +168,28 @@ export default function AllGoals() {
         style={styles.content}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
+        {/* Add Goal Button */}
+        <TouchableOpacity
+          style={styles.addGoalCard}
+          onPress={() => setShowAddModal(true)}
+        >
+          <View style={styles.addGoalIcon}>
+            <Ionicons name="add" size={28} color="#F59E0B" />
+          </View>
+          <View style={styles.addGoalContent}>
+            <Text style={styles.addGoalTitle}>Crear nuevo objetivo</Text>
+            <Text style={styles.addGoalSubtitle}>Añade un objetivo SMART a cualquier área</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+        </TouchableOpacity>
+
         {Object.keys(goalsByArea).length === 0 ? (
           <View style={styles.emptyState}>
             <Ionicons name="flag-outline" size={64} color="#D1D5DB" />
             <Text style={styles.emptyTitle}>Sin objetivos</Text>
             <Text style={styles.emptyText}>
-              Navega a las áreas de vida para crear tus primeros objetivos
+              Usa el botón de arriba para crear tu primer objetivo SMART
             </Text>
-            <TouchableOpacity
-              style={styles.emptyButton}
-              onPress={() => router.push('/purpose/dashboard')}
-            >
-              <Text style={styles.emptyButtonText}>Ir al dashboard</Text>
-            </TouchableOpacity>
           </View>
         ) : (
           Object.entries(goalsByArea).map(([areaKey, areaGoals]: [string, any]) => {
@@ -181,6 +250,174 @@ export default function AllGoals() {
         )}
         <View style={{ height: 40 }} />
       </ScrollView>
+
+      {/* SMART Info Modal */}
+      <Modal visible={showInfoModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>¿Qué es un objetivo SMART?</Text>
+              <TouchableOpacity onPress={() => setShowInfoModal(false)}>
+                <Ionicons name="close" size={24} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={styles.modalIntro}>
+                SMART es una metodología para crear objetivos efectivos que te ayudan a alcanzar lo que deseas.
+              </Text>
+
+              <View style={styles.smartItem}>
+                <View style={[styles.smartLetter, { backgroundColor: '#10B981' }]}>
+                  <Text style={styles.smartLetterText}>S</Text>
+                </View>
+                <View style={styles.smartItemContent}>
+                  <Text style={styles.smartItemTitle}>Específico (Specific)</Text>
+                  <Text style={styles.smartItemDesc}>Define claramente QUÉ quieres lograr</Text>
+                  <Text style={styles.smartItemExample}>❌ "Quiero estar mejor"</Text>
+                  <Text style={styles.smartItemExample}>✅ "Quiero hacer ejercicio 3 veces por semana"</Text>
+                </View>
+              </View>
+
+              <View style={styles.smartItem}>
+                <View style={[styles.smartLetter, { backgroundColor: '#3B82F6' }]}>
+                  <Text style={styles.smartLetterText}>M</Text>
+                </View>
+                <View style={styles.smartItemContent}>
+                  <Text style={styles.smartItemTitle}>Medible (Measurable)</Text>
+                  <Text style={styles.smartItemDesc}>¿Cómo sabrás que lo lograste?</Text>
+                  <Text style={styles.smartItemExample}>❌ "Ahorrar dinero"</Text>
+                  <Text style={styles.smartItemExample}>✅ "Ahorrar $50.000 al mes"</Text>
+                </View>
+              </View>
+
+              <View style={styles.smartItem}>
+                <View style={[styles.smartLetter, { backgroundColor: '#8B5CF6' }]}>
+                  <Text style={styles.smartLetterText}>A</Text>
+                </View>
+                <View style={styles.smartItemContent}>
+                  <Text style={styles.smartItemTitle}>Alcanzable (Achievable)</Text>
+                  <Text style={styles.smartItemDesc}>Debe ser realista dado tu contexto actual</Text>
+                  <Text style={styles.smartItemExample}>❌ "Correr un maratón mañana"</Text>
+                  <Text style={styles.smartItemExample}>✅ "Caminar 30 minutos diarios este mes"</Text>
+                </View>
+              </View>
+
+              <View style={styles.smartItem}>
+                <View style={[styles.smartLetter, { backgroundColor: '#EC4899' }]}>
+                  <Text style={styles.smartLetterText}>R</Text>
+                </View>
+                <View style={styles.smartItemContent}>
+                  <Text style={styles.smartItemTitle}>Relevante (Relevant)</Text>
+                  <Text style={styles.smartItemDesc}>¿Contribuye a tu propósito y recuperación?</Text>
+                  <Text style={styles.smartItemExample}>Pregúntate: ¿Por qué es importante para mí?</Text>
+                </View>
+              </View>
+
+              <View style={styles.smartItem}>
+                <View style={[styles.smartLetter, { backgroundColor: '#F59E0B' }]}>
+                  <Text style={styles.smartLetterText}>T</Text>
+                </View>
+                <View style={styles.smartItemContent}>
+                  <Text style={styles.smartItemTitle}>Temporal (Time-bound)</Text>
+                  <Text style={styles.smartItemDesc}>Define CUÁNDO lo lograrás</Text>
+                  <Text style={styles.smartItemExample}>❌ "Algún día aprenderé inglés"</Text>
+                  <Text style={styles.smartItemExample}>✅ "Tomaré 2 clases de inglés por semana durante 3 meses"</Text>
+                </View>
+              </View>
+
+              <View style={styles.tipBox}>
+                <Ionicons name="bulb" size={24} color="#F59E0B" />
+                <Text style={styles.tipText}>
+                  En tu recuperación, los objetivos SMART te ayudan a construir una vida con propósito, paso a paso.
+                </Text>
+              </View>
+            </ScrollView>
+
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => setShowInfoModal(false)}
+            >
+              <Text style={styles.modalButtonText}>Entendido</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Add Goal Modal */}
+      <Modal visible={showAddModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Nuevo objetivo SMART</Text>
+              <TouchableOpacity onPress={() => {
+                setShowAddModal(false);
+                setSelectedArea(null);
+                setNewGoal({ title: '', description: '' });
+              }}>
+                <Ionicons name="close" size={24} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={styles.inputLabel}>1. Selecciona el área de vida</Text>
+              <View style={styles.areasGrid}>
+                {AREAS_LIST.map((area) => (
+                  <TouchableOpacity
+                    key={area.key}
+                    style={[
+                      styles.areaOption,
+                      selectedArea === area.key && { borderColor: area.color, backgroundColor: area.color + '10' },
+                    ]}
+                    onPress={() => setSelectedArea(area.key)}
+                  >
+                    <View style={[styles.areaOptionIcon, { backgroundColor: area.color + '20' }]}>
+                      <Ionicons name={area.icon as any} size={20} color={area.color} />
+                    </View>
+                    <Text style={styles.areaOptionLabel}>{area.label}</Text>
+                    {selectedArea === area.key && (
+                      <Ionicons name="checkmark-circle" size={20} color={area.color} />
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <Text style={styles.inputLabel}>2. Define tu objetivo</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Ej: Meditar 10 minutos cada mañana"
+                value={newGoal.title}
+                onChangeText={(text) => setNewGoal({ ...newGoal, title: text })}
+              />
+
+              <Text style={styles.inputLabel}>3. Descripción (opcional)</Text>
+              <TextInput
+                style={[styles.input, styles.inputMultiline]}
+                placeholder="Añade detalles sobre cómo lo lograrás..."
+                value={newGoal.description}
+                onChangeText={(text) => setNewGoal({ ...newGoal, description: text })}
+                multiline
+                numberOfLines={3}
+              />
+
+              <View style={styles.smartReminder}>
+                <Ionicons name="information-circle" size={20} color="#3B82F6" />
+                <Text style={styles.smartReminderText}>
+                  Recuerda: Un buen objetivo es Específico, Medible, Alcanzable, Relevante y con Tiempo definido.
+                </Text>
+              </View>
+            </ScrollView>
+
+            <TouchableOpacity
+              style={[styles.modalButton, (!selectedArea || !newGoal.title.trim()) && styles.modalButtonDisabled]}
+              onPress={handleCreateGoal}
+              disabled={!selectedArea || !newGoal.title.trim()}
+            >
+              <Text style={styles.modalButtonText}>Crear objetivo</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -191,18 +428,46 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9FAFB',
   },
   header: {
-    paddingTop: 20,
+    paddingTop: 10,
     paddingBottom: 24,
     paddingHorizontal: 24,
   },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   backButton: {
-    marginBottom: 16,
+    padding: 4,
+  },
+  infoButton: {
+    padding: 4,
+  },
+  headerTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 4,
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: 'bold',
     color: '#FFFFFF',
-    marginBottom: 4,
+  },
+  smartBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    gap: 4,
+  },
+  smartBadgeText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: '#F59E0B',
   },
   headerSubtitle: {
     fontSize: 16,
@@ -235,6 +500,40 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
+  addGoalCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 16,
+    marginBottom: 16,
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#F59E0B',
+    borderStyle: 'dashed',
+    gap: 12,
+  },
+  addGoalIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#FEF3C7',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addGoalContent: {
+    flex: 1,
+  },
+  addGoalTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+  addGoalSubtitle: {
+    fontSize: 13,
+    color: '#6B7280',
+    marginTop: 2,
+  },
   emptyState: {
     alignItems: 'center',
     padding: 48,
@@ -251,17 +550,6 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     textAlign: 'center',
     marginBottom: 24,
-  },
-  emptyButton: {
-    backgroundColor: '#F59E0B',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-  },
-  emptyButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
   },
   areaSection: {
     marginBottom: 16,
@@ -343,5 +631,162 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     width: 35,
     textAlign: 'right',
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+    maxHeight: '90%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#1F2937',
+  },
+  modalIntro: {
+    fontSize: 15,
+    color: '#4B5563',
+    lineHeight: 22,
+    marginBottom: 20,
+  },
+  smartItem: {
+    flexDirection: 'row',
+    marginBottom: 20,
+    gap: 12,
+  },
+  smartLetter: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  smartLetterText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  smartItemContent: {
+    flex: 1,
+  },
+  smartItemTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginBottom: 4,
+  },
+  smartItemDesc: {
+    fontSize: 14,
+    color: '#4B5563',
+    marginBottom: 6,
+  },
+  smartItemExample: {
+    fontSize: 13,
+    color: '#6B7280',
+    fontStyle: 'italic',
+  },
+  tipBox: {
+    flexDirection: 'row',
+    backgroundColor: '#FEF3C7',
+    padding: 16,
+    borderRadius: 12,
+    gap: 12,
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  tipText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#92400E',
+    lineHeight: 20,
+  },
+  modalButton: {
+    backgroundColor: '#F59E0B',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  modalButtonDisabled: {
+    backgroundColor: '#D1D5DB',
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  // Add goal modal styles
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 10,
+    marginTop: 8,
+  },
+  areasGrid: {
+    gap: 8,
+    marginBottom: 16,
+  },
+  areaOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    gap: 12,
+  },
+  areaOptionIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  areaOptionLabel: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#1F2937',
+  },
+  input: {
+    backgroundColor: '#F9FAFB',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 16,
+    marginBottom: 12,
+  },
+  inputMultiline: {
+    height: 80,
+    textAlignVertical: 'top',
+  },
+  smartReminder: {
+    flexDirection: 'row',
+    backgroundColor: '#EFF6FF',
+    padding: 12,
+    borderRadius: 12,
+    gap: 10,
+    marginTop: 8,
+  },
+  smartReminderText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#1E40AF',
+    lineHeight: 18,
   },
 });
