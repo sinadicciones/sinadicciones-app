@@ -300,6 +300,18 @@ export default function RecommendationsScreen() {
               <Text style={styles.contactDescription}>
                 Contáctanos en sinadicciones.cl para orientación y apoyo profesional en adicciones
               </Text>
+              
+              {/* Botón principal de agendar */}
+              <TouchableOpacity 
+                style={styles.scheduleButton} 
+                onPress={() => Linking.openURL('https://sinadicciones.site.agendapro.com/cl/sucursal/446599')}
+              >
+                <Ionicons name="calendar" size={20} color="#FFFFFF" />
+                <Text style={styles.scheduleButtonText}>
+                  Asesórate con un profesional experto que te guíe
+                </Text>
+              </TouchableOpacity>
+
               <TouchableOpacity style={styles.contactButton} onPress={openWebsite}>
                 <Text style={styles.contactButtonText}>Visitar sinadicciones.cl</Text>
                 <Ionicons name="arrow-forward" size={20} color="#10B981" />
