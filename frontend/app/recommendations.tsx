@@ -306,11 +306,24 @@ export default function RecommendationsScreen() {
                 <View style={[styles.iconContainer, { backgroundColor: item.color + '20' }]}>
                   <Ionicons name={item.icon as any} size={24} color={item.color} />
                 </View>
-                {item.priority === 'high' && (
-                  <View style={styles.priorityBadge}>
-                    <Text style={styles.priorityText}>Prioritario</Text>
-                  </View>
-                )}
+                <View style={styles.headerRight}>
+                  {item.priority === 'high' && (
+                    <View style={styles.priorityBadge}>
+                      <Text style={styles.priorityText}>Prioritario</Text>
+                    </View>
+                  )}
+                  {item.detailedInfo && (
+                    <TouchableOpacity
+                      style={styles.infoButton}
+                      onPress={() => {
+                        setSelectedRecommendation(item);
+                        setShowInfoModal(true);
+                      }}
+                    >
+                      <Ionicons name="information-circle" size={28} color={item.color} />
+                    </TouchableOpacity>
+                  )}
+                </View>
               </View>
               <Text style={styles.recommendationTitle}>{item.title}</Text>
               <Text style={styles.recommendationDescription}>{item.description}</Text>
