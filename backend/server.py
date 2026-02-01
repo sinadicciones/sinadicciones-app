@@ -403,6 +403,39 @@ async def login_with_email(data: EmailLoginRequest, response: Response):
     
     return {"success": True, "user_id": user["user_id"], "session_token": session_token}
 
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+@app.post("/api/auth/change-password")
+async def change_password(data: ChangePasswordRequest, current_user: User = Depends(get_current_user)):
+    """Change user's password"""
+    # Get user from database
+    user = await db.users.find_one({"user_id": current_user.user_id})
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    
+    # Check if user has password_hash (email user, not OAuth)
+    if not user.get("password_hash"):
+        raise HTTPException(status_code=400, detail="Tu cuenta usa Google para iniciar sesión. No puedes cambiar la contraseña aquí.")
+    
+    # Verify current password
+    if user["password_hash"] != hash_password(data.current_password):
+        raise HTTPException(status_code=401, detail="La contraseña actual es incorrecta")
+    
+    # Validate new password length
+    if len(data.new_password) < 6:
+        raise HTTPException(status_code=400, detail="La nueva contraseña debe tener al menos 6 caracteres")
+    
+    # Update password
+    await db.users.update_one(
+        {"user_id": current_user.user_id},
+        {"$set": {"password_hash": hash_password(data.new_password)}}
+    )
+    
+    return {"success": True, "message": "Contraseña actualizada correctamente"}
+
 # ============== HABIT ENDPOINTS ==============
 
 @app.get("/api/habits")
