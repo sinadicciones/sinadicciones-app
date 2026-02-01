@@ -626,7 +626,7 @@ export default function PurposeDashboard() {
             <View style={styles.purposeHeader}>
               <View>
                 <Text style={styles.purposeLabel}>Tu tipo de propósito:</Text>
-                <Text style={styles.purposeType}>{stats.purpose_type}</Text>
+                <Text style={styles.purposeType}>{purposeInfo?.emoji} {stats.purpose_type}</Text>
               </View>
               <View style={styles.expandButton}>
                 <Text style={styles.expandButtonText}>Ver más</Text>
