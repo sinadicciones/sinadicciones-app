@@ -1078,6 +1078,35 @@ async def get_integrated_dashboard(current_user: User = Depends(get_current_user
 
 # ============== PURPOSE (SOBRIEDAD CON SENTIDO) ENDPOINTS ==============
 
+@app.post("/api/purpose/areas")
+async def save_life_areas(data: dict, current_user: User = Depends(get_current_user)):
+    """Save user's priority life areas from onboarding"""
+    areas = data.get("areas", [])
+    
+    # Save or update life areas
+    await db.life_areas.update_one(
+        {"user_id": current_user.user_id},
+        {
+            "$set": {
+                "user_id": current_user.user_id,
+                "areas": areas,
+                "updated_at": datetime.now(timezone.utc)
+            }
+        },
+        upsert=True
+    )
+    
+    return {"success": True, "areas_count": len(areas)}
+
+@app.get("/api/purpose/areas")
+async def get_life_areas(current_user: User = Depends(get_current_user)):
+    """Get user's life areas"""
+    result = await db.life_areas.find_one(
+        {"user_id": current_user.user_id},
+        {"_id": 0}
+    )
+    return result or {"areas": []}
+
 @app.post("/api/purpose/test")
 async def save_purpose_test(test_data: dict, current_user: User = Depends(get_current_user)):
     test_id = f"purpose_{uuid.uuid4().hex[:12]}"
