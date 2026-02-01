@@ -3,9 +3,18 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
 import { Platform } from 'react-native';
-import Constants from 'expo-constants';
 
-const BACKEND_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:8001';
+// Get backend URL - for web, use relative path to leverage proxy, for mobile use full URL
+const getBackendUrl = () => {
+  if (Platform.OS === 'web') {
+    // On web, use relative URL which goes through the proxy
+    return '';
+  }
+  // On mobile, use the full backend URL
+  return process.env.EXPO_PUBLIC_BACKEND_URL || 'https://sober-tracks.preview.emergentagent.com';
+};
+
+const BACKEND_URL = getBackendUrl();
 
 interface User {
   user_id: string;
