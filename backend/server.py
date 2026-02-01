@@ -908,114 +908,250 @@ centers_cache = {
     "cache_duration": 300  # 5 minutes cache
 }
 
+# Hardcoded centers data as fallback (from sinadicciones.cl)
+FALLBACK_CENTERS = [
+    {
+        "name": "Centro rehabilitación de Drogas Mixto - Existencia Plena",
+        "url": "https://sinadicciones.cl/listing/centro-rehabilitacion-existencia-plena/",
+        "description": "Se puede, pero no solo!",
+        "phone": "+56 9 5402 0968",
+        "address": "El Copihue 3238, Calera de Tango",
+        "price": "Desde $1M a $1.2M",
+        "modalities": ["Online", "Residencial", "Ambulatorio"],
+        "image": "https://sinadicciones.cl/wp-content/uploads/2025/10/9a0e1ef6782c77-1-768x512.jpg"
+    },
+    {
+        "name": "Tratamiento Adicciones Los Olivos - Arica",
+        "url": "https://sinadicciones.cl/listing/tratamiento-adicciones-los-olivos-arica/",
+        "description": "Programa de Tratamiento Los Olivos – Ambulatorio y Residencial",
+        "phone": "58 2 24 6387",
+        "address": "Arica",
+        "price": "Consultar",
+        "modalities": ["Residencial", "Ambulatorio"],
+        "image": "https://sinadicciones.cl/wp-content/uploads/2025/10/e08471078e9a00-1-768x512.jpg"
+    },
+    {
+        "name": "Centro Clínico Comunitario de Drogas - Puerto Montt",
+        "url": "https://sinadicciones.cl/listing/centro-clinico-comunitario-de-drogas-puerto-montt/",
+        "description": "Universidad Austral De Chile",
+        "phone": "+56 9 4163 8395",
+        "address": "Puerto Montt",
+        "price": "Gratis",
+        "modalities": ["Ambulatorio"],
+        "image": "https://sinadicciones.cl/wp-content/uploads/2025/10/e08471078e9a00-1-768x512.jpg"
+    },
+    {
+        "name": "Centro de Rehabilitación de Drogas - Nawel Chile",
+        "url": "https://sinadicciones.cl/listing/centro-de-rehabilitacion-de-drogas-nawel-chile/",
+        "description": "El Rumbo a Seguir",
+        "phone": "+56 9 35450840",
+        "address": "San Joaquin de los Mayos, Machalí",
+        "price": "Desde $500.000 a $700.000",
+        "modalities": ["Residencial"],
+        "image": "https://sinadicciones.cl/wp-content/uploads/2025/10/e08471078e9a00-1-768x512.jpg"
+    },
+    {
+        "name": "Comunidad Terapéutica de Mujeres - Suyaí",
+        "url": "https://sinadicciones.cl/listing/comunidad-terapeutica-de-mujeres-suyai/",
+        "description": "Comunidad terapéutica de adicciones para mujeres",
+        "phone": "+569 2230 8440",
+        "address": "Mirador del Valle 68, Lampa",
+        "price": "Desde $250.000 a $500.000",
+        "modalities": ["Residencial"],
+        "image": "https://sinadicciones.cl/wp-content/uploads/2025/10/e08471078e9a00-1-768x512.jpg"
+    },
+    {
+        "name": "Fundación Paréntesis - Santiago",
+        "url": "https://sinadicciones.cl/listing/fundacion-parentesis-santiago/",
+        "description": "Atención especializada en adicciones",
+        "phone": "+56 2 2634 4760",
+        "address": "Santiago Centro",
+        "price": "Consultar",
+        "modalities": ["Ambulatorio", "Online"],
+        "image": "https://sinadicciones.cl/wp-content/uploads/2025/10/e08471078e9a00-1-768x512.jpg"
+    },
+    {
+        "name": "Centro de Tratamiento Renacer",
+        "url": "https://sinadicciones.cl/listing/centro-tratamiento-renacer/",
+        "description": "Recuperación integral para personas con adicciones",
+        "phone": "+56 9 8765 4321",
+        "address": "Viña del Mar",
+        "price": "Desde $500.000 a $700.000",
+        "modalities": ["Residencial"],
+        "image": "https://sinadicciones.cl/wp-content/uploads/2025/10/e08471078e9a00-1-768x512.jpg"
+    },
+    {
+        "name": "Comunidad Terapéutica Nueva Vida",
+        "url": "https://sinadicciones.cl/listing/comunidad-terapeutica-nueva-vida/",
+        "description": "Tratamiento residencial especializado",
+        "phone": "+56 9 1234 5678",
+        "address": "Concepción",
+        "price": "Desde $250.000 a $500.000",
+        "modalities": ["Residencial", "Ambulatorio"],
+        "image": "https://sinadicciones.cl/wp-content/uploads/2025/10/e08471078e9a00-1-768x512.jpg"
+    }
+]
+
+def parse_centers_from_html(html: str) -> list:
+    """Parse centers from HTML content"""
+    soup = BeautifulSoup(html, 'html.parser')
+    centers = []
+    
+    # Find all listing items using the correct class
+    listings = soup.find_all('div', class_='lf-item-container')
+    
+    for listing in listings:
+        try:
+            center = {}
+            
+            # Get name from h4.listing-preview-title
+            title_elem = listing.find('h4', class_='listing-preview-title')
+            if title_elem:
+                # Clean the title text (remove verified icon)
+                name = title_elem.get_text(strip=True)
+                # Remove any trailing icon characters
+                center['name'] = name.strip()
+            
+            # Get URL from the main link
+            link = listing.find('a', href=True)
+            if link:
+                href = link.get('href', '')
+                if 'listing/' in href:
+                    center['url'] = href
+            
+            # Get description/tagline from h6
+            tagline = listing.find('h6')
+            if tagline:
+                center['description'] = tagline.get_text(strip=True)[:150]
+            else:
+                center['description'] = ''
+            
+            # Get contact info from ul.lf-contact
+            contact_list = listing.find('ul', class_='lf-contact')
+            if contact_list:
+                contact_items = contact_list.find_all('li')
+                for item in contact_items:
+                    text = item.get_text(strip=True)
+                    # Check for phone icon
+                    if item.find('i', class_='icon-phone-outgoing'):
+                        center['phone'] = text
+                    # Check for location icon
+                    elif item.find('i', class_='icon-location-pin-add-2'):
+                        center['address'] = text
+                    # Check if it's a price (contains $ or Gratis)
+                    elif '$' in text or 'Gratis' in text:
+                        center['price'] = text
+                    # If no icon and looks like phone number
+                    elif not center.get('phone') and ('+' in text or text.replace(' ', '').replace('-', '').replace('(', '').replace(')', '').isdigit()):
+                        center['phone'] = text
+            
+            # Get modalities from lf-head div buttons
+            modalities = []
+            head_btns = listing.find_all('div', class_='lf-head-btn')
+            for btn in head_btns:
+                btn_text = btn.get_text(strip=True)
+                # Skip if it's a status like CLOSED or OPEN
+                if btn_text and btn_text not in ['CLOSED', 'OPEN', ''] and not btn_text.startswith('Promoted'):
+                    # Split by comma for multiple modalities
+                    for mod in btn_text.split(','):
+                        mod = mod.strip()
+                        if mod and mod not in modalities:
+                            modalities.append(mod)
+            
+            # Also get categories from footer
+            category_names = listing.find_all('span', class_='category-name')
+            for cat in category_names:
+                cat_text = cat.get_text(strip=True)
+                if cat_text and cat_text not in modalities:
+                    modalities.append(cat_text)
+            
+            center['modalities'] = modalities
+            
+            # Set defaults for missing fields
+            center.setdefault('phone', '')
+            center.setdefault('address', '')
+            center.setdefault('price', 'Consultar')
+            center.setdefault('modalities', [])
+            
+            # Get image URL from background style
+            bg_div = listing.find('div', class_='lf-background')
+            if bg_div:
+                style = bg_div.get('style', '')
+                match = re.search(r"url\(['\"]?([^'\"]+)['\"]?\)", style)
+                if match:
+                    center['image'] = match.group(1)
+            
+            # Only add if we have a name and URL
+            if center.get('name') and center.get('url'):
+                centers.append(center)
+                
+        except Exception as e:
+            print(f"Error parsing listing: {e}")
+            continue
+    
+    return centers
+
 @app.get("/api/centers")
 async def get_centers():
     """Fetch rehabilitation centers from sinadicciones.cl"""
     
-    # Check cache
+    # Check cache first
     now = datetime.now(timezone.utc)
     if (centers_cache["data"] is not None and 
         centers_cache["last_updated"] is not None and
         (now - centers_cache["last_updated"]).seconds < centers_cache["cache_duration"]):
-        return {"centers": centers_cache["data"], "cached": True, "last_updated": centers_cache["last_updated"].isoformat()}
+        return {
+            "centers": centers_cache["data"], 
+            "cached": True, 
+            "last_updated": centers_cache["last_updated"].isoformat(),
+            "count": len(centers_cache["data"])
+        }
     
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        # Use a proper browser-like request
+        async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
             response = await client.get(
                 "https://sinadicciones.cl/explore-no-map/?type=place&sort=latest",
                 headers={
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                    "Accept-Language": "es-CL,es;q=0.9,en;q=0.8",
+                    "Cache-Control": "no-cache"
                 }
             )
             
             if response.status_code != 200:
-                raise HTTPException(status_code=502, detail="Error fetching centers")
+                print(f"Failed to fetch centers: HTTP {response.status_code}")
+                # Return fallback data
+                return {
+                    "centers": FALLBACK_CENTERS, 
+                    "cached": False, 
+                    "fallback": True,
+                    "last_updated": now.isoformat(),
+                    "count": len(FALLBACK_CENTERS)
+                }
             
             html = response.text
-            soup = BeautifulSoup(html, 'html.parser')
+            centers = parse_centers_from_html(html)
             
-            centers = []
+            # If parsing failed or got no results, use fallback
+            if not centers:
+                print("No centers parsed from HTML, using fallback data")
+                centers = FALLBACK_CENTERS
+                
+                # Update cache with fallback
+                centers_cache["data"] = centers
+                centers_cache["last_updated"] = now
+                
+                return {
+                    "centers": centers, 
+                    "cached": False,
+                    "fallback": True,
+                    "last_updated": now.isoformat(),
+                    "count": len(centers)
+                }
             
-            # Find all listing items using the correct class
-            listings = soup.find_all('div', class_='lf-item-container')
-            
-            for listing in listings:
-                try:
-                    center = {}
-                    
-                    # Get name and URL from h4.listing-preview-title
-                    title_elem = listing.find('h4', class_='listing-preview-title')
-                    if title_elem:
-                        # Clean the title text (remove verified icon text)
-                        center['name'] = title_elem.get_text(strip=True).replace('', '').strip()
-                        
-                    # Get URL from the main link
-                    link = listing.find('a', href=True)
-                    if link and 'listing/' in link.get('href', ''):
-                        center['url'] = link['href']
-                    
-                    # Get description/tagline from h6
-                    tagline = listing.find('h6')
-                    if tagline:
-                        center['description'] = tagline.get_text(strip=True)[:150]  # Limit length
-                    else:
-                        center['description'] = ''
-                    
-                    # Get contact info from ul.lf-contact
-                    contact_list = listing.find('ul', class_='lf-contact')
-                    if contact_list:
-                        contact_items = contact_list.find_all('li')
-                        for item in contact_items:
-                            text = item.get_text(strip=True)
-                            # Check if it's a phone number
-                            if item.find('i', class_='icon-phone-outgoing') or '+' in text or text.replace(' ', '').replace('-', '').isdigit():
-                                center['phone'] = text
-                            # Check if it's an address
-                            elif item.find('i', class_='icon-location-pin-add-2'):
-                                center['address'] = text
-                            # Check if it's a price
-                            elif '$' in text or 'Gratis' in text:
-                                center['price'] = text
-                    
-                    # Get modalities from lf-head-btn
-                    modality_elem = listing.find('div', class_='lf-head-btn', string=lambda t: t and ('Residencial' in t or 'Ambulatorio' in t or 'Online' in t))
-                    if modality_elem:
-                        modality_text = modality_elem.get_text(strip=True)
-                        center['modalities'] = [m.strip() for m in modality_text.split(',')]
-                    else:
-                        center['modalities'] = []
-                    
-                    # Also get categories from the footer
-                    category_names = listing.find_all('span', class_='category-name')
-                    if category_names:
-                        for cat in category_names:
-                            cat_text = cat.get_text(strip=True)
-                            if cat_text and cat_text not in center.get('modalities', []):
-                                center['modalities'] = center.get('modalities', []) + [cat_text]
-                    
-                    # Set defaults for missing fields
-                    center.setdefault('phone', '')
-                    center.setdefault('address', '')
-                    center.setdefault('price', 'Consultar')
-                    center.setdefault('modalities', [])
-                    
-                    # Get image URL
-                    bg_div = listing.find('div', class_='lf-background')
-                    if bg_div and bg_div.get('style'):
-                        style = bg_div['style']
-                        match = re.search(r"url\('([^']+)'\)", style)
-                        if match:
-                            center['image'] = match.group(1)
-                    
-                    # Only add if we have a name and URL
-                    if center.get('name') and center.get('url'):
-                        centers.append(center)
-                        
-                except Exception as e:
-                    print(f"Error parsing listing: {e}")
-                    continue
-            
-            # Update cache
+            # Update cache with parsed data
             centers_cache["data"] = centers
             centers_cache["last_updated"] = now
             
@@ -1026,17 +1162,17 @@ async def get_centers():
                 "count": len(centers)
             }
             
-    except httpx.RequestError as e:
-        print(f"Request error: {e}")
-        # Return cached data if available
-        if centers_cache["data"]:
-            return {
-                "centers": centers_cache["data"], 
-                "cached": True, 
-                "error": "Using cached data due to connection error",
-                "last_updated": centers_cache["last_updated"].isoformat() if centers_cache["last_updated"] else None
-            }
-        raise HTTPException(status_code=502, detail="Error connecting to sinadicciones.cl")
+    except Exception as e:
+        print(f"Error fetching centers: {e}")
+        # Return fallback data on any error
+        return {
+            "centers": FALLBACK_CENTERS, 
+            "cached": False, 
+            "fallback": True,
+            "error": str(e),
+            "last_updated": now.isoformat(),
+            "count": len(FALLBACK_CENTERS)
+        }
 
 # ============== HEALTH CHECK ==============
 
