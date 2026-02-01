@@ -278,11 +278,11 @@ export default function CentersScreen() {
                 <View style={styles.centerActions}>
                   {center.phone ? (
                     <TouchableOpacity
-                      style={styles.callButton}
-                      onPress={() => handleCall(center.phone)}
+                      style={styles.whatsappButton}
+                      onPress={() => handleWhatsApp(center.phone, center.name)}
                     >
-                      <Ionicons name="call" size={18} color="#FFFFFF" />
-                      <Text style={styles.callButtonText}>Llamar</Text>
+                      <Ionicons name="logo-whatsapp" size={18} color="#FFFFFF" />
+                      <Text style={styles.whatsappButtonText}>WhatsApp</Text>
                     </TouchableOpacity>
                   ) : null}
                   <TouchableOpacity
