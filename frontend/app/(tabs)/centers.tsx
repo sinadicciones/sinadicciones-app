@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,89 +7,61 @@ import {
   ScrollView,
   Linking,
   RefreshControl,
-  Image,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import BottomNavigation from '../../components/BottomNavigation';
 
+const BACKEND_URL = process.env.EXPO_PUBLIC_API_URL || '';
 const SINADICCIONES_URL = 'https://sinadicciones.cl';
-
-// Static list of featured centers
-const FEATURED_CENTERS = [
-  {
-    id: '1',
-    name: 'Centro Existencia Plena',
-    description: 'Se puede, pero no solo!',
-    phone: '+56 9 5402 0968',
-    address: 'El Copihue 3238',
-    price: 'Desde $1M a $1.2M',
-    modality: ['Online', 'Residencial', 'Ambulatorio'],
-    type: 'Mixto',
-    url: 'https://sinadicciones.cl/listing/centro-rehabilitacion-existencia-plena/',
-    featured: true,
-  },
-  {
-    id: '2',
-    name: 'Tratamiento Los Olivos - Arica',
-    description: 'Programa de Tratamiento Ambulatorio y Residencial',
-    phone: '58 2 24 6387',
-    address: 'Arica',
-    price: 'Consultar',
-    modality: ['Residencial', 'Ambulatorio'],
-    type: 'Mixto',
-    url: 'https://sinadicciones.cl/listing/tratamiento-adicciones-los-olivos-arica/',
-    featured: false,
-  },
-  {
-    id: '3',
-    name: 'Centro Clínico Comunitario - Puerto Montt',
-    description: 'Universidad Austral De Chile',
-    phone: '+56 9 4163 8395',
-    address: 'Puerto Montt',
-    price: 'Gratis',
-    modality: ['Ambulatorio'],
-    type: 'Mixto',
-    url: 'https://sinadicciones.cl/listing/centro-clinico-comunitario-de-drogas-puerto-montt/',
-    featured: false,
-  },
-  {
-    id: '4',
-    name: 'Centro Nawel Chile',
-    description: 'El Rumbo a Seguir',
-    phone: '+56 9 35450840',
-    address: 'San Joaquín de los Mayos',
-    price: 'Desde $500.000 a $700.000',
-    modality: ['Residencial'],
-    type: 'Mixto',
-    url: 'https://sinadicciones.cl/listing/centro-de-rehabilitacion-de-drogas-nawel-chile/',
-    featured: false,
-  },
-  {
-    id: '5',
-    name: 'Comunidad Terapéutica Suyaí',
-    description: 'Comunidad terapéutica de adicciones para mujeres',
-    phone: '+569 2230 8440',
-    address: 'Mirador del Valle 68',
-    price: 'Desde $250.000 a $500.000',
-    modality: ['Residencial'],
-    type: 'Femenino',
-    url: 'https://sinadicciones.cl/listing/comunidad-terapeutica-de-mujeres-suyai/',
-    featured: false,
-  },
-];
 
 const QUICK_FILTERS = [
   { label: 'Todos', value: 'all' },
   { label: 'Residencial', value: 'residencial' },
   { label: 'Ambulatorio', value: 'ambulatorio' },
-  { label: 'Gratis', value: 'gratis' },
-  { label: 'Mujeres', value: 'femenino' },
+  { label: 'Online', value: 'online' },
 ];
 
 export default function CentersScreen() {
+  const [centers, setCenters] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [activeFilter, setActiveFilter] = useState('all');
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchCenters();
+  }, []);
+
+  const fetchCenters = async () => {
+    try {
+      setError(null);
+      const response = await fetch(`${BACKEND_URL}/api/centers`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        setCenters(data.centers || []);
+        setLastUpdated(data.last_updated);
+      } else {
+        throw new Error('Error fetching centers');
+      }
+    } catch (err) {
+      console.error('Error fetching centers:', err);
+      setError('No se pudieron cargar los centros');
+      // Keep existing centers if we have them
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchCenters();
+  };
 
   const handleOpenCenter = (url: string) => {
     Linking.openURL(url);
@@ -100,20 +72,48 @@ export default function CentersScreen() {
   };
 
   const handleCall = (phone: string) => {
-    Linking.openURL(`tel:${phone.replace(/\s/g, '')}`);
+    const cleanPhone = phone.replace(/\s/g, '').replace(/[^0-9+]/g, '');
+    if (cleanPhone) {
+      Linking.openURL(`tel:${cleanPhone}`);
+    }
   };
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1000);
-  };
-
-  const filteredCenters = FEATURED_CENTERS.filter((center) => {
+  const filteredCenters = centers.filter((center) => {
     if (activeFilter === 'all') return true;
-    if (activeFilter === 'gratis') return center.price === 'Gratis';
-    if (activeFilter === 'femenino') return center.type === 'Femenino';
-    return center.modality.some((m) => m.toLowerCase() === activeFilter);
+    const modalities = center.modalities || [];
+    return modalities.some((m: string) => 
+      m.toLowerCase().includes(activeFilter.toLowerCase())
+    );
   });
+
+  const formatLastUpdated = () => {
+    if (!lastUpdated) return '';
+    const date = new Date(lastUpdated);
+    return date.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+  };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <LinearGradient
+          colors={['#10B981', '#059669']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.header}
+        >
+          <View style={styles.headerTitleContainer}>
+            <Ionicons name="medical" size={24} color="#FFFFFF" />
+            <Text style={styles.headerTitle}>Centros de Rehabilitación</Text>
+          </View>
+        </LinearGradient>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#10B981" />
+          <Text style={styles.loadingText}>Cargando centros actualizados...</Text>
+        </View>
+        <BottomNavigation />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -129,9 +129,12 @@ export default function CentersScreen() {
             <Ionicons name="medical" size={24} color="#FFFFFF" />
             <Text style={styles.headerTitle}>Centros de Rehabilitación</Text>
           </View>
+          <TouchableOpacity style={styles.refreshButton} onPress={onRefresh}>
+            <Ionicons name="refresh" size={20} color="#FFFFFF" />
+          </TouchableOpacity>
         </View>
         <Text style={styles.headerSubtitle}>
-          Directorio de sinadicciones.cl
+          {centers.length} centros disponibles • Actualizado {formatLastUpdated()}
         </Text>
       </LinearGradient>
 
@@ -139,7 +142,7 @@ export default function CentersScreen() {
       <TouchableOpacity style={styles.searchButton} onPress={handleOpenDirectory}>
         <View style={styles.searchContent}>
           <Ionicons name="search" size={20} color="#6B7280" />
-          <Text style={styles.searchText}>Buscar más centros con filtros avanzados...</Text>
+          <Text style={styles.searchText}>Buscar con filtros avanzados...</Text>
         </View>
         <Ionicons name="open-outline" size={18} color="#10B981" />
       </TouchableOpacity>
@@ -172,6 +175,17 @@ export default function CentersScreen() {
         ))}
       </ScrollView>
 
+      {/* Error Message */}
+      {error && (
+        <View style={styles.errorBanner}>
+          <Ionicons name="warning" size={18} color="#DC2626" />
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity onPress={fetchCenters}>
+            <Text style={styles.retryText}>Reintentar</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       {/* Centers List */}
       <ScrollView
         style={styles.content}
@@ -179,96 +193,115 @@ export default function CentersScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        <Text style={styles.sectionTitle}>
-          Centros destacados ({filteredCenters.length})
-        </Text>
+        {filteredCenters.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Ionicons name="search" size={48} color="#D1D5DB" />
+            <Text style={styles.emptyTitle}>No se encontraron centros</Text>
+            <Text style={styles.emptyText}>
+              Prueba con otro filtro o busca en el sitio web
+            </Text>
+            <TouchableOpacity style={styles.emptyButton} onPress={handleOpenDirectory}>
+              <Text style={styles.emptyButtonText}>Ir a sinadicciones.cl</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <>
+            <Text style={styles.sectionTitle}>
+              {filteredCenters.length} {filteredCenters.length === 1 ? 'centro encontrado' : 'centros encontrados'}
+            </Text>
 
-        {filteredCenters.map((center) => (
-          <TouchableOpacity
-            key={center.id}
-            style={[styles.centerCard, center.featured && styles.centerCardFeatured]}
-            onPress={() => handleOpenCenter(center.url)}
-          >
-            {center.featured && (
-              <View style={styles.featuredBadge}>
-                <Ionicons name="star" size={12} color="#FFFFFF" />
-                <Text style={styles.featuredText}>Destacado</Text>
-              </View>
-            )}
-            
-            <View style={styles.centerHeader}>
-              <View style={styles.centerIcon}>
-                <Ionicons name="home" size={24} color="#10B981" />
-              </View>
-              <View style={styles.centerInfo}>
-                <Text style={styles.centerName}>{center.name}</Text>
-                <Text style={styles.centerDescription}>{center.description}</Text>
-              </View>
-            </View>
-
-            <View style={styles.centerDetails}>
-              <View style={styles.detailRow}>
-                <Ionicons name="location" size={16} color="#6B7280" />
-                <Text style={styles.detailText}>{center.address}</Text>
-              </View>
-              <View style={styles.detailRow}>
-                <Ionicons name="cash" size={16} color="#6B7280" />
-                <Text style={styles.detailText}>{center.price}</Text>
-              </View>
-            </View>
-
-            <View style={styles.modalityContainer}>
-              {center.modality.map((mod, index) => (
-                <View key={index} style={styles.modalityBadge}>
-                  <Text style={styles.modalityText}>{mod}</Text>
-                </View>
-              ))}
-              <View style={[styles.modalityBadge, styles.typeBadge]}>
-                <Text style={styles.typeText}>{center.type}</Text>
-              </View>
-            </View>
-
-            <View style={styles.centerActions}>
+            {filteredCenters.map((center, index) => (
               <TouchableOpacity
-                style={styles.callButton}
-                onPress={() => handleCall(center.phone)}
-              >
-                <Ionicons name="call" size={18} color="#FFFFFF" />
-                <Text style={styles.callButtonText}>Llamar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.viewButton}
+                key={index}
+                style={styles.centerCard}
                 onPress={() => handleOpenCenter(center.url)}
               >
-                <Text style={styles.viewButtonText}>Ver detalles</Text>
-                <Ionicons name="chevron-forward" size={18} color="#10B981" />
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        ))}
+                <View style={styles.centerHeader}>
+                  <View style={styles.centerIcon}>
+                    <Ionicons name="home" size={24} color="#10B981" />
+                  </View>
+                  <View style={styles.centerInfo}>
+                    <Text style={styles.centerName} numberOfLines={2}>{center.name}</Text>
+                    {center.description ? (
+                      <Text style={styles.centerDescription} numberOfLines={2}>
+                        {center.description}
+                      </Text>
+                    ) : null}
+                  </View>
+                </View>
 
-        {/* CTA to view more */}
-        <TouchableOpacity style={styles.viewMoreCard} onPress={handleOpenDirectory}>
-          <LinearGradient
-            colors={['#10B981', '#059669']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.viewMoreGradient}
-          >
-            <Ionicons name="search" size={32} color="#FFFFFF" />
-            <Text style={styles.viewMoreTitle}>Ver todos los centros</Text>
-            <Text style={styles.viewMoreText}>
-              Explora el directorio completo con filtros por región, precio, modalidad y más
-            </Text>
-            <View style={styles.viewMoreButton}>
-              <Text style={styles.viewMoreButtonText}>Ir a sinadicciones.cl</Text>
-              <Ionicons name="open-outline" size={18} color="#10B981" />
-            </View>
-          </LinearGradient>
-        </TouchableOpacity>
+                <View style={styles.centerDetails}>
+                  {center.address ? (
+                    <View style={styles.detailRow}>
+                      <Ionicons name="location" size={16} color="#6B7280" />
+                      <Text style={styles.detailText} numberOfLines={1}>{center.address}</Text>
+                    </View>
+                  ) : null}
+                  {center.price ? (
+                    <View style={styles.detailRow}>
+                      <Ionicons name="cash" size={16} color="#6B7280" />
+                      <Text style={styles.detailText}>{center.price}</Text>
+                    </View>
+                  ) : null}
+                </View>
+
+                {center.modalities && center.modalities.length > 0 && (
+                  <View style={styles.modalityContainer}>
+                    {center.modalities.slice(0, 4).map((mod: string, idx: number) => (
+                      <View key={idx} style={styles.modalityBadge}>
+                        <Text style={styles.modalityText}>{mod}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+
+                <View style={styles.centerActions}>
+                  {center.phone ? (
+                    <TouchableOpacity
+                      style={styles.callButton}
+                      onPress={() => handleCall(center.phone)}
+                    >
+                      <Ionicons name="call" size={18} color="#FFFFFF" />
+                      <Text style={styles.callButtonText}>Llamar</Text>
+                    </TouchableOpacity>
+                  ) : null}
+                  <TouchableOpacity
+                    style={[styles.viewButton, !center.phone && styles.viewButtonFull]}
+                    onPress={() => handleOpenCenter(center.url)}
+                  >
+                    <Text style={styles.viewButtonText}>Ver detalles</Text>
+                    <Ionicons name="chevron-forward" size={18} color="#10B981" />
+                  </TouchableOpacity>
+                </View>
+              </TouchableOpacity>
+            ))}
+
+            {/* CTA to view more */}
+            <TouchableOpacity style={styles.viewMoreCard} onPress={handleOpenDirectory}>
+              <LinearGradient
+                colors={['#10B981', '#059669']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.viewMoreGradient}
+              >
+                <Ionicons name="globe" size={32} color="#FFFFFF" />
+                <Text style={styles.viewMoreTitle}>Ver directorio completo</Text>
+                <Text style={styles.viewMoreText}>
+                  Explora más centros con filtros avanzados en sinadicciones.cl
+                </Text>
+                <View style={styles.viewMoreButton}>
+                  <Text style={styles.viewMoreButtonText}>Abrir sitio web</Text>
+                  <Ionicons name="open-outline" size={18} color="#10B981" />
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
+          </>
+        )}
 
         <View style={{ height: 40 }} />
       </ScrollView>
+
+      <BottomNavigation />
     </SafeAreaView>
   );
 }
@@ -297,11 +330,26 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
+  refreshButton: {
+    padding: 8,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 8,
+  },
   headerSubtitle: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#D1FAE5',
     marginTop: 4,
     marginLeft: 34,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#6B7280',
   },
   searchButton: {
     flexDirection: 'row',
@@ -352,13 +400,61 @@ const styles = StyleSheet.create({
   filterTextActive: {
     color: '#FFFFFF',
   },
+  errorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF2F2',
+    marginHorizontal: 16,
+    marginTop: 8,
+    padding: 12,
+    borderRadius: 8,
+    gap: 8,
+  },
+  errorText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#DC2626',
+  },
+  retryText: {
+    fontSize: 14,
+    color: '#10B981',
+    fontWeight: '600',
+  },
   content: {
     flex: 1,
   },
-  sectionTitle: {
-    fontSize: 16,
+  emptyState: {
+    alignItems: 'center',
+    padding: 48,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptyText: {
+    fontSize: 14,
+    color: '#6B7280',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  emptyButton: {
+    backgroundColor: '#10B981',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+  },
+  emptyButtonText: {
+    fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
+    color: '#FFFFFF',
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6B7280',
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 12,
@@ -374,26 +470,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
-  },
-  centerCardFeatured: {
-    borderWidth: 2,
-    borderColor: '#10B981',
-  },
-  featuredBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#10B981',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    gap: 4,
-    marginBottom: 12,
-  },
-  featuredText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#FFFFFF',
   },
   centerHeader: {
     flexDirection: 'row',
@@ -431,6 +507,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   detailText: {
+    flex: 1,
     fontSize: 13,
     color: '#4B5563',
   },
@@ -449,14 +526,6 @@ const styles = StyleSheet.create({
   modalityText: {
     fontSize: 12,
     color: '#3B82F6',
-    fontWeight: '500',
-  },
-  typeBadge: {
-    backgroundColor: '#F3E8FF',
-  },
-  typeText: {
-    fontSize: 12,
-    color: '#8B5CF6',
     fontWeight: '500',
   },
   centerActions: {
@@ -487,6 +556,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 8,
     gap: 4,
+  },
+  viewButtonFull: {
+    flex: 1,
   },
   viewButtonText: {
     fontSize: 14,
