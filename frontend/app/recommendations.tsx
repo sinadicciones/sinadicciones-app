@@ -593,6 +593,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  infoButton: {
+    padding: 4,
+  },
   priorityBadge: {
     backgroundColor: '#FEE2E2',
     paddingHorizontal: 12,
