@@ -936,91 +936,84 @@ async def get_centers():
             
             centers = []
             
-            # Find all listing items
-            listings = soup.find_all('div', class_='listing-preview')
+            # Find all listing items using the correct class
+            listings = soup.find_all('div', class_='lf-item-container')
             
             for listing in listings:
                 try:
                     center = {}
                     
-                    # Get name and URL
-                    title_elem = listing.find('h2', class_='listing-title') or listing.find('h3', class_='listing-title')
+                    # Get name and URL from h4.listing-preview-title
+                    title_elem = listing.find('h4', class_='listing-preview-title')
                     if title_elem:
-                        link = title_elem.find('a')
-                        if link:
-                            center['name'] = link.get_text(strip=True)
-                            center['url'] = link.get('href', '')
+                        # Clean the title text (remove verified icon text)
+                        center['name'] = title_elem.get_text(strip=True).replace('', '').strip()
+                        
+                    # Get URL from the main link
+                    link = listing.find('a', href=True)
+                    if link and 'listing/' in link.get('href', ''):
+                        center['url'] = link['href']
                     
-                    # Get description/tagline
-                    tagline = listing.find('div', class_='listing-tagline') or listing.find('p', class_='listing-tagline')
+                    # Get description/tagline from h6
+                    tagline = listing.find('h6')
                     if tagline:
-                        center['description'] = tagline.get_text(strip=True)
+                        center['description'] = tagline.get_text(strip=True)[:150]  # Limit length
                     else:
                         center['description'] = ''
                     
-                    # Get address
-                    address_elem = listing.find('li', class_='address') or listing.find('span', class_='address')
-                    if address_elem:
-                        center['address'] = address_elem.get_text(strip=True)
+                    # Get contact info from ul.lf-contact
+                    contact_list = listing.find('ul', class_='lf-contact')
+                    if contact_list:
+                        contact_items = contact_list.find_all('li')
+                        for item in contact_items:
+                            text = item.get_text(strip=True)
+                            # Check if it's a phone number
+                            if item.find('i', class_='icon-phone-outgoing') or '+' in text or text.replace(' ', '').replace('-', '').isdigit():
+                                center['phone'] = text
+                            # Check if it's an address
+                            elif item.find('i', class_='icon-location-pin-add-2'):
+                                center['address'] = text
+                            # Check if it's a price
+                            elif '$' in text or 'Gratis' in text:
+                                center['price'] = text
+                    
+                    # Get modalities from lf-head-btn
+                    modality_elem = listing.find('div', class_='lf-head-btn', string=lambda t: t and ('Residencial' in t or 'Ambulatorio' in t or 'Online' in t))
+                    if modality_elem:
+                        modality_text = modality_elem.get_text(strip=True)
+                        center['modalities'] = [m.strip() for m in modality_text.split(',')]
                     else:
-                        center['address'] = ''
+                        center['modalities'] = []
                     
-                    # Get phone
-                    phone_elem = listing.find('li', class_='phone') or listing.find('a', href=re.compile(r'^tel:'))
-                    if phone_elem:
-                        phone_text = phone_elem.get_text(strip=True)
-                        center['phone'] = phone_text
-                    else:
-                        center['phone'] = ''
+                    # Also get categories from the footer
+                    category_names = listing.find_all('span', class_='category-name')
+                    if category_names:
+                        for cat in category_names:
+                            cat_text = cat.get_text(strip=True)
+                            if cat_text and cat_text not in center.get('modalities', []):
+                                center['modalities'] = center.get('modalities', []) + [cat_text]
                     
-                    # Get image
-                    img_elem = listing.find('img')
-                    if img_elem:
-                        center['image'] = img_elem.get('src', '') or img_elem.get('data-src', '')
-                    else:
-                        center['image'] = ''
+                    # Set defaults for missing fields
+                    center.setdefault('phone', '')
+                    center.setdefault('address', '')
+                    center.setdefault('price', 'Consultar')
+                    center.setdefault('modalities', [])
                     
-                    # Get categories/modalities
-                    categories = listing.find_all('span', class_='category-name') or listing.find_all('a', class_='listing-category')
-                    center['modalities'] = [cat.get_text(strip=True) for cat in categories if cat.get_text(strip=True)]
+                    # Get image URL
+                    bg_div = listing.find('div', class_='lf-background')
+                    if bg_div and bg_div.get('style'):
+                        style = bg_div['style']
+                        match = re.search(r"url\('([^']+)'\)", style)
+                        if match:
+                            center['image'] = match.group(1)
                     
-                    # Get price if available
-                    price_elem = listing.find('span', class_='price') or listing.find('div', class_='listing-price')
-                    if price_elem:
-                        center['price'] = price_elem.get_text(strip=True)
-                    else:
-                        center['price'] = 'Consultar'
-                    
-                    # Only add if we have a name
-                    if center.get('name'):
+                    # Only add if we have a name and URL
+                    if center.get('name') and center.get('url'):
                         centers.append(center)
                         
                 except Exception as e:
                     print(f"Error parsing listing: {e}")
                     continue
-            
-            # If we couldn't parse any listings, try alternative parsing
-            if not centers:
-                # Try finding article elements
-                articles = soup.find_all('article')
-                for article in articles:
-                    try:
-                        center = {}
-                        title = article.find(['h2', 'h3', 'h4'])
-                        if title:
-                            link = title.find('a') or article.find('a')
-                            if link:
-                                center['name'] = title.get_text(strip=True)
-                                center['url'] = link.get('href', '')
-                                center['description'] = ''
-                                center['address'] = ''
-                                center['phone'] = ''
-                                center['modalities'] = []
-                                center['price'] = 'Consultar'
-                                if center.get('name') and center.get('url'):
-                                    centers.append(center)
-                    except:
-                        continue
             
             # Update cache
             centers_cache["data"] = centers
