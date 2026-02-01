@@ -71,10 +71,30 @@ export default function CentersScreen() {
     Linking.openURL(`${SINADICCIONES_URL}/explore-no-map/?type=place&sort=latest`);
   };
 
-  const handleCall = (phone: string) => {
-    const cleanPhone = phone.replace(/\s/g, '').replace(/[^0-9+]/g, '');
-    if (cleanPhone) {
-      Linking.openURL(`tel:${cleanPhone}`);
+  const handleWhatsApp = (phone: string, centerName: string) => {
+    // Limpiar el número de teléfono
+    let cleanPhone = phone.replace(/\s/g, '').replace(/[^0-9+]/g, '');
+    
+    // Si el número empieza con +56, está bien. Si no, agregar código de Chile
+    if (!cleanPhone.startsWith('+')) {
+      if (cleanPhone.startsWith('56')) {
+        cleanPhone = '+' + cleanPhone;
+      } else if (cleanPhone.startsWith('9')) {
+        cleanPhone = '+56' + cleanPhone;
+      } else {
+        cleanPhone = '+56' + cleanPhone;
+      }
+    }
+    
+    // Mensaje predefinido
+    const message = `Hola estoy interesado, encontré tu servicio en Sinadicciones.cl, puedes darme más información del centro`;
+    const encodedMessage = encodeURIComponent(message);
+    
+    // Remover el + para la URL de WhatsApp
+    const whatsappNumber = cleanPhone.replace('+', '');
+    
+    if (whatsappNumber) {
+      Linking.openURL(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`);
     }
   };
 
