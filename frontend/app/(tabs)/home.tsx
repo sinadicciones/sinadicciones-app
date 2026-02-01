@@ -32,11 +32,12 @@ export default function HomeScreen() {
   }, []);
 
   const loadData = async () => {
-    try {
+    try:
       // Load profile first to check if onboarding is complete
       const profileResponse = await authenticatedFetch(`${BACKEND_URL}/api/profile`);
       if (profileResponse.ok) {
         const profileData = await profileResponse.json();
+        setProfile(profileData);
         // If profile not completed, redirect to onboarding
         if (!profileData.profile_completed) {
           router.replace('/onboarding');
@@ -66,6 +67,65 @@ export default function HomeScreen() {
   const onRefresh = () => {
     setRefreshing(true);
     loadData();
+  };
+
+  const handleSOS = async () => {
+    try {
+      // Cargar perfil si no está cargado
+      let currentProfile = profile;
+      if (!currentProfile) {
+        const profileResponse = await authenticatedFetch(`${BACKEND_URL}/api/profile`);
+        if (profileResponse.ok) {
+          currentProfile = await profileResponse.json();
+          setProfile(currentProfile);
+        }
+      }
+
+      // Verificar si hay contactos de emergencia
+      if (!currentProfile || !currentProfile.emergency_contacts || currentProfile.emergency_contacts.length === 0) {
+        Alert.alert(
+          'Sin contactos de emergencia',
+          'Primero debes agregar contactos de emergencia en tu perfil.',
+          [
+            { text: 'Cancelar', style: 'cancel' },
+            { text: 'Ir al perfil', onPress: () => router.push('/(tabs)/profile') },
+          ]
+        );
+        return;
+      }
+
+      // Obtener primer contacto
+      const firstContact = currentProfile.emergency_contacts[0];
+      
+      if (!firstContact.phone) {
+        Alert.alert('Error', 'El contacto no tiene número de teléfono configurado');
+        return;
+      }
+
+      // Preparar mensaje de WhatsApp
+      const message = 'Paso por un mal momento, ¿podemos hablar?';
+      const phoneNumber = firstContact.phone.replace(/[^0-9]/g, ''); // Limpiar número
+      const whatsappUrl = `whatsapp://send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
+
+      // Intentar abrir WhatsApp
+      const canOpen = await Linking.canOpenURL(whatsappUrl);
+      
+      if (canOpen) {
+        await Linking.openURL(whatsappUrl);
+      } else {
+        Alert.alert(
+          'WhatsApp no disponible',
+          `¿Deseas llamar a ${firstContact.name} (${firstContact.relationship})?`,
+          [
+            { text: 'Cancelar', style: 'cancel' },
+            { text: 'Llamar', onPress: () => Linking.openURL(`tel:${phoneNumber}`) },
+          ]
+        );
+      }
+    } catch (error) {
+      console.error('Error en SOS:', error);
+      Alert.alert('Error', 'No se pudo enviar el mensaje de emergencia');
+    }
   };
 
   const toggleHabit = async (habitId: string, currentStatus: boolean) => {
