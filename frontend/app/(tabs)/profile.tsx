@@ -40,10 +40,30 @@ export default function ProfileScreen() {
         const data = await response.json();
         setProfile(data);
         setFormData(data);
+        
+        // Si tiene fecha limpio desde, establecerla en el date picker
+        if (data.clean_since) {
+          setSelectedDate(new Date(data.clean_since));
+        }
       }
     } catch (error) {
       console.error('Failed to load profile:', error);
     }
+  };
+
+  const handleDateChange = (event: any, date?: Date) => {
+    setShowDatePicker(Platform.OS === 'ios'); // En iOS mantener abierto
+    
+    if (date) {
+      setSelectedDate(date);
+      // Formatear fecha a YYYY-MM-DD
+      const formattedDate = format(date, 'yyyy-MM-dd');
+      setFormData({ ...formData, clean_since: formattedDate });
+    }
+  };
+
+  const openDatePicker = () => {
+    setShowDatePicker(true);
   };
 
   const saveProfile = async () => {
