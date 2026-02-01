@@ -129,7 +129,7 @@ export default function AllGoals() {
               <View key={areaKey} style={styles.areaSection}>
                 <TouchableOpacity
                   style={styles.areaHeader}
-                  onPress={() => router.push(`/purpose/area?area=${areaKey}`)}
+                  onPress={() => router.push(`/purpose/${areaKey}`)}
                 >
                   <View style={[styles.areaIcon, { backgroundColor: areaInfo.color + '20' }]}>
                     <Ionicons name={areaInfo.icon as any} size={20} color={areaInfo.color} />
