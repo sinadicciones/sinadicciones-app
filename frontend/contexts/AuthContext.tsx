@@ -18,6 +18,8 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   login: () => Promise<void>;
+  loginWithEmail: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  registerWithEmail: (email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
