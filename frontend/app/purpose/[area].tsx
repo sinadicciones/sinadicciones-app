@@ -299,6 +299,8 @@ export default function AreaDetail() {
           </View>
         </View>
       </Modal>
+
+      <BottomNavigation />
     </SafeAreaView>
   );
 }
