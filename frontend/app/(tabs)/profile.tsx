@@ -167,6 +167,12 @@ export default function ProfileScreen() {
   };
 
   const showPhotoOptions = () => {
+    if (Platform.OS === 'web') {
+      // En web, ir directo a seleccionar archivo
+      pickImage();
+      return;
+    }
+    
     Alert.alert(
       'Cambiar foto de perfil',
       'Elige una opción',
