@@ -42,6 +42,10 @@ export default function ProfileScreen() {
   });
   const [passwordError, setPasswordError] = useState('');
   const [changingPassword, setChangingPassword] = useState(false);
+  
+  // Estados para foto de perfil
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   useEffect(() => {
     loadProfile();
