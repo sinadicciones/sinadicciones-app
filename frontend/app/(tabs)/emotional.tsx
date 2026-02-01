@@ -58,21 +58,14 @@ export default function EmotionalScreen() {
 
   const loadData = async () => {
     try {
-      const token = await AsyncStorage.getItem('session_token');
-      if (!token) return;
-
       // Load emotional logs
-      const logsResponse = await fetch(`${BACKEND_URL}/api/emotional-logs`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
+      const logsResponse = await authenticatedFetch(`${BACKEND_URL}/api/emotional-logs`);
       if (logsResponse.ok) {
         setLogs(await logsResponse.json());
       }
 
       // Load stats
-      const statsResponse = await fetch(`${BACKEND_URL}/api/emotional-logs/stats`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
+      const statsResponse = await authenticatedFetch(`${BACKEND_URL}/api/emotional-logs/stats`);
       if (statsResponse.ok) {
         setStats(await statsResponse.json());
       }
@@ -85,15 +78,8 @@ export default function EmotionalScreen() {
 
   const saveLog = async () => {
     try {
-      const token = await AsyncStorage.getItem('session_token');
-      if (!token) return;
-
-      await fetch(`${BACKEND_URL}/api/emotional-logs`, {
+      await authenticatedFetch(`${BACKEND_URL}/api/emotional-logs`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           mood_scale: selectedMood,
           note: note,
