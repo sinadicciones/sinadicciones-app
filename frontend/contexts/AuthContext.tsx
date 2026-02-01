@@ -5,7 +5,7 @@ import * as Linking from 'expo-linking';
 import { Platform } from 'react-native';
 
 // Get backend URL - use environment variable or fallback
-const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'https://sober-tracks.preview.emergentagent.com';
+const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'https://sober-path-3.preview.emergentagent.com';
 
 // Helper for storing token (works on both web and mobile)
 const storeToken = async (token: string) => {
