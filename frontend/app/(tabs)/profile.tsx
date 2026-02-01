@@ -228,6 +228,41 @@ export default function ProfileScreen() {
       </LinearGradient>
 
       <ScrollView style={styles.content}>
+        {/* Mi Cuenta Section */}
+        <View style={styles.accountSection}>
+          <View style={styles.accountHeader}>
+            <View style={styles.avatarContainer}>
+              <Text style={styles.avatarText}>
+                {user?.name?.charAt(0).toUpperCase() || '?'}
+              </Text>
+            </View>
+            <View style={styles.accountInfo}>
+              <Text style={styles.accountName}>{user?.name || 'Usuario'}</Text>
+              <Text style={styles.accountEmail}>{user?.email || ''}</Text>
+            </View>
+          </View>
+          
+          <View style={styles.accountActions}>
+            <TouchableOpacity 
+              style={styles.accountButton}
+              onPress={() => setShowPasswordModal(true)}
+            >
+              <Ionicons name="key-outline" size={20} color="#6B7280" />
+              <Text style={styles.accountButtonText}>Cambiar contraseña</Text>
+              <Ionicons name="chevron-forward" size={20} color="#D1D5DB" />
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.accountButton, styles.logoutButton]}
+              onPress={handleLogout}
+            >
+              <Ionicons name="log-out-outline" size={20} color="#EF4444" />
+              <Text style={[styles.accountButtonText, styles.logoutText]}>Cerrar sesión</Text>
+              <Ionicons name="chevron-forward" size={20} color="#EF4444" />
+            </TouchableOpacity>
+          </View>
+        </View>
+
         {/* Edit Button */}
         <View style={styles.section}>
           <View style={styles.buttonRow}>
