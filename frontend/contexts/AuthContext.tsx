@@ -85,16 +85,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         headers: {
           'X-Session-ID': sessionId,
         },
+        credentials: 'include', // Important for cookies
       });
 
       if (response.ok) {
         const data = await response.json();
-        // Store session token
-        const cookies = response.headers.get('set-cookie');
-        if (cookies) {
-          const tokenMatch = cookies.match(/session_token=([^;]+)/);
-          if (tokenMatch) {
-            await AsyncStorage.setItem('session_token', tokenMatch[1]);
+        
+        // For web, check if cookie was set by backend
+        // For mobile, extract and store token from response
+        if (Platform.OS !== 'web') {
+          const cookies = response.headers.get('set-cookie');
+          if (cookies) {
+            const tokenMatch = cookies.match(/session_token=([^;]+)/);
+            if (tokenMatch) {
+              await AsyncStorage.setItem('session_token', tokenMatch[1]);
+            }
           }
         }
         
