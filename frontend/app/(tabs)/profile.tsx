@@ -364,7 +364,7 @@ export default function ProfileScreen() {
         end={{ x: 1, y: 1 }}
         style={styles.header}
       >
-        <Text style={styles.headerTitle}>Caja de Herramientas</Text>
+        <Text style={styles.headerTitle}>Mi Perfil</Text>
         <Text style={styles.headerSubtitle}>Tu espacio personal de recuperación</Text>
       </LinearGradient>
 
