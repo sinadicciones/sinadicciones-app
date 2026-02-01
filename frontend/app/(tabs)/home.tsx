@@ -30,6 +30,17 @@ export default function HomeScreen() {
 
   const loadData = async () => {
     try {
+      // Load profile first to check if onboarding is complete
+      const profileResponse = await authenticatedFetch(`${BACKEND_URL}/api/profile`);
+      if (profileResponse.ok) {
+        const profileData = await profileResponse.json();
+        // If profile not completed, redirect to onboarding
+        if (!profileData.profile_completed) {
+          router.replace('/onboarding');
+          return;
+        }
+      }
+
       // Load dashboard stats
       const statsResponse = await authenticatedFetch(`${BACKEND_URL}/api/dashboard/stats`);
       if (statsResponse.ok) {
