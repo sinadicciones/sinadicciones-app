@@ -127,25 +127,35 @@ export default function ProfileScreen() {
       <ScrollView style={styles.content}>
         {/* Edit Button */}
         <View style={styles.section}>
-          <TouchableOpacity
-            style={[styles.editButton, editing && styles.editButtonActive]}
-            onPress={() => {
-              if (editing) {
-                saveProfile();
-              } else {
-                setEditing(true);
-              }
-            }}
-          >
-            <Ionicons
-              name={editing ? 'checkmark' : 'create'}
-              size={20}
-              color="#FFFFFF"
-            />
-            <Text style={styles.editButtonText}>
-              {editing ? 'Guardar' : 'Editar Perfil'}
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.buttonRow}>
+            <TouchableOpacity
+              style={[styles.actionButton, editing && styles.editButtonActive]}
+              onPress={() => {
+                if (editing) {
+                  saveProfile();
+                } else {
+                  setEditing(true);
+                }
+              }}
+            >
+              <Ionicons
+                name={editing ? 'checkmark' : 'create'}
+                size={20}
+                color="#FFFFFF"
+              />
+              <Text style={styles.actionButtonText}>
+                {editing ? 'Guardar' : 'Editar Perfil'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.actionButton, styles.recommendationsButton]}
+              onPress={() => router.push('/recommendations')}
+            >
+              <Ionicons name="bulb" size={20} color="#FFFFFF" />
+              <Text style={styles.actionButtonText}>Recomendaciones</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Basic Info */}
