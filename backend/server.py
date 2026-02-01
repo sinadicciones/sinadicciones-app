@@ -538,10 +538,11 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
             longest_streak = streak
     
     # Get recent mood
-    recent_mood = await db.emotional_logs.find_one(
+    recent_mood = await db.emotional_logs.find(
         {"user_id": current_user.user_id},
         {"_id": 0}
-    ).sort("date", -1)
+    ).sort("date", -1).limit(1).to_list(1)
+    recent_mood = recent_mood[0] if recent_mood else None
     
     return {
         "total_habits": total_habits,
