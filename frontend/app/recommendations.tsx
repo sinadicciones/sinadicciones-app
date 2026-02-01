@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Linking,
   Modal,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -15,397 +16,443 @@ import { authenticatedFetch, getBackendURL } from '../utils/api';
 
 const BACKEND_URL = getBackendURL();
 
+// Recomendaciones específicas por gatillo
+const TRIGGER_RECOMMENDATIONS: Record<string, any> = {
+  'Estrés': {
+    title: 'Manejo del Estrés',
+    icon: 'fitness',
+    color: '#EF4444',
+    tips: [
+      'Practica respiración diafragmática 4-7-8 cuando sientas tensión',
+      'Realiza ejercicio físico regular (30 min diarios)',
+      'Identifica las fuentes de estrés y trabaja en reducirlas',
+      'Considera técnicas como yoga o tai chi',
+    ],
+    habit: { name: 'Meditación anti-estrés', icon: '🧘', frequency: 'daily' },
+  },
+  'Soledad': {
+    title: 'Combatir la Soledad',
+    icon: 'people',
+    color: '#3B82F6',
+    tips: [
+      'Asiste a reuniones de grupos de apoyo (AA, NA)',
+      'Llama a tu padrino o contacto de emergencia',
+      'Participa en actividades comunitarias',
+      'Considera adoptar una mascota',
+    ],
+    habit: { name: 'Llamar a alguien', icon: '📞', frequency: 'daily' },
+  },
+  'Conflictos': {
+    title: 'Gestión de Conflictos',
+    icon: 'chatbubbles',
+    color: '#F59E0B',
+    tips: [
+      'Aprende técnicas de comunicación asertiva',
+      'Practica el "time-out" antes de reaccionar',
+      'Busca resolver conflictos cuando estés calmado',
+      'Considera terapia de pareja o familiar si es necesario',
+    ],
+    habit: { name: 'Escribir antes de reaccionar', icon: '📝', frequency: 'daily' },
+  },
+  'Emociones negativas': {
+    title: 'Regulación Emocional',
+    icon: 'heart-dislike',
+    color: '#EC4899',
+    tips: [
+      'Practica el reconocimiento y nombrado de emociones',
+      'Usa la técnica HALT: Hambre, Enojo, Soledad, Cansancio',
+      'Escribe un diario emocional',
+      'Habla con alguien de confianza sobre cómo te sientes',
+    ],
+    habit: { name: 'Diario emocional', icon: '📖', frequency: 'daily' },
+  },
+  'Aburrimiento': {
+    title: 'Vencer el Aburrimiento',
+    icon: 'game-controller',
+    color: '#10B981',
+    tips: [
+      'Desarrolla nuevos hobbies y pasatiempos',
+      'Crea una lista de actividades para momentos de ocio',
+      'Aprende algo nuevo (idioma, instrumento, arte)',
+      'Mantén una rutina estructurada',
+    ],
+    habit: { name: 'Actividad creativa', icon: '🎨', frequency: 'daily' },
+  },
+  'Celebraciones': {
+    title: 'Navegando Celebraciones',
+    icon: 'wine',
+    color: '#8B5CF6',
+    tips: [
+      'Planifica con anticipación eventos sociales',
+      'Ten siempre una bebida sin alcohol en la mano',
+      'Identifica aliados en las reuniones',
+      'Permítete salir temprano si es necesario',
+    ],
+    habit: { name: 'Plan de salida', icon: '🚪', frequency: 'weekly' },
+  },
+  'Ciertos lugares': {
+    title: 'Evitar Lugares de Riesgo',
+    icon: 'location',
+    color: '#06B6D4',
+    tips: [
+      'Identifica y evita lugares asociados al consumo',
+      'Planifica rutas alternativas',
+      'Si debes ir, hazlo acompañado',
+      'Crea nuevos lugares "seguros" para socializar',
+    ],
+    habit: { name: 'Revisar ruta diaria', icon: '🗺️', frequency: 'daily' },
+  },
+  'Personas del pasado': {
+    title: 'Relaciones del Pasado',
+    icon: 'person-remove',
+    color: '#EF4444',
+    tips: [
+      'Establece límites claros con personas que consumen',
+      'No temas alejarte de amistades tóxicas',
+      'Construye nuevas relaciones en grupos de recuperación',
+      'Comunica tus necesidades de forma clara',
+    ],
+    habit: { name: 'Evaluar relaciones', icon: '👥', frequency: 'weekly' },
+  },
+};
+
+// Recomendaciones por factor protector
+const PROTECTIVE_RECOMMENDATIONS: Record<string, any> = {
+  'Ejercicio': {
+    boost: 'El ejercicio libera endorfinas naturales que reducen el craving',
+    goal: 'Aumenta gradualmente a 150 minutos semanales',
+  },
+  'Meditación': {
+    boost: 'La meditación fortalece tu autocontrol y reduce la impulsividad',
+    goal: 'Practica 10-20 minutos diarios, preferiblemente por la mañana',
+  },
+  'Reuniones de apoyo': {
+    boost: 'Los grupos de apoyo reducen el aislamiento y proveen modelos a seguir',
+    goal: 'Asiste al menos a 90 reuniones en 90 días al inicio',
+  },
+  'Padrino/Mentor': {
+    boost: 'Tener un padrino aumenta significativamente las tasas de éxito',
+    goal: 'Habla con tu padrino al menos 3 veces por semana',
+  },
+  'Familia': {
+    boost: 'El apoyo familiar es uno de los mejores predictores de recuperación',
+    goal: 'Comunica tu proceso y necesidades a tu familia',
+  },
+  'Trabajo/Estudio': {
+    boost: 'Tener propósito diario reduce el tiempo de ocio peligroso',
+    goal: 'Mantén una rutina laboral o de estudio estable',
+  },
+  'Terapia': {
+    boost: 'La terapia profesional aborda las causas raíz de la adicción',
+    goal: 'Asiste semanalmente y realiza las tareas entre sesiones',
+  },
+  'Fe/Espiritualidad': {
+    boost: 'La espiritualidad provee significado y comunidad',
+    goal: 'Dedica tiempo diario a tu práctica espiritual',
+  },
+};
+
 export default function RecommendationsScreen() {
   const router = useRouter();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showInfoModal, setShowInfoModal] = useState(false);
-  const [selectedRecommendation, setSelectedRecommendation] = useState<any>(null);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [habits, setHabits] = useState<any[]>([]);
 
   useEffect(() => {
-    loadProfile();
+    loadData();
   }, []);
 
-  const loadProfile = async () => {
+  const loadData = async () => {
     try {
-      const response = await authenticatedFetch(`${BACKEND_URL}/api/profile`);
-      if (response.ok) {
-        const data = await response.json();
-        setProfile(data);
+      const [profileRes, habitsRes] = await Promise.all([
+        authenticatedFetch(`${BACKEND_URL}/api/profile`),
+        authenticatedFetch(`${BACKEND_URL}/api/habits`),
+      ]);
+      
+      if (profileRes.ok) {
+        setProfile(await profileRes.json());
+      }
+      if (habitsRes.ok) {
+        setHabits(await habitsRes.json());
       }
     } catch (error) {
-      console.error('Failed to load profile:', error);
+      console.error('Failed to load data:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const openWebsite = () => {
-    Linking.openURL('https://sinadicciones.cl');
-  };
-
-  const getPersonalizedAnalysis = () => {
-    if (!profile) return [];
-
-    const analysis = [];
-
-    // Análisis de años de consumo
-    if (profile.years_using) {
-      if (profile.years_using >= 10) {
-        analysis.push({
-          icon: 'alert-circle',
-          color: '#EF4444',
-          title: 'Adicción de larga data',
-          description: `Has vivido con esta adicción por ${profile.years_using} años. La recuperación es un proceso gradual, pero cada día limpio es una victoria importante.`,
-        });
-      } else if (profile.years_using >= 5) {
-        analysis.push({
-          icon: 'warning',
-          color: '#F59E0B',
-          title: 'Experiencia significativa con la adicción',
-          description: `${profile.years_using} años de consumo indican que la adicción ha sido parte importante de tu vida. Es fundamental construir nuevas rutinas saludables.`,
-        });
-      } else {
-        analysis.push({
-          icon: 'information-circle',
-          color: '#3B82F6',
-          title: 'Identificación temprana',
-          description: 'Has reconocido el problema relativamente pronto, lo cual es positivo para tu recuperación.',
-        });
+  const createHabit = async (habit: any) => {
+    try {
+      const response = await authenticatedFetch(`${BACKEND_URL}/api/habits`, {
+        method: 'POST',
+        body: JSON.stringify({
+          name: habit.name,
+          icon: habit.icon,
+          frequency: habit.frequency,
+          color: '#10B981',
+        }),
+      });
+      if (response.ok) {
+        loadData();
+        alert(`Hábito "${habit.name}" creado exitosamente`);
       }
+    } catch (error) {
+      console.error('Failed to create habit:', error);
     }
-
-    // Análisis de patología dual
-    if (profile.dual_diagnosis && profile.diagnoses.length > 0) {
-      analysis.push({
-        icon: 'medical',
-        color: '#8B5CF6',
-        title: 'Patología Dual Identificada',
-        description: `Has identificado condiciones como ${profile.diagnoses.join(', ')}. Es crucial un tratamiento integral que aborde tanto la adicción como tu salud mental.`,
-      });
-    }
-
-    // Análisis de gatillos
-    if (profile.triggers.length > 5) {
-      analysis.push({
-        icon: 'alert',
-        color: '#EF4444',
-        title: 'Múltiples gatillos identificados',
-        description: `Has identificado ${profile.triggers.length} gatillos. Es importante trabajar en estrategias de afrontamiento para cada uno.`,
-      });
-    } else if (profile.triggers.length > 0) {
-      analysis.push({
-        icon: 'shield-checkmark',
-        color: '#10B981',
-        title: 'Autoconocimiento de gatillos',
-        description: 'Conocer tus gatillos es el primer paso para evitarlos o manejarlos efectivamente.',
-      });
-    }
-
-    // Análisis de factores protectores
-    if (profile.protective_factors.length >= 3) {
-      analysis.push({
-        icon: 'checkmark-circle',
-        color: '#10B981',
-        title: 'Buenos recursos de apoyo',
-        description: `Has identificado ${profile.protective_factors.length} factores protectores. Estos serán tu escudo en momentos difíciles.`,
-      });
-    } else if (profile.protective_factors.length > 0) {
-      analysis.push({
-        icon: 'construct',
-        color: '#F59E0B',
-        title: 'Construye más recursos',
-        description: 'Es recomendable ampliar tu red de apoyo y actividades protectoras.',
-      });
-    }
-
-    return analysis;
   };
 
-  const getRecommendations = () => {
-    if (!profile) return [];
+  const habitExists = (habitName: string) => {
+    return habits.some(h => h.name.toLowerCase() === habitName.toLowerCase());
+  };
 
-    const recommendations = [];
-
-    // Recomendación de tratamiento profesional
-    const needsProfessionalHelp =
-      profile.years_using >= 5 ||
-      profile.dual_diagnosis ||
-      profile.triggers.length > 5 ||
-      profile.protective_factors.length < 2;
-
-    if (needsProfessionalHelp) {
-      recommendations.push({
-        icon: 'person',
-        color: '#8B5CF6',
-        title: 'Tratamiento Profesional Recomendado',
-        description: 'Basado en tu perfil, es altamente recomendable que busques apoyo profesional especializado en adicciones.',
-        priority: 'high',
-        detailedInfo: {
-          title: 'Por qué necesitas tratamiento profesional',
-          content: `Basándome en tu perfil:\n\n• Años de consumo: ${profile.years_using || 0} años\n• Patología dual: ${profile.dual_diagnosis ? 'Sí' : 'No'}\n• Gatillos identificados: ${profile.triggers.length}\n• Factores protectores: ${profile.protective_factors.length}\n\nUn profesional puede ayudarte con:\n\n1. **Evaluación completa**: Diagnóstico preciso de tu situación\n2. **Plan de tratamiento personalizado**: Adaptado a tus necesidades específicas\n3. **Terapia individual**: Espacio seguro para trabajar traumas y patrones\n4. **Manejo de síntomas**: Control de ansiedad, depresión y craving\n5. **Prevención de recaídas**: Estrategias específicas para tu perfil\n6. **Medicación si es necesaria**: Especialmente en patología dual\n\nRecuerda: Pedir ayuda es un signo de fortaleza, no de debilidad.`,
-          actions: ['Agenda tu primera sesión', 'Busca centros especializados cercanos'],
-        },
-      });
-    }
-
-    // Recomendación de grupos de apoyo
-    recommendations.push({
-      icon: 'people',
-      color: '#3B82F6',
-      title: 'Grupos de Apoyo',
-      description: 'Considera unirte a grupos como Alcohólicos Anónimos (AA), Narcóticos Anónimos (NA) o grupos de apoyo específicos para tu adicción.',
-      priority: 'high',
-      detailedInfo: {
-        title: 'Beneficios de los grupos de apoyo',
-        content: `Los grupos de apoyo son fundamentales en la recuperación:\n\n**Beneficios principales:**\n\n1. **Sentido de pertenencia**: No estás solo en esto\n2. **Experiencias compartidas**: Aprende de quienes han pasado por lo mismo\n3. **Apoyo 24/7**: Siempre hay alguien disponible\n4. **Accountability**: Te ayuda a mantenerte comprometido\n5. **Herramientas prácticas**: Aprende estrategias que funcionan\n6. **Padrinos/Mentores**: Guía de alguien con más tiempo limpio\n\n**Grupos recomendados en Chile:**\n\n• Alcohólicos Anónimos (AA): www.aa.cl\n• Narcóticos Anónimos (NA): www.na.org.ar\n• Jugadores Anónimos: Para adicción al juego\n• Al-Anon: Para familiares\n\n**Cómo empezar:**\n1. Busca reuniones cerca de tu ubicación\n2. Asiste a varias para encontrar donde te sientas cómodo\n3. No tienes que hablar la primera vez, solo escucha\n4. Considera conseguir un padrino después de algunas semanas`,
-        actions: ['Buscar reuniones cercanas', 'Asistir a tu primera reunión'],
-      },
-    });
-
-    // Si tiene patología dual
-    if (profile.dual_diagnosis) {
-      recommendations.push({
-        icon: 'fitness',
-        color: '#EC4899',
-        title: 'Atención de Salud Mental',
-        description: 'Es fundamental que recibas tratamiento paralelo para tus condiciones de salud mental. Un psiquiatra o psicólogo especializado puede ayudarte.',
-        priority: 'high',
-        detailedInfo: {
-          title: 'Tratamiento integral de patología dual',
-          content: `Has identificado las siguientes condiciones: ${profile.diagnoses.join(', ')}\n\n**Por qué es crucial tratar ambos:**\n\nLa adicción y los trastornos mentales se alimentan mutuamente. Tratar solo uno no es suficiente.\n\n**Lo que necesitas:**\n\n1. **Psiquiatra**: Para evaluación y medicación si es necesaria\n   - Antidepresivos\n   - Estabilizadores del ánimo\n   - Medicación para ansiedad\n   - Control del craving\n\n2. **Psicólogo/Terapeuta**: Para terapia regular\n   - Terapia Cognitivo-Conductual (TCC)\n   - Terapia Dialéctico-Conductual (TDC)\n   - EMDR para trauma\n\n3. **Seguimiento continuo**: No es algo de una vez\n\n**Señales de alerta:**\n• Pensamientos de hacerte daño\n• Ideación suicida\n• Crisis de pánico\n• Episodios de ira incontrolable\n• Aislamiento extremo\n\n⚠️ Si experimentas alguna de estas, busca ayuda inmediata.`,
-          actions: ['Agendar evaluación psiquiátrica', 'Llamar a Salud Responde: 600 360 7777'],
-        },
-      });
-    }
-
-    // Recomendaciones generales
-    recommendations.push({
-      icon: 'barbell',
-      color: '#10B981',
-      title: 'Actividad Física',
-      description: 'El ejercicio regular ayuda a reducir la ansiedad, mejorar el estado de ánimo y fortalecer tu recuperación.',
-      priority: 'medium',
-      detailedInfo: {
-        title: 'Ejercicio como herramienta de recuperación',
-        content: `El ejercicio es una de las mejores herramientas naturales:\n\n**Beneficios científicamente comprobados:**\n\n1. **Produce endorfinas**: El "high natural"\n2. **Reduce el craving**: Disminuye el deseo de consumir\n3. **Mejora el sueño**: Fundamental en recuperación\n4. **Reduce ansiedad y depresión**: Tan efectivo como medicación\n5. **Estructura tu día**: Crea rutina saludable\n6. **Mejora autoestima**: Te ves y sientes mejor\n\n**Recomendaciones prácticas:**\n\n• Caminar 30 minutos diarios\n• Trotar/correr 3 veces por semana\n• Yoga o Pilates para mindfulness\n• Natación (muy terapéutica)\n• Gimnasio con rutina estructurada\n• Deportes de equipo (fútbol, básquet)\n\n**Tips para empezar:**\n1. Empieza pequeño: 10 minutos es suficiente\n2. Hazlo a la misma hora cada día\n3. Encuentra algo que disfrutes\n4. Consigue un compañero de ejercicio\n5. Celebra cada logro pequeño`,
-        actions: ['Hacer caminata de 10 minutos hoy', 'Buscar gimnasio o parque cercano'],
-      },
-    });
-
-    recommendations.push({
-      icon: 'moon',
-      color: '#6366F1',
-      title: 'Rutinas Saludables',
-      description: 'Establece horarios regulares de sueño, alimentación y actividades. La estructura ayuda en la recuperación.',
-      priority: 'medium',
-      detailedInfo: {
-        title: 'La importancia de la rutina',
-        content: `La estructura es tu aliada en la recuperación:\n\n**Por qué las rutinas son cruciales:**\n\n1. **Reducen decisiones**: Menos espacio para autosabotaje\n2. **Crean estabilidad**: Tu cerebro necesita predictibilidad\n3. **Evitan tiempos muertos**: Los momentos peligrosos\n4. **Construyen disciplina**: Fortaleza mental\n\n**Rutina recomendada:**\n\n**Mañana (6:00-9:00)**\n• Despierta a la misma hora\n• Hidratación inmediata (2 vasos de agua)\n• Ejercicio ligero o meditación\n• Desayuno nutritivo\n• Revisar tu "Para Qué"\n\n**Día (9:00-18:00)**\n• Trabajo/estudio estructurado\n• Comidas a horas fijas\n• Pausas activas cada 2 horas\n• Evitar lugares/personas gatillo\n\n**Tarde (18:00-21:00)**\n• Ejercicio o actividad recreativa\n• Cena saludable\n• Tiempo con familia/amigos\n• Reunión de apoyo si es tu día\n\n**Noche (21:00-22:00)**\n• Sin pantallas 1 hora antes de dormir\n• Registro del día (app)\n• Gratitud: 3 cosas buenas del día\n• Lectura o relajación\n\n**Sueño (22:00-6:00)**\n• 7-8 horas no negociables\n• Ambiente oscuro y fresco\n• Misma hora siempre`,
-        actions: ['Crear horario de sueño', 'Planificar semana'],
-      },
-    });
-
-    if (profile.triggers.includes('Soledad') || profile.triggers.includes('soledad')) {
-      recommendations.push({
-        icon: 'chatbubbles',
-        color: '#F59E0B',
-        title: 'Conexión Social',
-        description: 'Has identificado la soledad como gatillo. Mantén contacto regular con tu red de apoyo y busca actividades grupales.',
-        priority: 'high',
-        detailedInfo: {
-          title: 'Combatiendo la soledad',
-          content: `La soledad es un gatillo muy común y peligroso:\n\n**Por qué la soledad es peligrosa:**\n• Tiempo para pensar en consumir\n• Nadie que te detenga\n• Pensamientos negativos se amplifican\n• Falta de accountability\n\n**Estrategias inmediatas (cuando te sientes solo):**\n\n1. **Llamar a alguien**: No importa la hora\n   - Tu padrino/mentor\n   - Familiar de confianza\n   - Línea de ayuda 1412\n\n2. **Salir de casa**: Ir a un lugar público\n   - Café\n   - Biblioteca\n   - Parque\n   - Centro comercial\n\n3. **Reunión virtual o presencial**: Siempre hay una\n\n**Estrategias a largo plazo:**\n\n• Voluntariado regular\n• Clases grupales (yoga, idiomas, cocina)\n• Deportes de equipo\n• Grupos de interés (lectura, senderismo)\n• Comunidad religiosa/espiritual\n• Adoptar una mascota (responsabilidad)\n\n**Red de apoyo:**\nAsegúrate de tener al menos:\n• 1 padrino/mentor\n• 2-3 amigos en recuperación\n• 1 familiar de confianza\n• 1 profesional (terapeuta)\n\n**Activar tu red:**\n• Envía mensaje diario a alguien\n• Programa llamadas semanales\n• Comparte tus logros\n• Pide ayuda cuando la necesites`,
-          actions: ['Llamar a un amigo ahora', 'Unirse a grupo social'],
-        },
-      });
-    }
-
-    return recommendations;
+  const openSinAdicciones = () => {
+    Linking.openURL('https://sinadicciones.cl');
   };
 
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <Text>Cargando...</Text>
+        <ActivityIndicator size="large" color="#10B981" />
+        <Text style={styles.loadingText}>Analizando tu perfil...</Text>
       </View>
     );
   }
 
-  const analysis = getPersonalizedAnalysis();
-  const recommendations = getRecommendations();
+  const triggers = profile?.triggers || [];
+  const protectiveFactors = profile?.protective_factors || [];
+  const diagnoses = profile?.diagnoses || [];
+  const yearsUsing = profile?.years_using || 0;
+  const myWhy = profile?.my_why || '';
+  const priorityAreas = profile?.priority_life_areas || [];
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <LinearGradient
-        colors={['#8B5CF6', '#EC4899']}
+        colors={['#10B981', '#3B82F6']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.header}
       >
-        <View style={styles.headerTop}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.homeButton}
-            onPress={() => router.push('/(tabs)/home')}
-          >
-            <Ionicons name="home" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
-        </View>
-        <Text style={styles.headerTitle}>Tu Perfil de Recuperación</Text>
-        <Text style={styles.headerSubtitle}>Análisis y recomendaciones personalizadas</Text>
+        <Text style={styles.headerTitle}>🎯 Tu Plan de Recuperación</Text>
+        <Text style={styles.headerSubtitle}>Recomendaciones personalizadas para ti</Text>
       </LinearGradient>
 
-      <ScrollView style={styles.content}>
-        {/* Disclaimer */}
-        <View style={styles.disclaimerCard}>
-          <View style={styles.disclaimerHeader}>
-            <Ionicons name="information-circle" size={24} color="#F59E0B" />
-            <Text style={styles.disclaimerTitle}>Información Importante</Text>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        
+        {/* Mi Para Qué - Recordatorio */}
+        {myWhy && (
+          <View style={styles.whyCard}>
+            <View style={styles.whyHeader}>
+              <Ionicons name="heart" size={24} color="#EF4444" />
+              <Text style={styles.whyTitle}>Tu "Para Qué"</Text>
+            </View>
+            <Text style={styles.whyText}>"{myWhy}"</Text>
+            <Text style={styles.whyReminder}>Recuerda esto cuando la tentación llegue</Text>
           </View>
-          <Text style={styles.disclaimerText}>
-            Esta información es solo una guía educativa y <Text style={styles.bold}>NO reemplaza</Text> el diagnóstico,
-            tratamiento o consejo de un profesional de la salud. Si necesitas ayuda profesional, por favor contacta
-            con especialistas en adicciones.
-          </Text>
-        </View>
+        )}
 
-        {/* Análisis Personalizado */}
+        {/* Análisis de Riesgo */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📊 Análisis de tu perfil</Text>
-          {analysis.map((item, index) => (
-            <View key={index} style={styles.analysisCard}>
-              <View style={[styles.iconContainer, { backgroundColor: item.color + '20' }]}>
-                <Ionicons name={item.icon as any} size={28} color={item.color} />
-              </View>
+          <Text style={styles.sectionTitle}>📊 Tu Análisis Personal</Text>
+          
+          {/* Años de consumo */}
+          <View style={[styles.analysisCard, { borderLeftColor: yearsUsing >= 10 ? '#EF4444' : yearsUsing >= 5 ? '#F59E0B' : '#10B981' }]}>
+            <Ionicons name="time" size={24} color={yearsUsing >= 10 ? '#EF4444' : yearsUsing >= 5 ? '#F59E0B' : '#10B981'} />
+            <View style={styles.analysisContent}>
+              <Text style={styles.analysisTitle}>
+                {yearsUsing >= 10 ? 'Adicción de larga data' : yearsUsing >= 5 ? 'Experiencia significativa' : 'Identificación temprana'}
+              </Text>
+              <Text style={styles.analysisDesc}>
+                {yearsUsing} años de consumo. {yearsUsing >= 10 
+                  ? 'Considera tratamiento residencial o intensivo.' 
+                  : yearsUsing >= 5 
+                    ? 'Un programa estructurado puede ayudarte mucho.'
+                    : 'Has dado el primer paso a tiempo, ¡felicitaciones!'}
+              </Text>
+            </View>
+          </View>
+
+          {/* Patología Dual */}
+          {diagnoses.length > 0 && (
+            <View style={[styles.analysisCard, { borderLeftColor: '#8B5CF6' }]}>
+              <Ionicons name="medical" size={24} color="#8B5CF6" />
               <View style={styles.analysisContent}>
-                <Text style={styles.analysisTitle}>{item.title}</Text>
-                <Text style={styles.analysisDescription}>{item.description}</Text>
+                <Text style={styles.analysisTitle}>Patología Dual Identificada</Text>
+                <Text style={styles.analysisDesc}>
+                  Has identificado: {diagnoses.join(', ')}. Es crucial tratar ambas condiciones simultáneamente.
+                </Text>
               </View>
             </View>
-          ))}
-        </View>
+          )}
 
-        {/* Recomendaciones */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>💡 Recomendaciones</Text>
-          {recommendations.map((item, index) => (
-            <View
-              key={index}
-              style={[
-                styles.recommendationCard,
-                item.priority === 'high' && styles.highPriority,
-              ]}
-            >
-              <View style={styles.recommendationHeader}>
-                <View style={[styles.iconContainer, { backgroundColor: item.color + '20' }]}>
-                  <Ionicons name={item.icon as any} size={24} color={item.color} />
-                </View>
-                <View style={styles.headerRight}>
-                  {item.priority === 'high' && (
-                    <View style={styles.priorityBadge}>
-                      <Text style={styles.priorityText}>Prioritario</Text>
-                    </View>
-                  )}
-                  {item.detailedInfo && (
-                    <TouchableOpacity
-                      style={styles.infoButton}
-                      onPress={() => {
-                        setSelectedRecommendation(item);
-                        setShowInfoModal(true);
-                      }}
-                    >
-                      <Ionicons name="information-circle" size={28} color={item.color} />
-                    </TouchableOpacity>
-                  )}
-                </View>
+          {/* Áreas prioritarias */}
+          {priorityAreas.length > 0 && (
+            <View style={[styles.analysisCard, { borderLeftColor: '#06B6D4' }]}>
+              <Ionicons name="flag" size={24} color="#06B6D4" />
+              <View style={styles.analysisContent}>
+                <Text style={styles.analysisTitle}>Tus Áreas Prioritarias</Text>
+                <Text style={styles.analysisDesc}>
+                  {priorityAreas.join(', ')}. Enfócate en mejorar estas áreas durante tu recuperación.
+                </Text>
               </View>
-              <Text style={styles.recommendationTitle}>{item.title}</Text>
-              <Text style={styles.recommendationDescription}>{item.description}</Text>
             </View>
-          ))}
+          )}
         </View>
 
-        {/* Contacto Profesional */}
+        {/* Estrategias por Gatillo */}
+        {triggers.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>⚠️ Estrategias para tus Gatillos</Text>
+            <Text style={styles.sectionSubtitle}>
+              Has identificado {triggers.length} gatillos. Aquí tienes estrategias específicas:
+            </Text>
+            
+            {triggers.map((trigger: string, index: number) => {
+              const rec = TRIGGER_RECOMMENDATIONS[trigger];
+              if (!rec) return null;
+              
+              return (
+                <TouchableOpacity 
+                  key={index}
+                  style={styles.triggerCard}
+                  onPress={() => {
+                    setSelectedItem(rec);
+                    setShowInfoModal(true);
+                  }}
+                >
+                  <View style={[styles.triggerIcon, { backgroundColor: rec.color + '20' }]}>
+                    <Ionicons name={rec.icon} size={24} color={rec.color} />
+                  </View>
+                  <View style={styles.triggerContent}>
+                    <Text style={styles.triggerTitle}>{trigger}</Text>
+                    <Text style={styles.triggerTip}>{rec.tips[0]}</Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        )}
+
+        {/* Potencia tus Factores Protectores */}
+        {protectiveFactors.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>💪 Potencia tus Fortalezas</Text>
+            <Text style={styles.sectionSubtitle}>
+              Tus {protectiveFactors.length} factores protectores son tu escudo:
+            </Text>
+            
+            {protectiveFactors.map((factor: string, index: number) => {
+              const rec = PROTECTIVE_RECOMMENDATIONS[factor];
+              if (!rec) return null;
+              
+              return (
+                <View key={index} style={styles.protectiveCard}>
+                  <View style={styles.protectiveHeader}>
+                    <Ionicons name="shield-checkmark" size={20} color="#10B981" />
+                    <Text style={styles.protectiveName}>{factor}</Text>
+                  </View>
+                  <Text style={styles.protectiveBoost}>{rec.boost}</Text>
+                  <View style={styles.protectiveGoal}>
+                    <Ionicons name="flag" size={16} color="#3B82F6" />
+                    <Text style={styles.protectiveGoalText}>{rec.goal}</Text>
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        )}
+
+        {/* Hábitos Recomendados */}
         <View style={styles.section}>
-          <View style={styles.contactCard}>
+          <Text style={styles.sectionTitle}>✅ Hábitos Recomendados</Text>
+          <Text style={styles.sectionSubtitle}>
+            Basado en tus gatillos, te recomendamos estos hábitos:
+          </Text>
+          
+          {triggers.map((trigger: string, index: number) => {
+            const rec = TRIGGER_RECOMMENDATIONS[trigger];
+            if (!rec?.habit) return null;
+            
+            const exists = habitExists(rec.habit.name);
+            
+            return (
+              <View key={index} style={styles.habitRecCard}>
+                <Text style={styles.habitRecIcon}>{rec.habit.icon}</Text>
+                <View style={styles.habitRecContent}>
+                  <Text style={styles.habitRecName}>{rec.habit.name}</Text>
+                  <Text style={styles.habitRecFor}>Para manejar: {trigger}</Text>
+                </View>
+                {exists ? (
+                  <View style={styles.habitExistsBadge}>
+                    <Ionicons name="checkmark" size={16} color="#10B981" />
+                    <Text style={styles.habitExistsText}>Activo</Text>
+                  </View>
+                ) : (
+                  <TouchableOpacity 
+                    style={styles.addHabitBtn}
+                    onPress={() => createHabit(rec.habit)}
+                  >
+                    <Ionicons name="add" size={20} color="#FFFFFF" />
+                  </TouchableOpacity>
+                )}
+              </View>
+            );
+          })}
+        </View>
+
+        {/* Recursos Profesionales */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>🏥 Recursos Profesionales</Text>
+          
+          <TouchableOpacity style={styles.resourceCard} onPress={openSinAdicciones}>
             <LinearGradient
               colors={['#10B981', '#059669']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.contactGradient}
+              style={styles.resourceGradient}
             >
-              <Ionicons name="call" size={32} color="#FFFFFF" />
-              <Text style={styles.contactTitle}>¿Necesitas ayuda profesional?</Text>
-              <Text style={styles.contactDescription}>
-                Contáctanos en sinadicciones.cl para orientación y apoyo profesional en adicciones
-              </Text>
-              
-              {/* Botón principal de agendar */}
-              <TouchableOpacity 
-                style={styles.scheduleButton} 
-                onPress={() => Linking.openURL('https://sinadicciones.site.agendapro.com/cl/sucursal/446599')}
-              >
-                <Ionicons name="calendar" size={20} color="#FFFFFF" />
-                <Text style={styles.scheduleButtonText}>
-                  Asesórate con un profesional experto que te guíe
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.contactButton} onPress={openWebsite}>
-                <Text style={styles.contactButtonText}>Visitar sinadicciones.cl</Text>
-                <Ionicons name="arrow-forward" size={20} color="#10B981" />
-              </TouchableOpacity>
+              <Ionicons name="globe" size={32} color="#FFFFFF" />
+              <View style={styles.resourceContent}>
+                <Text style={styles.resourceTitle}>SinAdicciones.cl</Text>
+                <Text style={styles.resourceDesc}>Directorio de centros de rehabilitación en Chile</Text>
+              </View>
+              <Ionicons name="open-outline" size={24} color="#FFFFFF" />
             </LinearGradient>
-          </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.resourceCard} 
+            onPress={() => router.push('/(tabs)/centers')}
+          >
+            <LinearGradient
+              colors={['#3B82F6', '#2563EB']}
+              style={styles.resourceGradient}
+            >
+              <Ionicons name="location" size={32} color="#FFFFFF" />
+              <View style={styles.resourceContent}>
+                <Text style={styles.resourceTitle}>Centros Cercanos</Text>
+                <Text style={styles.resourceDesc}>Encuentra ayuda profesional cerca de ti</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={24} color="#FFFFFF" />
+            </LinearGradient>
+          </TouchableOpacity>
         </View>
 
-        {/* Líneas de ayuda */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📞 Líneas de ayuda 24/7</Text>
-          <View style={styles.helplineCard}>
-            <View style={styles.helplineItem}>
-              <Text style={styles.helplineTitle}>Salud Responde (Chile)</Text>
-              <TouchableOpacity
-                style={styles.phoneButton}
-                onPress={() => Linking.openURL('tel:600 360 7777')}
-              >
-                <Ionicons name="call" size={20} color="#10B981" />
-                <Text style={styles.phoneText}>600 360 7777</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.helplineItem}>
-              <Text style={styles.helplineTitle}>SENDA Previene</Text>
-              <TouchableOpacity
-                style={styles.phoneButton}
-                onPress={() => Linking.openURL('tel:1412')}
-              >
-                <Ionicons name="call" size={20} color="#10B981" />
-                <Text style={styles.phoneText}>1412</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-
-        {/* Botón para continuar */}
+        {/* Botón Comenzar */}
         <TouchableOpacity
-          style={styles.continueButton}
+          style={styles.startButton}
           onPress={() => router.replace('/(tabs)/home')}
         >
-          <Text style={styles.continueButtonText}>Ir al inicio</Text>
+          <Text style={styles.startButtonText}>¡Comenzar mi Recuperación!</Text>
           <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
         </TouchableOpacity>
 
         <View style={{ height: 40 }} />
       </ScrollView>
 
-      {/* Modal de información detallada */}
+      {/* Modal de Detalles */}
       <Modal
         visible={showInfoModal}
         animationType="slide"
@@ -413,40 +460,45 @@ export default function RecommendationsScreen() {
         onRequestClose={() => setShowInfoModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.detailedModalContent}>
+          <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
-                {selectedRecommendation?.detailedInfo?.title}
-              </Text>
+              <Text style={styles.modalTitle}>{selectedItem?.title}</Text>
               <TouchableOpacity onPress={() => setShowInfoModal(false)}>
                 <Ionicons name="close" size={28} color="#6B7280" />
               </TouchableOpacity>
             </View>
             
-            <ScrollView style={styles.modalScroll}>
-              <Text style={styles.modalContent}>
-                {selectedRecommendation?.detailedInfo?.content}
-              </Text>
+            <ScrollView style={styles.modalBody}>
+              {selectedItem?.tips?.map((tip: string, index: number) => (
+                <View key={index} style={styles.tipItem}>
+                  <View style={styles.tipNumber}>
+                    <Text style={styles.tipNumberText}>{index + 1}</Text>
+                  </View>
+                  <Text style={styles.tipText}>{tip}</Text>
+                </View>
+              ))}
               
-              {selectedRecommendation?.detailedInfo?.actions && (
-                <View style={styles.actionsSection}>
-                  <Text style={styles.actionsSectionTitle}>Próximos pasos:</Text>
-                  {selectedRecommendation.detailedInfo.actions.map((action: string, index: number) => (
-                    <View key={index} style={styles.actionItem}>
-                      <Ionicons name="checkmark-circle" size={20} color="#10B981" />
-                      <Text style={styles.actionText}>{action}</Text>
-                    </View>
-                  ))}
+              {selectedItem?.habit && (
+                <View style={styles.modalHabit}>
+                  <Text style={styles.modalHabitTitle}>Hábito Sugerido:</Text>
+                  <View style={styles.modalHabitCard}>
+                    <Text style={styles.modalHabitIcon}>{selectedItem.habit.icon}</Text>
+                    <Text style={styles.modalHabitName}>{selectedItem.habit.name}</Text>
+                  </View>
+                  {!habitExists(selectedItem.habit.name) && (
+                    <TouchableOpacity 
+                      style={styles.modalAddBtn}
+                      onPress={() => {
+                        createHabit(selectedItem.habit);
+                        setShowInfoModal(false);
+                      }}
+                    >
+                      <Text style={styles.modalAddBtnText}>Agregar este hábito</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               )}
             </ScrollView>
-            
-            <TouchableOpacity
-              style={styles.modalCloseButton}
-              onPress={() => setShowInfoModal(false)}
-            >
-              <Text style={styles.modalCloseButtonText}>Entendido</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -464,326 +516,340 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#6B7280',
+  },
   header: {
-    paddingTop: 60,
-    paddingBottom: 24,
-    paddingHorizontal: 24,
-  },
-  headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  homeButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingTop: 50,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#FFFFFF',
-    marginBottom: 4,
   },
   headerSubtitle: {
-    fontSize: 16,
-    color: '#FAE8FF',
+    fontSize: 14,
+    color: '#D1FAE5',
+    marginTop: 4,
   },
   content: {
     flex: 1,
   },
-  disclaimerCard: {
-    backgroundColor: '#FEF3C7',
+  whyCard: {
+    backgroundColor: '#FEF2F2',
     margin: 16,
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 16,
     borderLeftWidth: 4,
-    borderLeftColor: '#F59E0B',
+    borderLeftColor: '#EF4444',
   },
-  disclaimerHeader: {
+  whyHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 8,
     marginBottom: 8,
   },
-  disclaimerTitle: {
+  whyTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#92400E',
-    marginLeft: 8,
+    color: '#991B1B',
   },
-  disclaimerText: {
-    fontSize: 14,
-    color: '#78350F',
-    lineHeight: 20,
+  whyText: {
+    fontSize: 16,
+    color: '#1F2937',
+    fontStyle: 'italic',
+    lineHeight: 24,
   },
-  bold: {
-    fontWeight: 'bold',
+  whyReminder: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 8,
   },
   section: {
     padding: 16,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#1F2937',
+    marginBottom: 4,
+  },
+  sectionSubtitle: {
+    fontSize: 14,
+    color: '#6B7280',
     marginBottom: 16,
   },
   analysisCard: {
     flexDirection: 'row',
     backgroundColor: '#FFFFFF',
-    padding: 16,
+    padding: 14,
     borderRadius: 12,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
+    marginBottom: 10,
+    borderLeftWidth: 4,
+    alignItems: 'flex-start',
+    gap: 12,
   },
   analysisContent: {
     flex: 1,
   },
   analysisTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1F2937',
-    marginBottom: 4,
-  },
-  analysisDescription: {
-    fontSize: 14,
-    color: '#6B7280',
-    lineHeight: 20,
-  },
-  recommendationCard: {
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  highPriority: {
-    borderWidth: 2,
-    borderColor: '#EF4444',
-  },
-  recommendationHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  infoButton: {
-    padding: 4,
-  },
-  priorityBadge: {
-    backgroundColor: '#FEE2E2',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  priorityText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#EF4444',
-  },
-  recommendationTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1F2937',
-    marginBottom: 8,
-  },
-  recommendationDescription: {
-    fontSize: 14,
-    color: '#6B7280',
-    lineHeight: 20,
-  },
-  contactCard: {
-    borderRadius: 16,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  contactGradient: {
-    padding: 24,
-    alignItems: 'center',
-  },
-  contactTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginTop: 12,
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  contactDescription: {
-    fontSize: 14,
-    color: '#F0FDF4',
-    textAlign: 'center',
-    marginBottom: 16,
-    lineHeight: 20,
-  },
-  scheduleButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-    marginBottom: 12,
-    gap: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  scheduleButtonText: {
     fontSize: 15,
-    fontWeight: 'bold',
-    color: '#059669',
-    textAlign: 'center',
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+  analysisDesc: {
+    fontSize: 13,
+    color: '#6B7280',
+    marginTop: 4,
+    lineHeight: 18,
+  },
+  triggerCard: {
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    padding: 14,
+    borderRadius: 12,
+    marginBottom: 10,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  triggerIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  triggerContent: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  triggerTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+  triggerTip: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+  protectiveCard: {
+    backgroundColor: '#ECFDF5',
+    padding: 14,
+    borderRadius: 12,
+    marginBottom: 10,
+  },
+  protectiveHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  protectiveName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#065F46',
+  },
+  protectiveBoost: {
+    fontSize: 13,
+    color: '#047857',
+    marginTop: 8,
+    lineHeight: 18,
+  },
+  protectiveGoal: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#A7F3D0',
+  },
+  protectiveGoalText: {
+    fontSize: 12,
+    color: '#3B82F6',
     flex: 1,
   },
-  contactButton: {
+  habitRecCard: {
     flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    padding: 14,
+    borderRadius: 12,
+    marginBottom: 10,
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-    gap: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
-  contactButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#10B981',
+  habitRecIcon: {
+    fontSize: 28,
   },
-  helplineCard: {
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+  habitRecContent: {
+    flex: 1,
+    marginLeft: 12,
   },
-  helplineItem: {
-    marginBottom: 16,
+  habitRecName: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#1F2937',
   },
-  helplineTitle: {
-    fontSize: 14,
+  habitRecFor: {
+    fontSize: 12,
     color: '#6B7280',
-    marginBottom: 8,
   },
-  phoneButton: {
+  habitExistsBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F0FDF4',
-    padding: 12,
-    borderRadius: 8,
-    gap: 8,
+    backgroundColor: '#ECFDF5',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 16,
+    gap: 4,
   },
-  phoneText: {
-    fontSize: 18,
-    fontWeight: 'bold',
+  habitExistsText: {
+    fontSize: 12,
     color: '#10B981',
+    fontWeight: '600',
   },
-  continueButton: {
+  addHabitBtn: {
+    backgroundColor: '#10B981',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  resourceCard: {
+    marginBottom: 12,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  resourceGradient: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#8B5CF6',
     padding: 16,
-    borderRadius: 12,
-    marginHorizontal: 16,
-    gap: 8,
+    gap: 12,
   },
-  continueButtonText: {
+  resourceContent: {
+    flex: 1,
+  },
+  resourceTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
-  detailedModalContent: {
+  resourceDesc: {
+    fontSize: 12,
+    color: '#D1FAE5',
+  },
+  startButton: {
+    flexDirection: 'row',
+    backgroundColor: '#10B981',
+    marginHorizontal: 16,
+    padding: 16,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+  },
+  startButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    padding: 24,
-    maxHeight: '90%',
+    maxHeight: '80%',
   },
-  modalScroll: {
-    maxHeight: 500,
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
   },
-  modalContent: {
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1F2937',
+  },
+  modalBody: {
+    padding: 20,
+  },
+  tipItem: {
+    flexDirection: 'row',
+    marginBottom: 16,
+    alignItems: 'flex-start',
+  },
+  tipNumber: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#10B981',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  tipNumberText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  tipText: {
+    flex: 1,
     fontSize: 15,
     color: '#374151',
-    lineHeight: 24,
-    marginBottom: 24,
+    lineHeight: 22,
   },
-  actionsSection: {
-    backgroundColor: '#F0FDF4',
+  modalHabit: {
+    backgroundColor: '#F3F4F6',
     padding: 16,
     borderRadius: 12,
     marginTop: 16,
   },
-  actionsSectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#059669',
+  modalHabitTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6B7280',
     marginBottom: 12,
   },
-  actionItem: {
+  modalHabitCard: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 8,
-    gap: 8,
+    alignItems: 'center',
+    gap: 12,
   },
-  actionText: {
-    fontSize: 14,
-    color: '#047857',
-    flex: 1,
+  modalHabitIcon: {
+    fontSize: 32,
   },
-  modalCloseButton: {
+  modalHabitName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+  modalAddBtn: {
     backgroundColor: '#10B981',
-    padding: 16,
-    borderRadius: 12,
+    padding: 14,
+    borderRadius: 10,
     alignItems: 'center',
     marginTop: 16,
   },
-  modalCloseButtonText: {
+  modalAddBtnText: {
     color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 15,
+    fontWeight: '600',
   },
 });
