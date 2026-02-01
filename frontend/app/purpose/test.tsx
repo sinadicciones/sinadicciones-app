@@ -443,6 +443,8 @@ export default function PurposeTestScreen() {
           <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
+
+      <BottomNavigation />
     </KeyboardAvoidingView>
   );
 }
