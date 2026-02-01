@@ -76,14 +76,33 @@ export default function ProfileScreen() {
   };
 
   const pickImage = async () => {
-    // Pedir permisos
+    // En web, usar input de archivo nativo
+    if (Platform.OS === 'web') {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = async (e: any) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onloadend = async () => {
+            const base64Image = reader.result as string;
+            await uploadProfilePhoto(base64Image);
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+      input.click();
+      return;
+    }
+
+    // En móvil, usar expo-image-picker
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
       Alert.alert('Permiso denegado', 'Necesitamos acceso a tu galería para cambiar la foto de perfil');
       return;
     }
 
-    // Abrir selector de imagen
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -99,14 +118,19 @@ export default function ProfileScreen() {
   };
 
   const takePhoto = async () => {
-    // Pedir permisos de cámara
+    // En web, la cámara no está disponible fácilmente, usar galería
+    if (Platform.OS === 'web') {
+      Alert.alert('No disponible', 'La cámara no está disponible en web. Usa "Elegir de galería".');
+      return;
+    }
+
+    // En móvil, usar cámara
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
       Alert.alert('Permiso denegado', 'Necesitamos acceso a tu cámara para tomar una foto');
       return;
     }
 
-    // Abrir cámara
     const result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       aspect: [1, 1],
