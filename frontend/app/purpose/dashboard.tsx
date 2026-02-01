@@ -1171,7 +1171,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#4B5563',
     lineHeight: 24,
-    marginBottom: 24,
+    marginBottom: 20,
+  },
+  affirmationCard: {
+    backgroundColor: '#FEF3C7',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 20,
+    borderLeftWidth: 4,
+    borderLeftColor: '#F59E0B',
+  },
+  affirmationLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#D97706',
+    marginBottom: 8,
+  },
+  affirmationText: {
+    fontSize: 16,
+    fontStyle: 'italic',
+    color: '#92400E',
+    lineHeight: 24,
   },
   modalSectionTitle: {
     fontSize: 18,
