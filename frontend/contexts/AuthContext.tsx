@@ -254,8 +254,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       const headers: any = {};
       
-      // On mobile, use Authorization header. On web, rely on cookies
-      if (Platform.OS !== 'web' && token) {
+      // Always use Authorization header if we have a token
+      if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
@@ -269,9 +269,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(userData);
       } else {
         setUser(null);
-        if (Platform.OS !== 'web') {
-          await AsyncStorage.removeItem('session_token');
-        }
+        await AsyncStorage.removeItem('session_token');
       }
     } catch (error) {
       console.error('Failed to refresh user:', error);
