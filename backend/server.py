@@ -456,7 +456,7 @@ async def get_profile(current_user: User = Depends(get_current_user)):
     
     if not profile:
         # Create default profile if it doesn't exist
-        profile = {
+        profile_data = {
             "user_id": current_user.user_id,
             "addiction_type": None,
             "secondary_addictions": [],
@@ -473,7 +473,13 @@ async def get_profile(current_user: User = Depends(get_current_user)):
             "my_why": None,
             "updated_at": datetime.now(timezone.utc)
         }
-        await db.user_profiles.insert_one(profile)
+        await db.user_profiles.insert_one(profile_data)
+        
+        # Return the profile without _id
+        profile = await db.user_profiles.find_one(
+            {"user_id": current_user.user_id},
+            {"_id": 0}
+        )
     
     return profile
 
