@@ -137,7 +137,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const checkExistingSession = async () => {
     try {
       // Check for stored token first
-      const token = await AsyncStorage.getItem('session_token');
+      const token = await getToken();
+      console.log('Checking session, token found:', !!token);
       
       const headers: any = {};
       
@@ -153,10 +154,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (response.ok) {
         const userData = await response.json();
+        console.log('Session valid, user:', userData.name);
         setUser(userData);
       } else {
         // Token invalid or no session, clear storage
-        await AsyncStorage.removeItem('session_token');
+        console.log('Session invalid, clearing token');
+        await removeToken();
         setUser(null);
       }
     } catch (error) {
