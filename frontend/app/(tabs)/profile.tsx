@@ -322,11 +322,27 @@ export default function ProfileScreen() {
         {/* Mi Cuenta Section */}
         <View style={styles.accountSection}>
           <View style={styles.accountHeader}>
-            <View style={styles.avatarContainer}>
-              <Text style={styles.avatarText}>
-                {user?.name?.charAt(0).toUpperCase() || '?'}
-              </Text>
-            </View>
+            <TouchableOpacity 
+              style={styles.avatarContainer}
+              onPress={showPhotoOptions}
+              disabled={uploadingPhoto}
+            >
+              {uploadingPhoto ? (
+                <ActivityIndicator size="small" color="#FFFFFF" />
+              ) : profilePhoto ? (
+                <Image 
+                  source={{ uri: profilePhoto }} 
+                  style={styles.avatarImage}
+                />
+              ) : (
+                <Text style={styles.avatarText}>
+                  {user?.name?.charAt(0).toUpperCase() || '?'}
+                </Text>
+              )}
+              <View style={styles.cameraIconContainer}>
+                <Ionicons name="camera" size={14} color="#FFFFFF" />
+              </View>
+            </TouchableOpacity>
             <View style={styles.accountInfo}>
               <Text style={styles.accountName}>{user?.name || 'Usuario'}</Text>
               <Text style={styles.accountEmail}>{user?.email || ''}</Text>
