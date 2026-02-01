@@ -149,15 +149,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const refreshUser = async () => {
     try {
       const token = await AsyncStorage.getItem('session_token');
-      if (!token) {
-        setUser(null);
-        return;
+      
+      const headers: any = {};
+      
+      // On mobile, use Authorization header. On web, rely on cookies
+      if (Platform.OS !== 'web' && token) {
+        headers['Authorization'] = `Bearer ${token}`;
       }
 
       const response = await fetch(`${BACKEND_URL}/api/auth/me`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers,
+        credentials: 'include', // Important for cookies on web
       });
 
       if (response.ok) {
@@ -165,7 +167,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(userData);
       } else {
         setUser(null);
-        await AsyncStorage.removeItem('session_token');
+        if (Platform.OS !== 'web') {
+          await AsyncStorage.removeItem('session_token');
+        }
       }
     } catch (error) {
       console.error('Failed to refresh user:', error);
