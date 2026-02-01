@@ -27,12 +27,7 @@ export default function ProfileScreen() {
 
   const loadProfile = async () => {
     try {
-      const token = await AsyncStorage.getItem('session_token');
-      if (!token) return;
-
-      const response = await fetch(`${BACKEND_URL}/api/profile`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
+      const response = await authenticatedFetch(`${BACKEND_URL}/api/profile`);
 
       if (response.ok) {
         const data = await response.json();
@@ -46,15 +41,8 @@ export default function ProfileScreen() {
 
   const saveProfile = async () => {
     try {
-      const token = await AsyncStorage.getItem('session_token');
-      if (!token) return;
-
-      const response = await fetch(`${BACKEND_URL}/api/profile`, {
+      const response = await authenticatedFetch(`${BACKEND_URL}/api/profile`, {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(formData),
       });
 
