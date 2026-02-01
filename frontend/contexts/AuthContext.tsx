@@ -241,9 +241,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const data = await response.json();
 
       if (response.ok) {
-        // Store token for all platforms
+        // Store token using helper
         if (data.session_token) {
-          await AsyncStorage.setItem('session_token', data.session_token);
+          await storeToken(data.session_token);
         }
         await refreshUser();
         return { success: true };
