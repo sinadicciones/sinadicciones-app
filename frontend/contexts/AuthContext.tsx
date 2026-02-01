@@ -7,6 +7,28 @@ import { Platform } from 'react-native';
 // Get backend URL - use environment variable or fallback
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'https://sober-tracks.preview.emergentagent.com';
 
+// Helper for storing token (works on both web and mobile)
+const storeToken = async (token: string) => {
+  if (Platform.OS === 'web' && typeof window !== 'undefined') {
+    localStorage.setItem('session_token', token);
+  }
+  await AsyncStorage.setItem('session_token', token);
+};
+
+const getToken = async (): Promise<string | null> => {
+  if (Platform.OS === 'web' && typeof window !== 'undefined') {
+    return localStorage.getItem('session_token');
+  }
+  return await AsyncStorage.getItem('session_token');
+};
+
+const removeToken = async () => {
+  if (Platform.OS === 'web' && typeof window !== 'undefined') {
+    localStorage.removeItem('session_token');
+  }
+  await AsyncStorage.removeItem('session_token');
+};
+
 interface User {
   user_id: string;
   email: string;
