@@ -122,7 +122,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // Create redirect URL based on platform
       const redirectUrl = Platform.OS === 'web'
-        ? `${BACKEND_URL}/`
+        ? window.location.origin + window.location.pathname
         : Linking.createURL('/');
 
       const authUrl = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
