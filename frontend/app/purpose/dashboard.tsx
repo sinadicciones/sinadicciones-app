@@ -731,7 +731,7 @@ export default function PurposeDashboard() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Tu Tipo: {stats?.purpose_type}</Text>
+              <Text style={styles.modalTitle}>{purposeInfo?.emoji} {stats?.purpose_type}</Text>
               <TouchableOpacity onPress={() => setShowPurposeModal(false)}>
                 <Ionicons name="close" size={24} color="#6B7280" />
               </TouchableOpacity>
@@ -741,6 +741,12 @@ export default function PurposeDashboard() {
               {purposeInfo && (
                 <>
                   <Text style={styles.modalDescription}>{purposeInfo.description}</Text>
+                  
+                  {/* Afirmación destacada */}
+                  <View style={styles.affirmationCard}>
+                    <Text style={styles.affirmationLabel}>✨ Tu afirmación diaria:</Text>
+                    <Text style={styles.affirmationText}>"{purposeInfo.affirmation}"</Text>
+                  </View>
                   
                   <Text style={styles.modalSectionTitle}>💪 Tus Fortalezas</Text>
                   <View style={styles.strengthsContainer}>
