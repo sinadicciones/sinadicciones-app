@@ -195,8 +195,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const data = await response.json();
 
       if (response.ok) {
-        // Store token for mobile
-        if (Platform.OS !== 'web' && data.session_token) {
+        // Store token for all platforms
+        if (data.session_token) {
           await AsyncStorage.setItem('session_token', data.session_token);
         }
         await refreshUser();
