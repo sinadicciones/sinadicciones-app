@@ -94,6 +94,35 @@ class UserProfile(BaseModel):
     profile_completed: bool = False
     updated_at: datetime
 
+class PurposeTest(BaseModel):
+    user_id: str
+    answers: dict
+    profile: dict  # Analyzed profile with values, strengths, purpose_type
+    completed_at: datetime
+
+class PurposeGoal(BaseModel):
+    goal_id: str
+    user_id: str
+    area: str  # health, relationships, work, personal, spiritual, finances
+    title: str
+    description: Optional[str] = None
+    target_date: Optional[str] = None
+    status: str = "active"  # active, completed, paused
+    progress: int = 0  # 0-100
+    steps: List[dict] = []  # [{step: str, completed: bool}]
+    created_at: datetime
+    updated_at: datetime
+
+class WeeklyCheckin(BaseModel):
+    checkin_id: str
+    user_id: str
+    week_start: str  # YYYY-MM-DD
+    area_ratings: dict  # {health: 7, relationships: 6, ...}
+    achievements: List[str] = []
+    challenges: List[str] = []
+    next_week_plan: Optional[str] = None
+    created_at: datetime
+
 # ============== AUTH HELPERS ==============
 
 async def get_current_user(request: Request) -> Optional[User]:
