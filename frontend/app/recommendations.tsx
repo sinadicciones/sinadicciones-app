@@ -734,4 +734,55 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
+  detailedModalContent: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+    maxHeight: '90%',
+  },
+  modalScroll: {
+    maxHeight: 500,
+  },
+  modalContent: {
+    fontSize: 15,
+    color: '#374151',
+    lineHeight: 24,
+    marginBottom: 24,
+  },
+  actionsSection: {
+    backgroundColor: '#F0FDF4',
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 16,
+  },
+  actionsSectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#059669',
+    marginBottom: 12,
+  },
+  actionItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+    gap: 8,
+  },
+  actionText: {
+    fontSize: 14,
+    color: '#047857',
+    flex: 1,
+  },
+  modalCloseButton: {
+    backgroundColor: '#10B981',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  modalCloseButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });
