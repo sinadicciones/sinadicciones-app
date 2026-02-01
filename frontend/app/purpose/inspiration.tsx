@@ -243,6 +243,8 @@ export default function InspirationLibrary() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
+
+      <BottomNavigation />
     </SafeAreaView>
   );
 }
