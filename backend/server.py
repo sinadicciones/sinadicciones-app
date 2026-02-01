@@ -616,6 +616,12 @@ async def get_purpose_test(current_user: User = Depends(get_current_user)):
     
     return tests[0] if tests else None
 
+@app.delete("/api/purpose/test")
+async def delete_purpose_test(current_user: User = Depends(get_current_user)):
+    """Delete all purpose tests for the user to allow retaking the test"""
+    result = await db.purpose_tests.delete_many({"user_id": current_user.user_id})
+    return {"success": True, "deleted_count": result.deleted_count}
+
 @app.get("/api/purpose/goals")
 async def get_purpose_goals(current_user: User = Depends(get_current_user)):
     goals = await db.purpose_goals.find(
