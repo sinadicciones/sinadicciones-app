@@ -1,17 +1,23 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
-const BACKEND_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:8001';
+const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'https://sober-tracks.preview.emergentagent.com';
 
 interface FetchOptions extends RequestInit {
   headers?: Record<string, string>;
 }
 
+// Helper to get token from storage (works on both web and mobile)
+const getToken = async (): Promise<string | null> => {
+  if (Platform.OS === 'web' && typeof window !== 'undefined') {
+    return localStorage.getItem('session_token');
+  }
+  return await AsyncStorage.getItem('session_token');
+};
+
 /**
  * Helper function to make authenticated API requests
- * On web, uses cookies automatically
- * On mobile, uses Authorization header with token from AsyncStorage
+ * Uses Authorization header with token from storage
  */
 export async function authenticatedFetch(url: string, options: FetchOptions = {}): Promise<Response> {
   const headers: Record<string, string> = {
@@ -19,16 +25,13 @@ export async function authenticatedFetch(url: string, options: FetchOptions = {}
     ...options.headers,
   };
 
-  // On mobile, add Authorization header with token from AsyncStorage
-  if (Platform.OS !== 'web') {
-    const token = await AsyncStorage.getItem('session_token');
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
+  // Add Authorization header with token from storage
+  const token = await getToken();
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
   }
 
   // Make the request
-  // On web, credentials: 'include' ensures cookies are sent
   return fetch(url, {
     ...options,
     headers,
