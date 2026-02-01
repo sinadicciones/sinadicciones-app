@@ -10,6 +10,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   Modal,
+  Image,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -18,6 +20,7 @@ import { authenticatedFetch, getBackendURL } from '../../utils/api';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 import { useAuth } from '../../contexts/AuthContext';
+import * as ImagePicker from 'expo-image-picker';
 
 const BACKEND_URL = getBackendURL();
 
