@@ -735,10 +735,12 @@ async def get_purpose_stats(current_user: User = Depends(get_current_user)):
             goals_by_area[area]["avg_progress"] = goals_by_area[area]["total_progress"] / goals_by_area[area]["count"]
     
     # Get latest checkin
-    latest_checkin = await db.weekly_checkins.find_one(
+    checkins = await db.weekly_checkins.find(
         {"user_id": current_user.user_id},
         {"_id": 0}
-    ).sort("week_start", -1)
+    ).sort("week_start", -1).to_list(1)
+    
+    latest_checkin = checkins[0] if checkins else None
     
     # Calculate days working on vision
     days_working = 0
