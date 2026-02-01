@@ -139,6 +139,70 @@ export default function ProfileScreen() {
     });
   };
 
+  const handleChangePassword = async () => {
+    setPasswordError('');
+    
+    // Validaciones
+    if (!passwordData.currentPassword) {
+      setPasswordError('Ingresa tu contraseña actual');
+      return;
+    }
+    if (!passwordData.newPassword) {
+      setPasswordError('Ingresa tu nueva contraseña');
+      return;
+    }
+    if (passwordData.newPassword.length < 6) {
+      setPasswordError('La nueva contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordError('Las contraseñas no coinciden');
+      return;
+    }
+
+    setChangingPassword(true);
+    try {
+      const response = await authenticatedFetch(`${BACKEND_URL}/api/auth/change-password`, {
+        method: 'POST',
+        body: JSON.stringify({
+          current_password: passwordData.currentPassword,
+          new_password: passwordData.newPassword,
+        }),
+      });
+
+      if (response.ok) {
+        Alert.alert('Éxito', 'Contraseña actualizada correctamente');
+        setShowPasswordModal(false);
+        setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      } else {
+        const data = await response.json();
+        setPasswordError(data.detail || 'Error al cambiar la contraseña');
+      }
+    } catch (error) {
+      setPasswordError('Error de conexión');
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Cerrar sesión',
+      '¿Estás seguro que quieres cerrar sesión?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { 
+          text: 'Cerrar sesión', 
+          style: 'destructive',
+          onPress: async () => {
+            await logout();
+            router.replace('/');
+          }
+        },
+      ]
+    );
+  };
+
   if (!profile) {
     return (
       <View style={styles.loadingContainer}>
