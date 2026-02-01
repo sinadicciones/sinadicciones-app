@@ -445,6 +445,39 @@ export default function PurposeDashboard() {
     return PURPOSE_TYPES[stats.purpose_type] || PURPOSE_TYPES['Cuidador'];
   };
 
+  const handleRestartPurpose = () => {
+    Alert.alert(
+      '🔄 Reiniciar mi sentido',
+      '¿Estás seguro de que quieres volver a hacer el test de propósito?\n\nTu tipo actual y respuestas se eliminarán, pero tus objetivos se mantendrán.',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Sí, reiniciar',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const response = await authenticatedFetch(`${BACKEND_URL}/api/purpose/test`, {
+                method: 'DELETE',
+              });
+              if (response.ok) {
+                router.replace('/purpose/test');
+              } else {
+                // Even if delete fails, allow retry
+                router.replace('/purpose/test');
+              }
+            } catch (error) {
+              // Navigate anyway to allow retry
+              router.replace('/purpose/test');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const WheelOfLife = () => {
     const centerX = 150;
     const centerY = 150;
