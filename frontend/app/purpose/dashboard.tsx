@@ -906,6 +906,8 @@ export default function PurposeDashboard() {
           </View>
         </View>
       </Modal>
+
+      <BottomNavigation />
     </SafeAreaView>
   );
 }
