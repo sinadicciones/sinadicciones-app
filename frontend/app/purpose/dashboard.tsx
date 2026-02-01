@@ -16,6 +16,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { authenticatedFetch, getBackendURL } from '../../utils/api';
 import { Svg, Polygon, Circle, Line as SvgLine, Text as SvgText } from 'react-native-svg';
+import BottomNavigation from '../../components/BottomNavigation';
 
 const BACKEND_URL = getBackendURL();
 const { width } = Dimensions.get('window');
