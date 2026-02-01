@@ -32,7 +32,7 @@ export default function HomeScreen() {
   }, []);
 
   const loadData = async () => {
-    try:
+    try {
       // Load profile first to check if onboarding is complete
       const profileResponse = await authenticatedFetch(`${BACKEND_URL}/api/profile`);
       if (profileResponse.ok) {
