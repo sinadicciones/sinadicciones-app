@@ -86,7 +86,7 @@ export default function ProfileScreen() {
         if (file) {
           const reader = new FileReader();
           reader.onloadend = async () => {
-            const base64Image = reader.result as string;
+            const base64Image = reader.result;
             await uploadProfilePhoto(base64Image);
           };
           reader.readAsDataURL(file);
