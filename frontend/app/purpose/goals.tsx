@@ -428,6 +428,125 @@ export default function AllGoals() {
           </View>
         </View>
       </Modal>
+
+      {/* Guide Modal - How to write SMART goals */}
+      <Modal visible={showGuideModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>📝 Guía para escribir objetivos</Text>
+              <TouchableOpacity onPress={() => setShowGuideModal(false)}>
+                <Ionicons name="close" size={24} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={styles.guideIntro}>
+                Un buen objetivo SMART debe ser claro y medible. Aquí tienes la fórmula y ejemplos para cada área:
+              </Text>
+
+              <View style={styles.formulaBox}>
+                <Text style={styles.formulaTitle}>📐 Fórmula básica:</Text>
+                <Text style={styles.formulaText}>
+                  [ACCIÓN] + [CANTIDAD/FRECUENCIA] + [PERÍODO DE TIEMPO]
+                </Text>
+              </View>
+
+              {/* Examples by Area */}
+              <Text style={styles.examplesTitle}>Ejemplos por área:</Text>
+
+              <View style={styles.exampleCard}>
+                <View style={[styles.exampleIcon, { backgroundColor: '#10B98120' }]}>
+                  <Ionicons name="fitness" size={20} color="#10B981" />
+                </View>
+                <View style={styles.exampleContent}>
+                  <Text style={styles.exampleArea}>Salud Física</Text>
+                  <Text style={styles.exampleBad}>❌ "Hacer ejercicio"</Text>
+                  <Text style={styles.exampleGood}>✅ "Caminar 30 minutos al día, 5 días a la semana, por 4 semanas"</Text>
+                  <Text style={styles.exampleGood}>✅ "Dormir 7 horas mínimo cada noche durante este mes"</Text>
+                </View>
+              </View>
+
+              <View style={styles.exampleCard}>
+                <View style={[styles.exampleIcon, { backgroundColor: '#3B82F620' }]}>
+                  <Ionicons name="people" size={20} color="#3B82F6" />
+                </View>
+                <View style={styles.exampleContent}>
+                  <Text style={styles.exampleArea}>Relaciones</Text>
+                  <Text style={styles.exampleBad}>❌ "Mejorar relación con mi familia"</Text>
+                  <Text style={styles.exampleGood}>✅ "Llamar a mis padres 2 veces por semana durante 2 meses"</Text>
+                  <Text style={styles.exampleGood}>✅ "Asistir a 4 reuniones de grupo de apoyo este mes"</Text>
+                </View>
+              </View>
+
+              <View style={styles.exampleCard}>
+                <View style={[styles.exampleIcon, { backgroundColor: '#8B5CF620' }]}>
+                  <Ionicons name="briefcase" size={20} color="#8B5CF6" />
+                </View>
+                <View style={styles.exampleContent}>
+                  <Text style={styles.exampleArea}>Trabajo/Carrera</Text>
+                  <Text style={styles.exampleBad}>❌ "Conseguir un mejor trabajo"</Text>
+                  <Text style={styles.exampleGood}>✅ "Enviar 3 currículums por semana durante 1 mes"</Text>
+                  <Text style={styles.exampleGood}>✅ "Completar 1 curso online de mi área en 8 semanas"</Text>
+                </View>
+              </View>
+
+              <View style={styles.exampleCard}>
+                <View style={[styles.exampleIcon, { backgroundColor: '#EC489920' }]}>
+                  <Ionicons name="school" size={20} color="#EC4899" />
+                </View>
+                <View style={styles.exampleContent}>
+                  <Text style={styles.exampleArea}>Desarrollo Personal</Text>
+                  <Text style={styles.exampleBad}>❌ "Leer más"</Text>
+                  <Text style={styles.exampleGood}>✅ "Leer 20 páginas diarias durante 30 días"</Text>
+                  <Text style={styles.exampleGood}>✅ "Escribir en mi diario 10 minutos cada noche por 2 semanas"</Text>
+                </View>
+              </View>
+
+              <View style={styles.exampleCard}>
+                <View style={[styles.exampleIcon, { backgroundColor: '#F59E0B20' }]}>
+                  <Ionicons name="sparkles" size={20} color="#F59E0B" />
+                </View>
+                <View style={styles.exampleContent}>
+                  <Text style={styles.exampleArea}>Espiritualidad</Text>
+                  <Text style={styles.exampleBad}>❌ "Ser más espiritual"</Text>
+                  <Text style={styles.exampleGood}>✅ "Meditar 10 minutos cada mañana durante 21 días"</Text>
+                  <Text style={styles.exampleGood}>✅ "Practicar gratitud escribiendo 3 cosas cada noche por 1 mes"</Text>
+                </View>
+              </View>
+
+              <View style={styles.exampleCard}>
+                <View style={[styles.exampleIcon, { backgroundColor: '#EF444420' }]}>
+                  <Ionicons name="cash" size={20} color="#EF4444" />
+                </View>
+                <View style={styles.exampleContent}>
+                  <Text style={styles.exampleArea}>Finanzas</Text>
+                  <Text style={styles.exampleBad}>❌ "Ahorrar dinero"</Text>
+                  <Text style={styles.exampleGood}>✅ "Ahorrar $30.000 semanales durante 3 meses"</Text>
+                  <Text style={styles.exampleGood}>✅ "No gastar en compras impulsivas por 30 días"</Text>
+                </View>
+              </View>
+
+              <View style={styles.tipBoxGuide}>
+                <Ionicons name="bulb" size={24} color="#F59E0B" />
+                <View style={styles.tipBoxContent}>
+                  <Text style={styles.tipBoxTitle}>💡 Consejo clave:</Text>
+                  <Text style={styles.tipBoxText}>
+                    Si puedes responder "¿Cuánto?" y "¿Cuándo?", tu objetivo está bien definido.
+                  </Text>
+                </View>
+              </View>
+            </ScrollView>
+
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => setShowGuideModal(false)}
+            >
+              <Text style={styles.modalButtonText}>¡Entendido!</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
