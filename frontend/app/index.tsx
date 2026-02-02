@@ -453,18 +453,17 @@ const styles = StyleSheet.create({
   featureIconPro: {
     backgroundColor: 'rgba(59, 130, 246, 0.3)',
   },
-  },
   featureTextContainer: {
     flex: 1,
   },
   featureTitle: {
-    fontSize: 15,
+    fontSize: 14,
     color: '#FFFFFF',
     fontWeight: '600',
     marginBottom: 2,
   },
   featureText: {
-    fontSize: 13,
+    fontSize: 12,
     color: '#9CA3AF',
   },
   authButtons: {
