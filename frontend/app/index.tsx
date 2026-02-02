@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#1A1A1A',
   },
   gradient: {
     flex: 1,
@@ -379,6 +379,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 40,
   },
+  logoImage: {
+    width: 200,
+    height: 120,
+    marginBottom: 16,
+  },
   logo: {
     fontSize: 70,
     marginBottom: 12,
@@ -391,7 +396,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#D1FAE5',
+    color: '#9CA3AF',
     textAlign: 'center',
   },
   features: {
@@ -402,15 +407,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     padding: 14,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   featureIconContainer: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -426,7 +433,7 @@ const styles = StyleSheet.create({
   },
   featureText: {
     fontSize: 13,
-    color: '#D1FAE5',
+    color: '#9CA3AF',
   },
   authButtons: {
     width: '100%',
@@ -459,10 +466,10 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
   },
   dividerText: {
-    color: '#D1FAE5',
+    color: '#9CA3AF',
     marginHorizontal: 16,
     fontSize: 14,
   },
@@ -476,7 +483,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   emailButtonText: {
-    color: '#10B981',
+    color: '#1A1A1A',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -533,7 +540,7 @@ const styles = StyleSheet.create({
     color: '#1F2937',
   },
   submitButton: {
-    backgroundColor: '#047857',
+    backgroundColor: '#FFFFFF',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -543,7 +550,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   submitButtonText: {
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -552,13 +559,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   switchModeText: {
-    color: '#D1FAE5',
+    color: '#9CA3AF',
     fontSize: 14,
     textDecorationLine: 'underline',
   },
   privacy: {
     fontSize: 14,
-    color: '#D1FAE5',
+    color: '#9CA3AF',
     textAlign: 'center',
   },
 });
