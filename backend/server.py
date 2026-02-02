@@ -311,6 +311,9 @@ class EmailRegisterRequest(BaseModel):
     email: str
     password: str
     name: str
+    role: str = "patient"  # patient or professional
+    country: Optional[str] = None
+    identification: Optional[str] = None  # RUT, DNI, etc.
 
 class EmailLoginRequest(BaseModel):
     email: str
