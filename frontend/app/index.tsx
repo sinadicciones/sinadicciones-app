@@ -163,11 +163,15 @@ export default function WelcomeScreen() {
 
             {!showEmailForm ? (
               <>
-                {/* Features - Updated with new functionalities */}
+                {/* Features for Users */}
+                <View style={styles.sectionHeader}>
+                  <Ionicons name="person" size={18} color="#10B981" />
+                  <Text style={styles.sectionTitle}>Para Usuarios</Text>
+                </View>
                 <View style={styles.features}>
                   <View style={styles.feature}>
                     <View style={styles.featureIconContainer}>
-                      <Ionicons name="calendar" size={22} color="#FFFFFF" />
+                      <Ionicons name="calendar" size={20} color="#FFFFFF" />
                     </View>
                     <View style={styles.featureTextContainer}>
                       <Text style={styles.featureTitle}>Seguimiento diario</Text>
@@ -177,31 +181,38 @@ export default function WelcomeScreen() {
                   
                   <View style={styles.feature}>
                     <View style={styles.featureIconContainer}>
-                      <Ionicons name="star" size={22} color="#FFFFFF" />
+                      <Ionicons name="compass" size={20} color="#FFFFFF" />
                     </View>
                     <View style={styles.featureTextContainer}>
                       <Text style={styles.featureTitle}>Sobriedad con Sentido</Text>
-                      <Text style={styles.featureText}>Descubre tu propósito y objetivos SMART</Text>
+                      <Text style={styles.featureText}>Propósito y objetivos de vida</Text>
+                    </View>
+                  </View>
+                </View>
+
+                {/* Features for Professionals */}
+                <View style={styles.sectionHeader}>
+                  <Ionicons name="medical" size={18} color="#3B82F6" />
+                  <Text style={styles.sectionTitlePro}>Para Profesionales</Text>
+                </View>
+                <View style={styles.features}>
+                  <View style={[styles.feature, styles.featurePro]}>
+                    <View style={[styles.featureIconContainer, styles.featureIconPro]}>
+                      <Ionicons name="people" size={20} color="#FFFFFF" />
+                    </View>
+                    <View style={styles.featureTextContainer}>
+                      <Text style={styles.featureTitle}>Gestión de Pacientes</Text>
+                      <Text style={styles.featureText}>Dashboard con pacientes vinculados</Text>
                     </View>
                   </View>
                   
-                  <View style={styles.feature}>
-                    <View style={styles.featureIconContainer}>
-                      <Ionicons name="search" size={22} color="#FFFFFF" />
+                  <View style={[styles.feature, styles.featurePro]}>
+                    <View style={[styles.featureIconContainer, styles.featureIconPro]}>
+                      <Ionicons name="notifications" size={20} color="#FFFFFF" />
                     </View>
                     <View style={styles.featureTextContainer}>
-                      <Text style={styles.featureTitle}>Directorio de centros</Text>
-                      <Text style={styles.featureText}>Busca tratamientos en sinadicciones.cl</Text>
-                    </View>
-                  </View>
-                  
-                  <View style={styles.feature}>
-                    <View style={styles.featureIconContainer}>
-                      <Ionicons name="call" size={22} color="#FFFFFF" />
-                    </View>
-                    <View style={styles.featureTextContainer}>
-                      <Text style={styles.featureTitle}>Botón SOS</Text>
-                      <Text style={styles.featureText}>Contacto de emergencia inmediato</Text>
+                      <Text style={styles.featureTitle}>Alertas Inteligentes</Text>
+                      <Text style={styles.featureText}>Recaídas, inactividad y emociones</Text>
                     </View>
                   </View>
                 </View>
