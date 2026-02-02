@@ -1380,3 +1380,48 @@ ul {
         border-radius: 50%;
     }
 }
+/* =============================================
+   PROFESSIONALS SECTION
+   ============================================= */
+.professionals {
+    padding: var(--space-4xl) 0;
+    background: linear-gradient(180deg, var(--dark) 0%, var(--gray-900) 100%);
+}
+
+.professionals .section-badge {
+    background: linear-gradient(135deg, rgba(0, 212, 170, 0.2), transparent);
+    border-color: var(--secondary);
+    color: var(--secondary);
+}
+
+.professional-card {
+    border-color: var(--gray-700);
+}
+
+.professional-card:hover {
+    border-color: var(--secondary);
+    box-shadow: 0 0 40px rgba(0, 212, 170, 0.2);
+}
+
+.professional-icon {
+    background: linear-gradient(135deg, rgba(0, 212, 170, 0.2), transparent);
+    border-color: var(--secondary);
+    color: var(--secondary-light);
+}
+
+/* Footer contact info without buttons */
+.footer-contact-info {
+    margin: var(--space-lg) 0;
+}
+
+.footer-contact-info p {
+    color: var(--gray-400);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.footer-contact-info i {
+    color: var(--primary-light);
+}
