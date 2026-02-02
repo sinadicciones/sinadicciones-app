@@ -325,6 +325,53 @@ export default function OnboardingActiveScreen() {
         return (
           <View style={styles.stepContent}>
             <View style={styles.stepHeader}>
+              <Ionicons name="shield-checkmark" size={40} color="#10B981" />
+              <Text style={styles.stepTitle}>Factores Protectores</Text>
+              <Text style={styles.stepSubtitle}>¿Qué te ayuda a mantenerte bien?</Text>
+            </View>
+
+            <View style={styles.optionsGrid}>
+              {PROTECTIVE_FACTORS.map((factor) => (
+                <TouchableOpacity
+                  key={factor.id}
+                  style={[
+                    styles.optionCard,
+                    styles.optionCardGreen,
+                    selectedProtective.includes(factor.id) && styles.optionCardSelectedGreen,
+                  ]}
+                  onPress={() => toggleProtective(factor.id)}
+                >
+                  <Ionicons 
+                    name={factor.icon as any} 
+                    size={24} 
+                    color={selectedProtective.includes(factor.id) ? '#10B981' : '#9CA3AF'} 
+                  />
+                  <Text style={[
+                    styles.optionLabel,
+                    selectedProtective.includes(factor.id) && styles.optionLabelSelectedGreen,
+                  ]}>
+                    {factor.label}
+                  </Text>
+                  {selectedProtective.includes(factor.id) && (
+                    <Ionicons name="checkmark-circle" size={18} color="#10B981" />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <View style={styles.tipBoxGreen}>
+              <Ionicons name="bulb" size={20} color="#10B981" />
+              <Text style={styles.tipTextGreen}>
+                Estos son tus recursos para enfrentar los momentos difíciles. ¡Cultívalos!
+              </Text>
+            </View>
+          </View>
+        );
+
+      case 5:
+        return (
+          <View style={styles.stepContent}>
+            <View style={styles.stepHeader}>
               <Ionicons name="heart" size={40} color="#F59E0B" />
               <Text style={styles.stepTitle}>Tu porqué</Text>
               <Text style={styles.stepSubtitle}>¿Por qué quieres dejar de consumir?</Text>
@@ -352,7 +399,7 @@ export default function OnboardingActiveScreen() {
           </View>
         );
 
-      case 5:
+      case 6:
         return (
           <View style={styles.stepContent}>
             <View style={styles.stepHeader}>
