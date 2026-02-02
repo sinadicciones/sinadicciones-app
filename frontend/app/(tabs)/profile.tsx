@@ -918,7 +918,7 @@ export default function ProfileScreen() {
           />
         </View>
 
-        <View style={{ height: 40 }} />
+            <View style={{ height: 40 }} />
           </>
         )}
       </ScrollView>
