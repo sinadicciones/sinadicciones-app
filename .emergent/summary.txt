@@ -1,89 +1,112 @@
 <analysis>
-<original_problem_statement>
-The user initially wanted to create a mobile app for addiction recovery called sinadicciones.cl. After extensive development of the mobile app, the user's focus shifted.
 
-The most recent and significant requests are:
-1.  **Therapist & Admin Platform:** The user wants to expand the app into a multi-role platform.
-    *   **Patients:** Use the app as it is, but can link to a therapist.
-    *   **Professionals (Therapists):** Have their own onboarding and a dashboard to view their linked patients' statistics and receive alerts (e.g., inactivity, negative emotions, relapse).
-    *   **Admin (User):** A special dashboard with global statistics on user registration, activity, etc.
-    *   **Additional Features:** The user also requested a button of emergency, shared journal entries, assigned tasks by therapists, and internal messaging.
+**original_problem_statement**: The user wants to build a comprehensive addiction recovery mobile app called sinadicciones.cl. The app has evolved to support multiple user roles:
+1.  **Patient / Usuario en recuperación**: The original user type with features for tracking sobriety, habits, and emotional state.
+2.  **Professional / Profesional**: Therapists who can link with patients, monitor their progress, and view alerts.
+3.  **Admin**: A superuser () with access to global platform statistics.
+4.  **Active User / En consumo activo pero quiero dejarlo**: A new user type for individuals still in active addiction who want to start recovery. This profile features a 21-day challenge, educational content, and specific action items, with a focus on privacy (e.g., no national ID required).
 
-2.  **Playlist of Recovery Music:** A new section in the app for users to listen to provided audio files (meditations, motivational talks, etc.).
-
-3.  **New Website from Scratch:** In the final message, the user requested the creation of a completely new website similar to , where rehabilitation centers and therapists can register and get their own dashboards. This website should integrate with the app's data. This is a major pivot from the mobile app development.
-
-4.  **Landing Page:** The user requested a static landing page to promote the app. This was created and refined, but the user had trouble updating the files on their own external hosting.
-</original_problem_statement>
+In this session, the user also requested:
+*   A dark mode theme for the initial login/register screen.
+*   Updates to the separate static landing page to reflect new features and a new preview URL.
+*   A new professional dashboard with patient management and a section for a partner academy (Academia Lidera).
+*   A plan to create a completely separate, but integrated, website () for rehabilitation centers and therapists.
 
 **User's preferred language**: Spanish. The next agent MUST respond in Spanish.
 
 **what currently exists?**
-A full-stack Expo (React Native) and FastAPI/MongoDB application. The core application for Patients is feature-rich. In this session, a significant amount of new, **untested** functionality was added to support a multi-role system:
+A full-stack Expo (React Native) and FastAPI/MongoDB application with a 4-role architecture (patient, professional, admin, active_user).
 
-*   **Multi-Role Backend:** The  collection in the database now includes a  field ('patient', 'professional', 'admin'). Numerous new API endpoints have been created to support professional dashboards, patient-therapist linking, alerts, and admin statistics. The user  will be automatically assigned the 'admin' role upon registration.
-*   **Multi-Role Frontend:**
-    *   A new registration flow that includes a  screen.
-    *   A separate onboarding flow for professionals ().
-    *   New screens for the Professional role: , , and .
-    *   New screens for the Patient role:  and .
-    *   A new screen for the Admin role: .
-    *   The Profile screen () is now dynamic, showing different buttons based on the user's role (e.g., Find Therapist, Report Relapse, Admin Dashboard).
-*   **Static Landing Page:** A complete, modern landing page has been created in the  directory, with files (, , ) ready to be uploaded to an external host. The buttons on this page point to the app's preview URL.
+*   **Backend ():** Massively expanded to include logic and endpoints for the new Active User role, a 21-day challenge, educational content, automatic habit creation, and improved professional-patient linking. The file has become extremely large and complex.
+*   **Frontend:**
+    *   **Login/Register ():** Redesigned with a dark theme and sections detailing features for both Patients and Professionals.
+    *   **Role Selection ():** Updated to include the three main roles: Patient, Active User, and Professional. Logic was added to skip asking for a national ID for the Active User role.
+    *   **Active User Flow:** New screens created: , , and .
+    *   **Professional Flow:** The  was completely redesigned with a tabbed interface for managing patients and viewing educational content. The profile page  is being heavily modified to show role-specific information.
+    *   **Static Landing Page ():** Updated with a new design, new URL, and information about features for both patients and professionals.
+    *   **Architecture Document ():** A document was created to summarize the backend architecture to facilitate the creation of the separate website project.
 
 **Last working item**:
--   Last item agent was working: The agent was implementing the user's new, large-scale vision for a multi-role platform. The final piece of code written was for **Phase 6: Admin Dashboard**. This included creating the backend endpoints (), the frontend screen (), and the logic to automatically grant the user  admin privileges upon registration.
--   Status: IN PROGRESS (The code for all new features is written but is completely untested by the agent or the user).
+-   Last item agent was working: The agent was in the middle of a major refactor of the **Profile screen ()**. The goal was to make the screen display completely different information based on the user's role. Specifically, it was tailoring the view for the Professional role to remove irrelevant patient-centric information (like substance use, triggers) and eventually add content relevant to them.
+-   Status: **IN PROGRESS**
 -   Agent Testing Done: N
--   Which testing method agent to use? manual testing by curl. The next agent's primary task is to guide the user through testing this entire new platform, starting with the Admin role. The flow to test is:
-    1.  User registers a **new account** with the email .
-    2.  After login, the user navigates to their profile.
-    3.  Verify that an Admin Dashboard button appears.
-    4.  Verify that this button navigates to the admin dashboard and that it attempts to load data.
+-   Which testing method agent to use? manual testing by curl. Once the refactor is complete, the agent must guide the user to test the profile screen for all roles (Professional, Patient, Active User) to ensure the correct information is displayed for each.
 -   User Testing Done: N
 
 **All Pending/In progress Issue list**:
--   **Issue 1: Outdated Landing Page on User's Hosting (P1)**
-    -   **Description:** The user has a live landing page at  which is showing an old version of the files from . The user has struggled to correctly upload the latest version from the workspace to their hosting.
-    -   **Attempted fixes:** The agent correctly identified that the files in the workspace are correct and that the issue is with the user's deployment process (not using Save to GitHub and then not replacing the files on their server). The user confirmed they weren't saving to GitHub.
+-   **Issue 1: Complete and Test the Professional Profile Refactor (P0)**
+    -   **Description:** The user reported that the profile page for a Professional user was showing irrelevant information meant for patients (e.g., what substance do you consume). The agent started refactoring  to use conditional rendering based on the user's role, but the work is incomplete.
+    -   **Attempted fixes:** The agent was using multiple  calls to inject new JSX and styles for the professional view. The task was interrupted.
     -   **Next debug checklist**:
-        1.  Confirm with the user that they have successfully run Save to GitHub again.
-        2.  Ask the user to detail the exact steps they are taking to upload the files (e.g., cPanel File Manager, FTP client).
-        3.  Suggest clearing browser and server-side cache (if applicable) after uploading the new files.
-    -   **Why fix this issue and what will be achieved with the fix?**: The user's promotional landing page will be up-to-date with the correct functionality, design, and links.
-    -   **Status**: BLOCKED (Blocked on user action/understanding of their hosting environment).
+        1.  Review  to understand the current state of the conditional rendering logic.
+        2.  Complete the implementation to ensure professionals see their professional details (specialization, bio) and patients/active users see their recovery details.
+        3.  Test the profile screen by logging in as each of the three user types.
+    -   **Why fix this issue and what will be achieved with the fix?**: Provides a clean, relevant user experience for Professionals, which is critical for their adoption of the platform.
+    -   **Status**: IN PROGRESS
+    -   **Is recurring issue?**: N
+    -   **Should Test frontend/backend/both after fix?**: Frontend (manual testing by user/agent).
+    -   **Blocked on other issue**: None.
+
+-   **Issue 2: Professional-Patient Linking & Dashboard Display (P1)**
+    -   **Description:** The user reported that after a Professional links a patient, the patient does not appear in their dashboard, and no stats are shown.
+    -   **Attempted fixes:** The agent checked the logs and saw the  endpoint returned a . The agent also fixed an issue where no alert was shown if a patient email was not found. However, the core issue of the dashboard not updating/displaying the linked patient remains.
+    -   **Next debug checklist**:
+        1.  In , verify that the list of patients is being re-fetched after a new patient is successfully linked.
+        2.  Check the  endpoint to ensure it correctly returns the list of linked patients for the authenticated professional.
+        3.  Ensure the state management in the  component correctly updates the UI when the patient list changes.
+    -   **Why fix this issue and what will be achieved with the fix?**: This is a core feature of the Professional role. Without it, the professional dashboard is useless.
+    -   **Status**: NOT STARTED
     -   **Is recurring issue?**: Y
-    -   **Should Test frontend/backend/both after fix?**: Frontend (by inspecting the live URL).
+    -   **Should Test frontend/backend/both after fix?**: Both.
+    -   **Blocked on other issue**: None.
+
+-   **Issue 3: Google Login Error 400 (P2)**
+    -   **Description:** After a previous fix for a Google Login 404 error, the user reported a new Error 400.
+    -   **Attempted fixes:** The agent checked backend logs, CORS configuration, and . No obvious code error was found, and the agent suspected a temporary issue with the external authentication service.
+    -   **Next debug checklist**:
+        1.  Ask the user to try again in an incognito window to rule out caching issues.
+        2.  Add detailed  statements in the  function within  to inspect the exact URL and parameters being received after the Google redirect.
+        3.  Verify the redirect URIs configured in the Google Cloud Console for the OAuth client match the app's preview URLs.
+    -   **Why fix this issue and what will be achieved with the fix?**: Google login is a critical, low-friction onboarding path for new users.
+    -   **Status**: NOT STARTED
+    -   **Is recurring issue?**: Y
+    -   **Should Test frontend/backend/both after fix?**: Frontend.
     -   **Blocked on other issue**: None.
 
 **In progress Task List**:
--   **Task 1: Full Verification of the Multi-Role Platform (P0)**
-    -   **Description**: A massive set of features (Phases 1, 2, 3, and 6) was built in a single session and is completely unverified. This includes the entire workflow for patients, professionals, and the admin.
-    -   **Where to resume**: Start by guiding the user to test the **Admin Dashboard** flow as described in Last working item. Then, guide them to test the Professional and Patient flows (registering as each, linking accounts, checking dashboards).
-    -   **What will be achieved with this?**: This will validate the core of the user's new vision for the app and ensure the platform is stable before building more on top of it.
-    -   **Status**: TESTING PENDING
-    -   **Should Test frontend/backend/both after fix?**: Both.
+-   **Task 1: Refactor  for Role-Based Views (P0)**
+    -   **Where to resume**: Continue editing . The agent was adding conditional logic () and corresponding styles.
+    -   **What will be achieved with this?**: The profile screen will be tailored to each user role, improving UX.
+    -   **Status**: IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?**: Frontend.
     -   **Blocked on something**: None.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   **P0: Acknowledge and Plan for the New Website Request:** The user's last message was a request to build a full-featured website from scratch for centers and therapists. This is a separate project from the mobile app. The next agent MUST address this first, clarify the requirements, and propose a plan (or explain that this is a new job).
--   **Future Tasks (from the agreed-upon plan, currently on standby):**
-    -   **P1: Fase 4 - Playlist de Recuperación:** Create a new section for users to listen to provided MP3 audio files.
-    -   **P2: Fase 5 & 7 - Enhanced Therapist-Patient Interaction:** Implement Mensajería Interna, Tareas Asignadas, Botón de Emergencia, and Diario Compartido.
-    -   **P3: App Store / Play Store Publication:** The user has expressed interest in this and the agent has provided the steps. This will be a future goal after the app is stable.
-    -   **P4: Push Notifications:** Implement push notifications for reminders and alerts.
+    *   **P1: Add Relevant Content to Professional Profile:** As part of the profile refactor, the user requested adding content specifically for professionals (e.g., articles, resources for treating patients). This should be done after the UI is fixed.
+    *   **P2: Test Active User Graduation:** The logic for an active_user to become a patient after completing the 21-day challenge exists in the backend but is untested. This flow needs to be verified.
+-   **Future Tasks:**
+    *   **New Website Project:** The user wants to build a full website for centers and therapists. The agent has provided guidance that this should be a separate project and created  to help. This is a major new initiative.
+    *   **Playlist de Recuperación:** A previously planned feature to add a section with audio files.
+    *   **Enhanced Therapist-Patient Interaction:** Features like internal messaging, assigned tasks, and an emergency button.
 
 **Completed work in this session**
--   **Landing Page Creation:** A complete, static landing page was created and placed in . It was iteratively improved with user feedback.
--   **User Education:** Explained the difference between Expo Go, Web App (PWA), and native App Store deployment. Guided the user on how to get the app's public URL.
--   **Fase 1: Role System Implemented:** Added  to the backend user model. Created frontend screens for role selection and a separate onboarding for professionals.
--   **Fase 2: Professional Dashboard Implemented:** Created frontend screens for the professional's dashboard, patient detail view, and a screen for patients to find and link with a therapist.
--   **Fase 3: Alert System Implemented:** Built backend logic and endpoints for alerts (inactivity, negative emotions, relapse). Created frontend screens for professionals to view alerts and for patients to report a relapse.
--   **Fase 6: Admin Dashboard Implemented:** Created backend endpoints to pull global stats. Created the frontend dashboard screen. Implemented logic to automatically grant admin role to  upon registration.
+-   **UI Redesign:** The initial  screen was redesigned with a dark theme and role-specific feature lists.
+-   **New Role: Active User**: A complete flow for users in active consumption was implemented, including a new role (), a privacy-focused onboarding (), and a 21-day challenge dashboard ().
+-   **Professional Dashboard Redesign:** The  was completely overhauled with a new UI, including tabs for patient management and a new section for a partner academy.
+-   **Bug Fixes:**
+    -   Fixed Google Login 404 error by correcting the redirect URL.
+    -   Fixed the user registration flow to correctly prompt for a role instead of defaulting to patient.
+    -   Fixed a bug where an invalid role error occurred when selecting Active User.
+    -   Fixed the broken Cerrar Sesión (Logout) button.
+    -   Fixed a 500 error when the Active User created their recovery plan.
+    -   Improved the patient search for professionals to show an alert when a user is not found.
+-   **Documentation:** Created  to document the app's backend for a future project.
+-   **Static Landing Page:** The  was updated with a new URL and new content for different user roles.
 
 **Earlier issues found/mentioned but not fixed**
--   The issue of the user being unable to update the landing page on their external hosting remains unresolved.
+-   **Google Login Error 400:** As detailed in the Pending/In progress Issue list.
+-   **User's Landing Page Deployment:** The user previously had trouble updating the files on their external hosting. This is a user-side issue, not a code issue, but the agent may need to provide support again.
 
 **Known issue recurrence from previous fork**
 -   None.
@@ -92,66 +115,63 @@ A full-stack Expo (React Native) and FastAPI/MongoDB application. The core appli
 
 
 **Key Technical Concepts**
--   **Role-Based Access Control (RBAC):** The application now has a foundational architecture for different user roles (Patient, Professional, Admin) with distinct permissions and UI.
--   **API Development (FastAPI):** Numerous new endpoints were created for data aggregation (admin stats), relational actions (linking patients), and event-driven logic (alerts).
--   **Conditional Rendering (React):** The UI, especially the profile screen, now uses conditional rendering based on the user's role to display appropriate actions and information.
--   **Multi-Step Onboarding:** The app now supports multiple, distinct onboarding flows based on the selected user role.
--   **Static Site Generation:** Created a standalone static landing page (HTML/CSS/JS) separate from the Expo app.
+-   **Multi-Role Architecture:** The app now supports four distinct roles (, , , ) with different UI and logic paths.
+-   **Conditional Rendering:** Heavily used in  and  to display different components and layouts based on the authenticated user's role.
+-   **Complex Onboarding Flows:** The app now has three separate onboarding flows for patients, professionals, and active users.
+-   **API Development (FastAPI):**  has grown to include dozens of endpoints for role-specific data, challenges, educational content, and user management.
 
 **key DB schema**
--   ****: Now has a  field (string: 'patient', 'professional', 'admin') and a  field.
--   ****: A new collection to manage the relationship between therapists and patients.
--   ****: A new collection to store generated alerts for professionals.
--   ****: A new collection to log user-reported relapses.
+-   : The  field can now be 'patient', 'professional', 'admin', or 'active_user'. New fields for the active user challenge like ,  have been added.
 
 **changes in tech stack**
 -   None.
 
 **All files of reference**
-*   : Massively updated with logic for all three roles, linking, alerts, and admin stats.
-*   : Overhauled to conditionally display buttons for Admin Dashboard, Find Therapist, and Report Relapse based on user role.
-*    & : Modified to handle the new registration flow, redirecting to the role selection screen.
-*   All new files under  (e.g., , , , etc.).
-*   All files in the  directory.
+-   : The single source of all backend logic. Needs urgent refactoring.
+-   : The focus of the last task. A god component that is being refactored.
+-   : The newly designed dashboard for therapists.
+-   : The home screen for the Active User role.
+-   : Contains all authentication logic, including the potentially buggy Google Login flow.
 
 **Areas that need refactoring**:
--   ****: This file is now extremely large and complex. It urgently needs to be broken down into multiple router files (e.g., , , , ) using FastAPI's .
--   ****: This component is becoming a god component, managing state and navigation for multiple roles. The role-specific sections should be extracted into their own components.
+-   ****: **CRITICAL**. This file has become unmaintainably large. It must be broken down into smaller modules using FastAPI's  (e.g., , , ).
+-   ****: This is a god component. The logic for each role's profile view should be extracted into its own separate component (e.g., , ).
 
 **key api endpoints**
--   **Admin**: 
--   **Professional**: , 
--   **Patient**: , 
--   **General**:  (now includes ), 
+-   **Active User:**
+    -   : Completes onboarding and starts the challenge.
+    -   : Gets the status of the 21-day challenge.
+    -   : Retrieves educational content.
+-   **Professional:**
+    -   : Links a patient to the professional.
+    -   : Searches for a patient by email.
+    -   : Gets the list of linked patients.
 
 **Critical Info for New Agent**
--   **Address the New Website Request First:** The user's very last message is a request for a completely new project: a full website for centers and therapists. You MUST start by acknowledging this, clarifying that it's a major new undertaking, and outlining a plan for it separately from the current app.
--   **All New Features are UNTESTED:** A massive multi-role platform was just coded. Nothing has been tested. Your first priority for the *current app* is to guide the user through a thorough testing process, starting with the Admin role.
--   **Admin User Creation:** The user with email  needs to **create a new account** to be assigned the admin role. It will not work if they log in with a previously created account with that email.
--   **Landing Page Issue is External:** The problem with the landing page is not in the workspace code. It's related to the user's process of uploading files to their own hosting service. Be prepared to guide them through debugging their own workflow (FTP, cPanel, caching).
+-   **Address Pending Issues Systematically:** The user often reports multiple issues at once. Tackle them one by one, starting with the highest priority ().
+-   **Code Complexity:** Be aware that  and  are extremely complex and fragile. Changes there are high-risk. Propose refactoring them as a next step after fixing the current critical issues.
+-   **Database Isolation:** The user was confused about why a new chat for the website project couldn't access this app's database. Remember that each chat has an isolated environment. If the user brings this up again, reiterate the recommendation to use a cloud database like MongoDB Atlas for shared projects.
+-   **Un-tested Features:** The Active User flow and the new Professional Dashboard have been coded but have received very little testing. Expect bugs.
 
 **documents created in this job**
 -   
--   
--   
--   
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User (Msg 103):** Proposes a massive new feature: a therapist/admin platform. (Status: In Progress, coded but untested).
-2.  **Agent (Msg 104):** Breaks down the proposal into a phased plan and asks for clarification. (Status: Completed).
-3.  **User (Msg 105):** Provides answers, requests a playlist feature, and asks for more interaction ideas. (Status: Addressed).
-4.  **Agent (Msg 106):** Presents a revised, detailed plan with additional ideas and asks for confirmation to start Phase 1. (Status: Completed).
-5.  **User (Msg 107):** Approves additional features and confirms to start with Phase 1. (Status: Completed).
-6.  **Agent (Msg 163, 206, 251):** Provides summaries after completing the coding for Phases 1, 2, and 3. (Status: Completed).
-7.  **User (Msg 252):** Asks to skip ahead to Phase 6 (Admin Dashboard) and provides their admin email. (Status: Addressed).
-8.  **Agent (Msg 278):** Summarizes the completion of the Admin Dashboard code and asks the user to test by registering. (Status: Completed).
-9.  **PENDING HUMAN MESSAGE (Msg 279):** The user ignores the request to test and instead asks the agent to build a completely new website from scratch for rehab centers and therapists. This is the most critical pending message.
-10. **PENDING HUMAN MESSAGE (Implicit):** The entire multi-role platform is pending testing and verification by the user.
+1.  **User (Msg 340):** Reports that linking a patient doesn't work and the professional's profile shows irrelevant patient data. (Status: **IN PROGRESS**)
+2.  **Agent (Msg 341-372):** Starts working on fixing the professional profile screen.
+3.  **User (Msg 372):** Como continuó? (How did it continue?) - Indicates the agent's last response was cut off, waiting for the work to be finished. (Status: **PENDING RESPONSE**)
+4.  User (Msg 339): Provided summary of fixes for Quiero Dejarlo profile. (Status: Addressed).
+5.  User (Msg 340): Reported issues with professional profile and patient linking. (Status: In Progress).
+6.  User (Msg 277): Confirmed a fix worked and reported a new batch of issues for the active user profile (auto-habits, 404 on content, broken therapist link). (Status: Addressed/Fixed in subsequent steps).
+7.  User (Msg 258): Reported error de conexion when creating a plan in the 21-day challenge. (Status: Fixed).
+8.  User (Msg 231): Reported the logout button was not working. (Status: Fixed).
+9.  User (Msg 227): Asked to be logged out of the preview to test a new user. (Status: Completed).
+10. User (Msg 214): Reported that searching for a patient by email in the professional dashboard did nothing. (Status: Fixed).
 
 **Project Health Check:**
--   **Broken:** The newly implemented multi-role system is entirely unverified and should be considered potentially broken until tested.
+-   **Broken:** The professional-patient linking flow is reported as not working. The professional profile page is in a broken, half-refactored state. The Google login flow is potentially broken.
 -   **Mocked:** No data is mocked.
--   **Pending Verification:** The entire Therapist/Admin platform (Phases 1, 2, 3, 6).
+-   **Pending Verification:** The entire Active User journey, especially the 21-day challenge and graduation. The redesigned professional dashboard. The fixes for the logout button and patient search alert.
 
 **3rd Party Integrations**
 -   Emergent Google Auth (Social Login)
@@ -164,17 +184,18 @@ A full-stack Expo (React Native) and FastAPI/MongoDB application. The core appli
 -    (Backend)
 
 **Testing status**
--   Testing agent used after significant changes: No (not for the latest multi-role implementation).
--   Troubleshoot agent used after agent stuck in loop: No.
+-   Testing agent used after significant changes: NO
+-   Troubleshoot agent used after agent stuck in loop: NO
 -   Test files created: None.
--   Known regressions: None known, but high potential due to the scale of recent changes.
+-   Known regressions: The professional profile UI is currently broken due to the in-progress refactor.
 
 **Credentials to test flow:**
 -   **Admin User:** Register a new account with email .
--   **Patient/Professional:** Register new accounts and select the desired role.
--   **Existing Test User:**  /  (This user is a 'patient' with a completed profile but no role formally assigned in the new system).
+-   **Patient/Professional/Active User:** Register new accounts and select the desired role from the  screen.
 
 **What agent forgot to execute**
--   The agent did not fully resolve the user's issue with updating their external landing page, though it correctly diagnosed the cause.
--   The agent did not run any form of testing after implementing the massive multi-role feature set, leaving it entirely unverified. It moved directly from one phase to the next based on user requests.
+-   The agent did not fully resolve the Google Login Error 400, leaving it as a pending issue.
+-   The agent did not complete the refactoring of , leaving it in an unfinished state.
+-   The agent did not run any automated or structured manual testing after implementing several large, complex features, leading to a cascade of user-found bugs.
+
 </analysis>
