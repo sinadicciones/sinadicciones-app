@@ -443,6 +443,23 @@ const styles = StyleSheet.create({
     fontSize: 14,
     flex: 1,
   },
+  privacyNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 20,
+    gap: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.3)',
+  },
+  privacyNoteText: {
+    flex: 1,
+    color: '#10B981',
+    fontSize: 14,
+    lineHeight: 20,
+  },
   continueButton: {
     backgroundColor: '#FFFFFF',
     paddingVertical: 16,
