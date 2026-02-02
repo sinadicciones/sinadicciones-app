@@ -98,13 +98,22 @@ export default function OnboardingActiveScreen() {
     }
   };
 
+  const toggleProtective = (id: string) => {
+    if (selectedProtective.includes(id)) {
+      setSelectedProtective(selectedProtective.filter(p => p !== id));
+    } else {
+      setSelectedProtective([...selectedProtective, id]);
+    }
+  };
+
   const canContinue = () => {
     switch (step) {
       case 1: return selectedSubstances.length > 0 && primarySubstance;
       case 2: return yearsUsing && frequency;
       case 3: return selectedTriggers.length > 0;
-      case 4: return whyQuit.length >= 10;
-      case 5: return true; // Support person is optional
+      case 4: return selectedProtective.length > 0;
+      case 5: return whyQuit.length >= 10;
+      case 6: return true; // Support person is optional
       default: return false;
     }
   };
