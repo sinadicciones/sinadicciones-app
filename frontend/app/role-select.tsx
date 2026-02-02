@@ -15,7 +15,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { authenticatedFetch } from '../utils/api';
 
-type Role = 'patient' | 'professional' | null;
+type Role = 'patient' | 'professional' | 'active_user' | null;
 
 export default function RoleSelectScreen() {
   const router = useRouter();
@@ -48,8 +48,10 @@ export default function RoleSelectScreen() {
       if (response.ok) {
         if (selectedRole === 'patient') {
           router.replace('/onboarding');
-        } else {
+        } else if (selectedRole === 'professional') {
           router.replace('/onboarding-professional');
+        } else if (selectedRole === 'active_user') {
+          router.replace('/onboarding-active');
         }
       } else {
         const data = await response.json();
@@ -68,7 +70,7 @@ export default function RoleSelectScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <LinearGradient
-        colors={['#10B981', '#059669', '#047857']}
+        colors={['#1A1A1A', '#2D2D2D', '#1A1A1A']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.gradient}
@@ -77,37 +79,36 @@ export default function RoleSelectScreen() {
           <View style={styles.content}>
             {/* Header */}
             <View style={styles.header}>
-              <Text style={styles.logo}>🌱</Text>
               <Text style={styles.title}>¡Bienvenido!</Text>
-              <Text style={styles.subtitle}>¿Cómo usarás Sin Adicciones?</Text>
+              <Text style={styles.subtitle}>¿Cómo te identificas?</Text>
             </View>
 
             {/* Role Cards */}
             <View style={styles.rolesContainer}>
-              {/* Patient Card */}
+              {/* Patient Card - In Recovery */}
               <TouchableOpacity
                 style={[
                   styles.roleCard,
-                  selectedRole === 'patient' && styles.roleCardSelected,
+                  selectedRole === 'patient' && styles.roleCardSelectedGreen,
                 ]}
                 onPress={() => setSelectedRole('patient')}
               >
-                <View style={styles.roleIconContainer}>
+                <View style={[styles.roleIconContainer, styles.iconGreen]}>
                   <Ionicons 
-                    name="person" 
-                    size={32} 
-                    color={selectedRole === 'patient' ? '#10B981' : '#6B7280'} 
+                    name="leaf" 
+                    size={28} 
+                    color="#10B981" 
                   />
                 </View>
                 <View style={styles.roleTextContainer}>
                   <Text style={[
                     styles.roleTitle,
-                    selectedRole === 'patient' && styles.roleTitleSelected
+                    selectedRole === 'patient' && styles.roleTitleSelectedGreen
                   ]}>
-                    Persona en Recuperación
+                    Estoy en Recuperación
                   </Text>
                   <Text style={styles.roleDescription}>
-                    Quiero llevar un seguimiento de mi proceso de recuperación personal
+                    Ya dejé de consumir y quiero mantener mi sobriedad
                   </Text>
                 </View>
                 {selectedRole === 'patient' && (
@@ -117,35 +118,74 @@ export default function RoleSelectScreen() {
                 )}
               </TouchableOpacity>
 
-              {/* Professional Card */}
+              {/* Active User Card - Wants to Quit */}
               <TouchableOpacity
                 style={[
                   styles.roleCard,
-                  selectedRole === 'professional' && styles.roleCardSelected,
+                  selectedRole === 'active_user' && styles.roleCardSelectedOrange,
                 ]}
-                onPress={() => setSelectedRole('professional')}
+                onPress={() => setSelectedRole('active_user')}
               >
-                <View style={styles.roleIconContainer}>
+                <View style={[styles.roleIconContainer, styles.iconOrange]}>
                   <Ionicons 
-                    name="medical" 
-                    size={32} 
-                    color={selectedRole === 'professional' ? '#10B981' : '#6B7280'} 
+                    name="flame" 
+                    size={28} 
+                    color="#F59E0B" 
                   />
                 </View>
                 <View style={styles.roleTextContainer}>
                   <Text style={[
                     styles.roleTitle,
-                    selectedRole === 'professional' && styles.roleTitleSelected
+                    selectedRole === 'active_user' && styles.roleTitleSelectedOrange
                   ]}>
-                    Profesional de Salud
+                    Quiero Dejarlo
                   </Text>
                   <Text style={styles.roleDescription}>
-                    Soy psicólogo, psiquiatra, terapeuta o consejero y quiero acompañar pacientes
+                    Estoy consumiendo pero quiero dejar • Reto 21 días
+                  </Text>
+                  <View style={styles.badgeContainer}>
+                    <View style={styles.badge}>
+                      <Ionicons name="rocket" size={12} color="#F59E0B" />
+                      <Text style={styles.badgeText}>Reto 21 Días</Text>
+                    </View>
+                  </View>
+                </View>
+                {selectedRole === 'active_user' && (
+                  <View style={styles.checkmark}>
+                    <Ionicons name="checkmark-circle" size={24} color="#F59E0B" />
+                  </View>
+                )}
+              </TouchableOpacity>
+
+              {/* Professional Card */}
+              <TouchableOpacity
+                style={[
+                  styles.roleCard,
+                  selectedRole === 'professional' && styles.roleCardSelectedBlue,
+                ]}
+                onPress={() => setSelectedRole('professional')}
+              >
+                <View style={[styles.roleIconContainer, styles.iconBlue]}>
+                  <Ionicons 
+                    name="medical" 
+                    size={28} 
+                    color="#3B82F6" 
+                  />
+                </View>
+                <View style={styles.roleTextContainer}>
+                  <Text style={[
+                    styles.roleTitle,
+                    selectedRole === 'professional' && styles.roleTitleSelectedBlue
+                  ]}>
+                    Soy Profesional de Salud
+                  </Text>
+                  <Text style={styles.roleDescription}>
+                    Psicólogo, psiquiatra, terapeuta o consejero
                   </Text>
                 </View>
                 {selectedRole === 'professional' && (
                   <View style={styles.checkmark}>
-                    <Ionicons name="checkmark-circle" size={24} color="#10B981" />
+                    <Ionicons name="checkmark-circle" size={24} color="#3B82F6" />
                   </View>
                 )}
               </TouchableOpacity>
@@ -206,11 +246,11 @@ export default function RoleSelectScreen() {
               disabled={!selectedRole || isSubmitting}
             >
               {isSubmitting ? (
-                <ActivityIndicator size="small" color="#FFFFFF" />
+                <ActivityIndicator size="small" color="#1A1A1A" />
               ) : (
                 <>
                   <Text style={styles.continueButtonText}>Continuar</Text>
-                  <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
+                  <Ionicons name="arrow-forward" size={20} color="#1A1A1A" />
                 </>
               )}
             </TouchableOpacity>
@@ -242,11 +282,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: 32,
-  },
-  logo: {
-    fontSize: 60,
-    marginBottom: 12,
+    marginBottom: 28,
   },
   title: {
     fontSize: 28,
@@ -256,34 +292,50 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#D1FAE5',
+    color: '#9CA3AF',
     textAlign: 'center',
   },
   rolesContainer: {
-    gap: 16,
-    marginBottom: 24,
+    gap: 12,
+    marginBottom: 20,
   },
   roleCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: 16,
-    padding: 20,
+    padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 3,
-    borderColor: 'transparent',
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
-  roleCardSelected: {
+  roleCardSelectedGreen: {
     borderColor: '#10B981',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+  },
+  roleCardSelectedOrange: {
+    borderColor: '#F59E0B',
+    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+  },
+  roleCardSelectedBlue: {
+    borderColor: '#3B82F6',
+    backgroundColor: 'rgba(59, 130, 246, 0.15)',
   },
   roleIconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#F3F4F6',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: 14,
+  },
+  iconGreen: {
+    backgroundColor: 'rgba(16, 185, 129, 0.2)',
+  },
+  iconOrange: {
+    backgroundColor: 'rgba(245, 158, 11, 0.2)',
+  },
+  iconBlue: {
+    backgroundColor: 'rgba(59, 130, 246, 0.2)',
   },
   roleTextContainer: {
     flex: 1,
@@ -291,25 +343,51 @@ const styles = StyleSheet.create({
   roleTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1F2937',
+    color: '#FFFFFF',
     marginBottom: 4,
   },
-  roleTitleSelected: {
+  roleTitleSelectedGreen: {
     color: '#10B981',
+  },
+  roleTitleSelectedOrange: {
+    color: '#F59E0B',
+  },
+  roleTitleSelectedBlue: {
+    color: '#3B82F6',
   },
   roleDescription: {
     fontSize: 13,
-    color: '#6B7280',
+    color: '#9CA3AF',
     lineHeight: 18,
+  },
+  badgeContainer: {
+    flexDirection: 'row',
+    marginTop: 6,
+  },
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(245, 158, 11, 0.2)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 12,
+    gap: 4,
+  },
+  badgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#F59E0B',
   },
   checkmark: {
     marginLeft: 8,
   },
   identificationSection: {
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: 16,
     padding: 20,
-    marginBottom: 24,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   sectionTitle: {
     fontSize: 16,
@@ -318,11 +396,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   inputGroup: {
-    marginBottom: 16,
+    marginBottom: 14,
   },
   inputLabel: {
     fontSize: 14,
-    color: '#D1FAE5',
+    color: '#9CA3AF',
     marginBottom: 8,
   },
   inputContainer: {
@@ -356,7 +434,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   continueButton: {
-    backgroundColor: '#047857',
+    backgroundColor: '#FFFFFF',
     paddingVertical: 16,
     borderRadius: 12,
     flexDirection: 'row',
@@ -369,13 +447,13 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   continueButtonText: {
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     fontSize: 18,
     fontWeight: 'bold',
   },
   privacy: {
     fontSize: 14,
-    color: '#D1FAE5',
+    color: '#9CA3AF',
     textAlign: 'center',
   },
 });
