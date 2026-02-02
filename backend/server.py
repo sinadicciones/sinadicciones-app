@@ -2353,8 +2353,9 @@ class StartChallengeRequest(BaseModel):
     goal: Optional[str] = None
 
 @app.post("/api/challenge/start")
-async def start_21_day_challenge(data: StartChallengeRequest, user_id: str = Depends(get_current_user)):
+async def start_21_day_challenge(data: StartChallengeRequest, current_user: User = Depends(get_current_user)):
     """Start the 21-day challenge for active users"""
+    user_id = current_user.user_id
     # Check if user already has an active challenge
     existing = await db.challenges.find_one({
         "user_id": user_id,
@@ -2362,6 +2363,7 @@ async def start_21_day_challenge(data: StartChallengeRequest, user_id: str = Dep
     })
     
     if existing:
+        existing["_id"] = str(existing["_id"])
         return {"message": "Ya tienes un reto activo", "challenge": existing}
     
     challenge = {
@@ -2377,15 +2379,17 @@ async def start_21_day_challenge(data: StartChallengeRequest, user_id: str = Dep
     }
     
     await db.challenges.insert_one(challenge)
+    challenge["_id"] = str(challenge.get("_id", ""))
     
     return {"message": "¡Reto de 21 días iniciado!", "challenge": challenge}
 
 @app.get("/api/challenge/current")
-async def get_current_challenge(user_id: str = Depends(get_current_user)):
+async def get_current_challenge(current_user: User = Depends(get_current_user)):
     """Get user's current active challenge"""
+    user_id = current_user.user_id
     challenge = await db.challenges.find_one({
         "user_id": user_id,
-        "status": "active"
+        "status": {"$in": ["active", "restart_needed"]}
     })
     
     if not challenge:
@@ -2419,8 +2423,9 @@ class DailyLogRequest(BaseModel):
     cravings_level: int = 5  # 1-10
 
 @app.post("/api/challenge/log")
-async def log_challenge_day(data: DailyLogRequest, user_id: str = Depends(get_current_user)):
+async def log_challenge_day(data: DailyLogRequest, current_user: User = Depends(get_current_user)):
     """Log a day in the 21-day challenge"""
+    user_id = current_user.user_id
     challenge = await db.challenges.find_one({
         "user_id": user_id,
         "status": "active"
@@ -2469,8 +2474,9 @@ async def log_challenge_day(data: DailyLogRequest, user_id: str = Depends(get_cu
     return {"message": "¡Día registrado exitosamente!", "log": log_entry}
 
 @app.post("/api/challenge/restart")
-async def restart_challenge(user_id: str = Depends(get_current_user)):
+async def restart_challenge(current_user: User = Depends(get_current_user)):
     """Restart the 21-day challenge after a relapse"""
+    user_id = current_user.user_id
     # Archive old challenge
     await db.challenges.update_many(
         {"user_id": user_id, "status": {"$in": ["active", "restart_needed"]}},
@@ -2491,12 +2497,14 @@ async def restart_challenge(user_id: str = Depends(get_current_user)):
     }
     
     await db.challenges.insert_one(challenge)
+    challenge["_id"] = str(challenge.get("_id", ""))
     
     return {"message": "¡Nuevo reto iniciado! Cada intento te hace más fuerte.", "challenge": challenge}
 
 @app.post("/api/challenge/complete")
-async def complete_challenge_and_graduate(user_id: str = Depends(get_current_user)):
+async def complete_challenge_and_graduate(current_user: User = Depends(get_current_user)):
     """Complete challenge and transition user to 'patient' role (in recovery)"""
+    user_id = current_user.user_id
     challenge = await db.challenges.find_one({
         "user_id": user_id,
         "status": "completed"
