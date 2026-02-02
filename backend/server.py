@@ -2733,6 +2733,7 @@ class ActiveUserOnboardingRequest(BaseModel):
     years_using: int
     frequency: str  # daily, weekly, monthly, occasional
     triggers: list = []
+    protective_factors: list = []  # NEW: Factores protectores
     why_quit: str  # Their motivation
     support_person: Optional[dict] = None  # {name, phone, relationship}
     country: Optional[str] = None
@@ -2751,6 +2752,7 @@ async def complete_active_user_onboarding(data: ActiveUserOnboardingRequest, cur
         "years_using": data.years_using,
         "consumption_frequency": data.frequency,
         "triggers": data.triggers,
+        "protective_factors": data.protective_factors,
         "my_why": data.why_quit,
         "country": data.country,
         "identification": data.identification,
@@ -2782,10 +2784,37 @@ async def complete_active_user_onboarding(data: ActiveUserOnboardingRequest, cur
     
     await db.challenges.insert_one(challenge)
     
+    # ===== CREATE DEFAULT HABITS FOR THE CHALLENGE =====
+    default_habits = [
+        {"name": "No consumir hoy", "icon": "shield-checkmark", "color": "#EF4444", "frequency": "daily", "is_challenge_habit": True},
+        {"name": "Ejercicio físico (30 min)", "icon": "fitness", "color": "#10B981", "frequency": "daily", "is_challenge_habit": True},
+        {"name": "Meditación o respiración (10 min)", "icon": "leaf", "color": "#8B5CF6", "frequency": "daily", "is_challenge_habit": True},
+        {"name": "Llamar a persona de apoyo", "icon": "call", "color": "#3B82F6", "frequency": "daily", "is_challenge_habit": True},
+        {"name": "Escribir en diario", "icon": "document-text", "color": "#F59E0B", "frequency": "daily", "is_challenge_habit": True},
+        {"name": "Dormir 7-8 horas", "icon": "moon", "color": "#6366F1", "frequency": "daily", "is_challenge_habit": True},
+        {"name": "Comer saludable", "icon": "nutrition", "color": "#14B8A6", "frequency": "daily", "is_challenge_habit": True},
+        {"name": "Practicar gratitud", "icon": "heart", "color": "#EC4899", "frequency": "daily", "is_challenge_habit": True},
+    ]
+    
+    for habit_data in default_habits:
+        habit = {
+            "habit_id": f"habit_{uuid.uuid4().hex[:12]}",
+            "user_id": user_id,
+            "name": habit_data["name"],
+            "icon": habit_data["icon"],
+            "color": habit_data["color"],
+            "frequency": habit_data["frequency"],
+            "is_challenge_habit": True,
+            "is_active": True,
+            "created_at": datetime.now(timezone.utc)
+        }
+        await db.habits.insert_one(habit)
+    
     return {
         "message": "¡Perfil completado! Tu reto de 21 días ha comenzado.",
         "profile_completed": True,
-        "challenge_started": True
+        "challenge_started": True,
+        "habits_created": len(default_habits)
     }
 
 if __name__ == "__main__":
