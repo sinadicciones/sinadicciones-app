@@ -919,6 +919,8 @@ export default function ProfileScreen() {
         </View>
 
         <View style={{ height: 40 }} />
+          </>
+        )}
       </ScrollView>
 
       {/* Modal de Cambio de Contraseña */}
