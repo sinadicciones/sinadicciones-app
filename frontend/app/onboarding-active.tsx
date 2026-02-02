@@ -140,6 +140,7 @@ export default function OnboardingActiveScreen() {
           years_using: parseInt(yearsUsing) || 0,
           frequency,
           triggers: selectedTriggers,
+          protective_factors: selectedProtective,
           why_quit: whyQuit,
           support_person: supportName ? {
             name: supportName,
