@@ -171,7 +171,7 @@ export default function WelcomeScreen() {
                 <View style={styles.features}>
                   <View style={styles.feature}>
                     <View style={styles.featureIconContainer}>
-                      <Ionicons name="calendar" size={22} color="#10B981" />
+                      <Ionicons name="calendar" size={22} color="#FFFFFF" />
                     </View>
                     <View style={styles.featureTextContainer}>
                       <Text style={styles.featureTitle}>Seguimiento diario</Text>
@@ -181,7 +181,7 @@ export default function WelcomeScreen() {
                   
                   <View style={styles.feature}>
                     <View style={styles.featureIconContainer}>
-                      <Ionicons name="star" size={22} color="#F59E0B" />
+                      <Ionicons name="star" size={22} color="#FFFFFF" />
                     </View>
                     <View style={styles.featureTextContainer}>
                       <Text style={styles.featureTitle}>Sobriedad con Sentido</Text>
@@ -191,7 +191,7 @@ export default function WelcomeScreen() {
                   
                   <View style={styles.feature}>
                     <View style={styles.featureIconContainer}>
-                      <Ionicons name="search" size={22} color="#3B82F6" />
+                      <Ionicons name="search" size={22} color="#FFFFFF" />
                     </View>
                     <View style={styles.featureTextContainer}>
                       <Text style={styles.featureTitle}>Directorio de centros</Text>
@@ -201,7 +201,7 @@ export default function WelcomeScreen() {
                   
                   <View style={styles.feature}>
                     <View style={styles.featureIconContainer}>
-                      <Ionicons name="call" size={22} color="#EF4444" />
+                      <Ionicons name="call" size={22} color="#FFFFFF" />
                     </View>
                     <View style={styles.featureTextContainer}>
                       <Text style={styles.featureTitle}>Botón SOS</Text>
@@ -230,7 +230,7 @@ export default function WelcomeScreen() {
                       setIsRegister(false);
                     }}
                   >
-                    <Ionicons name="mail" size={20} color="#10B981" />
+                    <Ionicons name="mail" size={20} color="#1A1A1A" />
                     <Text style={styles.emailButtonText}>Continuar con Email</Text>
                   </TouchableOpacity>
                 </View>
