@@ -1233,8 +1233,23 @@ ul {
         justify-content: center;
     }
     
+    .beta-message {
+        justify-content: center;
+        text-align: left;
+    }
+    
     .features-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .screenshots-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-lg);
+    }
+    
+    .screenshot-phone {
+        width: 160px;
+        height: 320px;
     }
     
     .benefits-grid {
@@ -1286,6 +1301,16 @@ ul {
         grid-template-columns: 1fr;
     }
     
+    .screenshots-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-2xl);
+    }
+    
+    .screenshot-phone {
+        width: 200px;
+        height: 400px;
+    }
+    
     .step {
         flex-direction: column;
         text-align: center;
@@ -1314,9 +1339,21 @@ ul {
         justify-content: center;
     }
     
+    .footer-contact-buttons {
+        align-items: center;
+    }
+    
     .hero-stats {
         flex-direction: column;
         gap: var(--space-lg);
+    }
+    
+    .whatsapp-float {
+        bottom: 100px;
+        left: var(--space-md);
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
     }
 }
 
