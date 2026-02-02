@@ -126,6 +126,35 @@ class TherapistSearchResult(BaseModel):
 class LinkTherapistRequest(BaseModel):
     therapist_id: str
 
+# Alert Models
+class Alert(BaseModel):
+    alert_id: str
+    professional_id: str
+    patient_id: str
+    alert_type: str  # inactivity, negative_emotion, relapse
+    severity: str  # low, medium, high, critical
+    title: str
+    description: str
+    patient_name: str
+    created_at: datetime
+    is_read: bool = False
+    is_resolved: bool = False
+
+class RelapseReport(BaseModel):
+    relapse_id: str
+    user_id: str
+    date: str
+    substance: Optional[str] = None
+    trigger: Optional[str] = None
+    notes: Optional[str] = None
+    reported_at: datetime
+
+class ReportRelapseRequest(BaseModel):
+    date: str
+    substance: Optional[str] = None
+    trigger: Optional[str] = None
+    notes: Optional[str] = None
+
 class PurposeTest(BaseModel):
     user_id: str
     answers: dict
