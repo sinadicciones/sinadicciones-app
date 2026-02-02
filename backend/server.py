@@ -614,6 +614,96 @@ async def get_professional_patients(current_user: User = Depends(get_current_use
     
     return results
 
+@app.get("/api/professional/patient/{patient_id}")
+async def get_patient_detail(patient_id: str, current_user: User = Depends(get_current_user)):
+    """Get detailed information about a specific patient"""
+    # Check if user is a professional
+    profile = await db.user_profiles.find_one({"user_id": current_user.user_id})
+    
+    if not profile or profile.get("role") != "professional":
+        raise HTTPException(status_code=403, detail="Solo profesionales pueden ver pacientes")
+    
+    # Check if patient is linked to this professional
+    patient_profile = await db.user_profiles.find_one({
+        "user_id": patient_id,
+        "linked_therapist_id": current_user.user_id
+    })
+    
+    if not patient_profile:
+        raise HTTPException(status_code=404, detail="Paciente no encontrado o no vinculado")
+    
+    # Get user data
+    patient_user = await db.users.find_one({"user_id": patient_id}, {"_id": 0})
+    
+    # Get emotional logs (last 30)
+    emotional_logs = await db.emotional_logs.find(
+        {"user_id": patient_id},
+        {"_id": 0}
+    ).sort("date", -1).limit(30).to_list(30)
+    
+    # Get habits with today's completion status
+    habits = await db.habits.find(
+        {"user_id": patient_id, "is_active": True},
+        {"_id": 0}
+    ).to_list(50)
+    
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    habit_data = []
+    for habit in habits:
+        log = await db.habit_logs.find_one(
+            {"habit_id": habit["habit_id"], "date": today},
+            {"_id": 0}
+        )
+        # Calculate streak
+        streak = 0
+        check_date = datetime.now(timezone.utc)
+        for _ in range(365):
+            date_str = check_date.strftime("%Y-%m-%d")
+            day_log = await db.habit_logs.find_one({
+                "habit_id": habit["habit_id"],
+                "date": date_str,
+                "completed": True
+            })
+            if day_log:
+                streak += 1
+                check_date -= timedelta(days=1)
+            else:
+                break
+        
+        habit_data.append({
+            "habit_id": habit["habit_id"],
+            "name": habit["name"],
+            "completed_today": log.get("completed", False) if log else False,
+            "streak": streak
+        })
+    
+    return {
+        "patient": {
+            "user_id": patient_id,
+            "name": patient_user.get("name") if patient_user else "",
+            "email": patient_user.get("email") if patient_user else "",
+            "picture": patient_user.get("picture") if patient_user else None,
+            "clean_since": patient_profile.get("clean_since"),
+            "addiction_type": patient_profile.get("addiction_type"),
+            "profile": patient_profile
+        },
+        "emotional_logs": emotional_logs,
+        "habits": habit_data
+    }
+
+@app.post("/api/patient/unlink-therapist")
+async def unlink_therapist(current_user: User = Depends(get_current_user)):
+    """Unlink current therapist from patient"""
+    await db.user_profiles.update_one(
+        {"user_id": current_user.user_id},
+        {"$set": {
+            "linked_therapist_id": None,
+            "updated_at": datetime.now(timezone.utc)
+        }}
+    )
+    
+    return {"success": True, "message": "Terapeuta desvinculado"}
+
 # ============== HABIT ENDPOINTS ==============
 
 @app.get("/api/habits")
