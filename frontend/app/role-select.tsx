@@ -191,8 +191,8 @@ export default function RoleSelectScreen() {
               </TouchableOpacity>
             </View>
 
-            {/* Identification Section */}
-            {selectedRole && (
+            {/* Identification Section - Only for patient and professional */}
+            {selectedRole && selectedRole !== 'active_user' && (
               <View style={styles.identificationSection}>
                 <Text style={styles.sectionTitle}>Información adicional</Text>
                 
@@ -225,6 +225,16 @@ export default function RoleSelectScreen() {
                     />
                   </View>
                 </View>
+              </View>
+            )}
+
+            {/* Privacy note for active_user */}
+            {selectedRole === 'active_user' && (
+              <View style={styles.privacyNote}>
+                <Ionicons name="shield-checkmark" size={20} color="#10B981" />
+                <Text style={styles.privacyNoteText}>
+                  Tu información es 100% confidencial. No pedimos datos de identificación.
+                </Text>
               </View>
             )}
 
