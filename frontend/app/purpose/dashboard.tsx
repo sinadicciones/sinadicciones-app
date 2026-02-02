@@ -605,6 +605,8 @@ export default function PurposeDashboard() {
             <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
           </TouchableOpacity>
         </ScrollView>
+        
+        <BottomNavigation />
       </SafeAreaView>
     );
   }
