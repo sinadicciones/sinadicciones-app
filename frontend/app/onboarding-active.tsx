@@ -612,6 +612,13 @@ const styles = StyleSheet.create({
     borderColor: '#F59E0B',
     backgroundColor: 'rgba(245, 158, 11, 0.15)',
   },
+  optionCardGreen: {
+    borderColor: 'transparent',
+  },
+  optionCardSelectedGreen: {
+    borderColor: '#10B981',
+    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+  },
   optionLabel: {
     flex: 1,
     fontSize: 15,
@@ -619,6 +626,10 @@ const styles = StyleSheet.create({
   },
   optionLabelSelected: {
     color: '#F59E0B',
+    fontWeight: '600',
+  },
+  optionLabelSelectedGreen: {
+    color: '#10B981',
     fontWeight: '600',
   },
   primarySection: {
