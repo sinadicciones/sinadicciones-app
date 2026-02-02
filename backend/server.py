@@ -588,6 +588,66 @@ async def search_therapists(query: str = "", current_user: User = Depends(get_cu
     
     return results
 
+@app.get("/api/therapists/search-patient")
+async def search_patient_by_email(email: str, current_user: User = Depends(get_current_user)):
+    """Search for a patient by email (for professionals to link)"""
+    # Verify current user is a professional
+    prof_profile = await db.user_profiles.find_one({"user_id": current_user.user_id})
+    if not prof_profile or prof_profile.get("role") != "professional":
+        raise HTTPException(status_code=403, detail="Solo los profesionales pueden buscar pacientes")
+    
+    # Find user by email
+    user = await db.users.find_one({"email": email.lower()})
+    if not user:
+        return {"patient": None}
+    
+    # Get profile
+    profile = await db.user_profiles.find_one({"user_id": user["user_id"]})
+    if not profile or profile.get("role") not in ["patient", "active_user"]:
+        return {"patient": None, "message": "El usuario no es un paciente"}
+    
+    return {
+        "patient": {
+            "user_id": user["user_id"],
+            "name": user.get("name", ""),
+            "email": user.get("email", ""),
+            "picture": user.get("picture"),
+            "role": profile.get("role"),
+            "addiction_type": profile.get("addiction_type")
+        }
+    }
+
+class LinkPatientRequest(BaseModel):
+    patient_id: str
+
+@app.post("/api/professional/link-patient")
+async def professional_link_patient(data: LinkPatientRequest, current_user: User = Depends(get_current_user)):
+    """Professional links a patient to themselves"""
+    # Verify current user is a professional
+    prof_profile = await db.user_profiles.find_one({"user_id": current_user.user_id})
+    if not prof_profile or prof_profile.get("role") != "professional":
+        raise HTTPException(status_code=403, detail="Solo los profesionales pueden vincular pacientes")
+    
+    # Verify patient exists and is a patient/active_user
+    patient_profile = await db.user_profiles.find_one({"user_id": data.patient_id})
+    if not patient_profile or patient_profile.get("role") not in ["patient", "active_user"]:
+        raise HTTPException(status_code=404, detail="Paciente no encontrado")
+    
+    # Check if already linked
+    if patient_profile.get("linked_therapist_id") == current_user.user_id:
+        raise HTTPException(status_code=400, detail="Este paciente ya está vinculado contigo")
+    
+    if patient_profile.get("linked_therapist_id"):
+        raise HTTPException(status_code=400, detail="Este paciente ya está vinculado con otro profesional")
+    
+    # Link patient to professional
+    await db.user_profiles.update_one(
+        {"user_id": data.patient_id},
+        {"$set": {"linked_therapist_id": current_user.user_id}}
+    )
+    
+    return {"success": True, "message": "Paciente vinculado correctamente"}
+
 @app.post("/api/patient/link-therapist")
 async def link_therapist(data: LinkTherapistRequest, current_user: User = Depends(get_current_user)):
     """Link patient to a therapist"""
