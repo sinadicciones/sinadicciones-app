@@ -1094,6 +1094,9 @@ const styles = StyleSheet.create({
   therapistButton: {
     backgroundColor: '#EBF5FF',
   },
+  relapseButton: {
+    backgroundColor: '#FEE2E2',
+  },
   // Estilos para el modal de contraseña
   modalOverlay: {
     flex: 1,
