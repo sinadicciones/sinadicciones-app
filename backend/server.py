@@ -733,6 +733,205 @@ async def unlink_therapist(current_user: User = Depends(get_current_user)):
     
     return {"success": True, "message": "Terapeuta desvinculado"}
 
+# ============== ALERT SYSTEM ENDPOINTS ==============
+
+@app.get("/api/professional/alerts")
+async def get_professional_alerts(current_user: User = Depends(get_current_user)):
+    """Get all alerts for a professional, generating them dynamically"""
+    # Verify user is a professional
+    profile = await db.user_profiles.find_one({"user_id": current_user.user_id})
+    if not profile or profile.get("role") != "professional":
+        raise HTTPException(status_code=403, detail="Solo profesionales pueden ver alertas")
+    
+    alerts = []
+    today = datetime.now(timezone.utc)
+    three_days_ago = today - timedelta(days=3)
+    
+    # Get all patients linked to this professional
+    patients = await db.user_profiles.find(
+        {"linked_therapist_id": current_user.user_id},
+        {"_id": 0}
+    ).to_list(100)
+    
+    for patient_profile in patients:
+        patient_id = patient_profile.get("user_id")
+        patient_user = await db.users.find_one({"user_id": patient_id}, {"_id": 0})
+        patient_name = patient_user.get("name", "Paciente") if patient_user else "Paciente"
+        
+        # 1. Check for RELAPSES (Critical)
+        recent_relapses = await db.relapses.find(
+            {"user_id": patient_id},
+            {"_id": 0}
+        ).sort("reported_at", -1).limit(5).to_list(5)
+        
+        for relapse in recent_relapses:
+            reported_at = relapse.get("reported_at")
+            if isinstance(reported_at, datetime):
+                days_since = (today - reported_at).days
+                if days_since <= 7:  # Show relapses from last 7 days
+                    alerts.append({
+                        "alert_id": f"relapse_{relapse.get('relapse_id', '')}",
+                        "professional_id": current_user.user_id,
+                        "patient_id": patient_id,
+                        "patient_name": patient_name,
+                        "alert_type": "relapse",
+                        "severity": "critical",
+                        "title": "🚨 Recaída Reportada",
+                        "description": f"{patient_name} reportó una recaída el {relapse.get('date', 'fecha desconocida')}. Sustancia: {relapse.get('substance', 'No especificada')}. Trigger: {relapse.get('trigger', 'No especificado')}.",
+                        "created_at": reported_at.isoformat() if isinstance(reported_at, datetime) else str(reported_at),
+                        "is_read": False,
+                        "is_resolved": False,
+                        "data": relapse
+                    })
+        
+        # 2. Check for INACTIVITY (3+ days without activity)
+        last_emotional_log = await db.emotional_logs.find_one(
+            {"user_id": patient_id},
+            {"_id": 0}
+        )
+        
+        last_habit_log = await db.habit_logs.find_one(
+            {"user_id": patient_id},
+            {"_id": 0}
+        )
+        
+        # Determine last activity date
+        last_activity = None
+        if last_emotional_log:
+            try:
+                log_date = datetime.strptime(last_emotional_log.get("date", ""), "%Y-%m-%d").replace(tzinfo=timezone.utc)
+                last_activity = log_date
+            except:
+                pass
+        
+        if last_habit_log:
+            try:
+                habit_date = datetime.strptime(last_habit_log.get("date", ""), "%Y-%m-%d").replace(tzinfo=timezone.utc)
+                if not last_activity or habit_date > last_activity:
+                    last_activity = habit_date
+            except:
+                pass
+        
+        if last_activity:
+            days_inactive = (today - last_activity).days
+            if days_inactive >= 3:
+                severity = "high" if days_inactive >= 7 else "medium"
+                alerts.append({
+                    "alert_id": f"inactivity_{patient_id}_{today.strftime('%Y%m%d')}",
+                    "professional_id": current_user.user_id,
+                    "patient_id": patient_id,
+                    "patient_name": patient_name,
+                    "alert_type": "inactivity",
+                    "severity": severity,
+                    "title": f"⚠️ {days_inactive} días sin actividad",
+                    "description": f"{patient_name} no ha registrado actividad en los últimos {days_inactive} días. Última actividad: {last_activity.strftime('%d/%m/%Y')}.",
+                    "created_at": today.isoformat(),
+                    "is_read": False,
+                    "is_resolved": False,
+                    "data": {"days_inactive": days_inactive, "last_activity": last_activity.isoformat()}
+                })
+        
+        # 3. Check for NEGATIVE EMOTIONS
+        recent_emotions = await db.emotional_logs.find(
+            {"user_id": patient_id},
+            {"_id": 0}
+        ).sort("date", -1).limit(7).to_list(7)
+        
+        negative_count = 0
+        very_negative_found = False
+        for log in recent_emotions:
+            mood = log.get("mood", 5)
+            anxiety = log.get("anxiety", 0)
+            
+            if mood <= 2:  # Very low mood
+                very_negative_found = True
+                negative_count += 1
+            elif mood <= 3:  # Low mood
+                negative_count += 1
+            
+            if anxiety >= 4:  # High anxiety
+                negative_count += 1
+        
+        if very_negative_found or negative_count >= 3:
+            severity = "high" if very_negative_found else "medium"
+            alerts.append({
+                "alert_id": f"emotion_{patient_id}_{today.strftime('%Y%m%d')}",
+                "professional_id": current_user.user_id,
+                "patient_id": patient_id,
+                "patient_name": patient_name,
+                "alert_type": "negative_emotion",
+                "severity": severity,
+                "title": "😔 Emociones Negativas Detectadas",
+                "description": f"{patient_name} ha reportado estados emocionales negativos en los últimos días. Se recomienda seguimiento.",
+                "created_at": today.isoformat(),
+                "is_read": False,
+                "is_resolved": False,
+                "data": {"negative_count": negative_count, "very_negative": very_negative_found}
+            })
+    
+    # Sort alerts by severity and date
+    severity_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
+    alerts.sort(key=lambda x: (severity_order.get(x["severity"], 4), x["created_at"]), reverse=False)
+    
+    return alerts
+
+@app.get("/api/professional/alerts/summary")
+async def get_alerts_summary(current_user: User = Depends(get_current_user)):
+    """Get a summary count of alerts by type"""
+    alerts = await get_professional_alerts(current_user)
+    
+    summary = {
+        "total": len(alerts),
+        "critical": len([a for a in alerts if a["severity"] == "critical"]),
+        "high": len([a for a in alerts if a["severity"] == "high"]),
+        "medium": len([a for a in alerts if a["severity"] == "medium"]),
+        "by_type": {
+            "relapse": len([a for a in alerts if a["alert_type"] == "relapse"]),
+            "inactivity": len([a for a in alerts if a["alert_type"] == "inactivity"]),
+            "negative_emotion": len([a for a in alerts if a["alert_type"] == "negative_emotion"])
+        }
+    }
+    
+    return summary
+
+@app.post("/api/patient/report-relapse")
+async def report_relapse(data: ReportRelapseRequest, current_user: User = Depends(get_current_user)):
+    """Patient reports a relapse"""
+    relapse_id = f"relapse_{uuid.uuid4().hex[:12]}"
+    
+    relapse = {
+        "relapse_id": relapse_id,
+        "user_id": current_user.user_id,
+        "date": data.date,
+        "substance": data.substance,
+        "trigger": data.trigger,
+        "notes": data.notes,
+        "reported_at": datetime.now(timezone.utc)
+    }
+    
+    await db.relapses.insert_one(relapse)
+    
+    # Optionally reset clean_since date
+    await db.user_profiles.update_one(
+        {"user_id": current_user.user_id},
+        {"$set": {
+            "clean_since": data.date,
+            "updated_at": datetime.now(timezone.utc)
+        }}
+    )
+    
+    return {"success": True, "relapse_id": relapse_id, "message": "Recaída registrada. Tu contador de días ha sido reiniciado."}
+
+@app.get("/api/patient/relapses")
+async def get_patient_relapses(current_user: User = Depends(get_current_user)):
+    """Get patient's relapse history"""
+    relapses = await db.relapses.find(
+        {"user_id": current_user.user_id},
+        {"_id": 0}
+    ).sort("reported_at", -1).to_list(50)
+    
+    return relapses
+
 # ============== HABIT ENDPOINTS ==============
 
 @app.get("/api/habits")
