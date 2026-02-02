@@ -35,18 +35,30 @@ interface PatientStats {
   alerts: string[];
 }
 
+interface AlertSummary {
+  total: number;
+  critical: number;
+  high: number;
+  medium: number;
+}
+
 export default function ProfessionalDashboard() {
   const router = useRouter();
   const [patients, setPatients] = useState<Patient[]>([]);
+  const [alertSummary, setAlertSummary] = useState<AlertSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState('');
 
   const fetchPatients = useCallback(async () => {
     try {
-      const response = await authenticatedFetch('/api/professional/patients');
-      if (response.ok) {
-        const data = await response.json();
+      const [patientsRes, alertsRes] = await Promise.all([
+        authenticatedFetch('/api/professional/patients'),
+        authenticatedFetch('/api/professional/alerts/summary')
+      ]);
+      
+      if (patientsRes.ok) {
+        const data = await patientsRes.json();
         setPatients(data);
       } else {
         setError('Error al cargar pacientes');
