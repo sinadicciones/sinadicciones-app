@@ -10,11 +10,15 @@ import {
   Platform,
   ScrollView,
   Alert,
+  Image,
 } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+
+// Logo de sinadicciones.cl
+const LOGO_URL = 'https://customer-assets.emergentagent.com/job_b1701075-ef08-4c17-96e4-9e005036f1a8/artifacts/ftksetul_IMG_0917.jpeg';
 
 export default function WelcomeScreen() {
   const { user, isLoading, login, loginWithEmail, registerWithEmail } = useAuth();
