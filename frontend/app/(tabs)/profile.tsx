@@ -417,8 +417,22 @@ export default function ProfileScreen() {
           </View>
           
           <View style={styles.accountActions}>
+            {/* Botón para Dashboard Admin (solo admins) */}
+            {(profile?.role === 'admin' || user?.email === 'contacto@sinadicciones.cl') && (
+              <TouchableOpacity 
+                style={[styles.accountButton, styles.adminButton]}
+                onPress={() => router.push('/admin-dashboard')}
+              >
+                <Ionicons name="shield" size={20} color="#8B5CF6" />
+                <Text style={[styles.accountButtonText, { color: '#8B5CF6' }]}>
+                  Panel de Administración
+                </Text>
+                <Ionicons name="chevron-forward" size={20} color="#8B5CF6" />
+              </TouchableOpacity>
+            )}
+
             {/* Botón para buscar terapeuta (solo pacientes) */}
-            {profile?.role !== 'professional' && (
+            {profile?.role !== 'professional' && profile?.role !== 'admin' && (
               <TouchableOpacity 
                 style={[styles.accountButton, styles.therapistButton]}
                 onPress={() => router.push('/find-therapist')}
@@ -446,7 +460,7 @@ export default function ProfileScreen() {
             )}
 
             {/* Botón para reportar recaída (solo pacientes) */}
-            {profile?.role !== 'professional' && (
+            {profile?.role !== 'professional' && profile?.role !== 'admin' && (
               <TouchableOpacity 
                 style={[styles.accountButton, styles.relapseButton]}
                 onPress={() => router.push('/report-relapse')}
