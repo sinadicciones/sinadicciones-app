@@ -350,9 +350,12 @@ async def register_with_email(data: EmailRegisterRequest, response: Response):
         "created_at": datetime.now(timezone.utc)
     })
     
-    # Create default profile
+    # Create default profile with role
     await db.user_profiles.insert_one({
         "user_id": user_id,
+        "role": data.role,
+        "country": data.country,
+        "identification": data.identification,
         "addiction_type": None,
         "secondary_addictions": [],
         "years_using": None,
@@ -366,6 +369,13 @@ async def register_with_email(data: EmailRegisterRequest, response: Response):
         "life_story": None,
         "emergency_contacts": [],
         "my_why": None,
+        "linked_therapist_id": None,
+        "professional_type": None,
+        "specialization": None,
+        "years_experience": None,
+        "license_number": None,
+        "institution": None,
+        "bio": None,
         "profile_completed": False,
         "updated_at": datetime.now(timezone.utc)
     })
