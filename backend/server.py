@@ -340,7 +340,7 @@ class EmailRegisterRequest(BaseModel):
     email: str
     password: str
     name: str
-    role: str = "patient"  # patient or professional
+    role: str = ""  # Empty by default - user must select role
     country: Optional[str] = None
     identification: Optional[str] = None  # RUT, DNI, etc.
 
