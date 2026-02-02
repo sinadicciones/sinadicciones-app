@@ -760,6 +760,21 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18,
   },
+  tipBoxGreen: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    borderRadius: 12,
+    padding: 14,
+    gap: 10,
+    marginTop: 16,
+  },
+  tipTextGreen: {
+    flex: 1,
+    color: '#10B981',
+    fontSize: 13,
+    lineHeight: 18,
+  },
   optionalNote: {
     flexDirection: 'row',
     alignItems: 'flex-start',
