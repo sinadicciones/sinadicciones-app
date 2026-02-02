@@ -198,9 +198,14 @@ export default function HomeScreen() {
         const profileData = await profileResponse.json();
         setProfile(profileData);
         
-        // Redirect active_user to challenge dashboard
+        // Redirect based on role
         if (profileData.role === 'active_user') {
           router.replace('/(tabs)/challenge-dashboard');
+          return;
+        }
+        
+        if (profileData.role === 'professional') {
+          router.replace('/professional-dashboard');
           return;
         }
         
