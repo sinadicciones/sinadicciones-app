@@ -932,6 +932,218 @@ async def get_patient_relapses(current_user: User = Depends(get_current_user)):
     
     return relapses
 
+# ============== ADMIN ENDPOINTS ==============
+
+ADMIN_EMAIL = "contacto@sinadicciones.cl"
+
+async def is_admin(user: User) -> bool:
+    """Check if user is admin"""
+    if user.email == ADMIN_EMAIL:
+        return True
+    profile = await db.user_profiles.find_one({"user_id": user.user_id})
+    return profile and profile.get("role") == "admin"
+
+@app.get("/api/admin/stats")
+async def get_admin_stats(current_user: User = Depends(get_current_user)):
+    """Get global platform statistics - Admin only"""
+    if not await is_admin(current_user):
+        raise HTTPException(status_code=403, detail="Acceso solo para administradores")
+    
+    today = datetime.now(timezone.utc)
+    seven_days_ago = today - timedelta(days=7)
+    thirty_days_ago = today - timedelta(days=30)
+    
+    # Total users
+    total_users = await db.users.count_documents({})
+    
+    # Users by role
+    total_patients = await db.user_profiles.count_documents({"role": "patient"})
+    total_professionals = await db.user_profiles.count_documents({"role": "professional"})
+    total_admins = await db.user_profiles.count_documents({"role": "admin"})
+    
+    # Profiles completed
+    profiles_completed = await db.user_profiles.count_documents({"profile_completed": True})
+    
+    # Active users (with activity in last 7 days)
+    recent_emotional_logs = await db.emotional_logs.distinct("user_id")
+    recent_habit_logs = await db.habit_logs.distinct("user_id")
+    active_users = len(set(recent_emotional_logs) | set(recent_habit_logs))
+    
+    # Total habits created
+    total_habits = await db.habits.count_documents({"is_active": True})
+    
+    # Total emotional logs
+    total_emotional_logs = await db.emotional_logs.count_documents({})
+    
+    # Total relapses
+    total_relapses = await db.relapses.count_documents({})
+    
+    # Linked patients (with therapist)
+    linked_patients = await db.user_profiles.count_documents({
+        "role": "patient",
+        "linked_therapist_id": {"$ne": None}
+    })
+    
+    # Average mood (last 7 days)
+    pipeline = [
+        {"$group": {"_id": None, "avg_mood": {"$avg": "$mood"}}}
+    ]
+    mood_result = await db.emotional_logs.aggregate(pipeline).to_list(1)
+    avg_mood = round(mood_result[0]["avg_mood"], 1) if mood_result else 0
+    
+    # Registrations over time (last 30 days) - simplified
+    # We'll estimate based on user_id patterns
+    
+    return {
+        "users": {
+            "total": total_users,
+            "patients": total_patients,
+            "professionals": total_professionals,
+            "admins": total_admins,
+            "active": active_users,
+            "profiles_completed": profiles_completed
+        },
+        "engagement": {
+            "total_habits": total_habits,
+            "total_emotional_logs": total_emotional_logs,
+            "total_relapses": total_relapses,
+            "linked_patients": linked_patients,
+            "avg_mood": avg_mood
+        },
+        "timestamp": today.isoformat()
+    }
+
+@app.get("/api/admin/users")
+async def get_admin_users(
+    current_user: User = Depends(get_current_user),
+    role: str = None,
+    limit: int = 50,
+    skip: int = 0
+):
+    """Get all users - Admin only"""
+    if not await is_admin(current_user):
+        raise HTTPException(status_code=403, detail="Acceso solo para administradores")
+    
+    # Build filter
+    profile_filter = {}
+    if role:
+        profile_filter["role"] = role
+    
+    # Get profiles with filter
+    profiles = await db.user_profiles.find(
+        profile_filter,
+        {"_id": 0}
+    ).skip(skip).limit(limit).to_list(limit)
+    
+    # Enrich with user data
+    users = []
+    for profile in profiles:
+        user = await db.users.find_one(
+            {"user_id": profile["user_id"]},
+            {"_id": 0}
+        )
+        if user:
+            # Count activity
+            emotional_count = await db.emotional_logs.count_documents({"user_id": profile["user_id"]})
+            habit_count = await db.habits.count_documents({"user_id": profile["user_id"], "is_active": True})
+            
+            users.append({
+                "user_id": profile["user_id"],
+                "name": user.get("name"),
+                "email": user.get("email"),
+                "picture": user.get("picture"),
+                "role": profile.get("role", "patient"),
+                "profile_completed": profile.get("profile_completed", False),
+                "clean_since": profile.get("clean_since"),
+                "addiction_type": profile.get("addiction_type"),
+                "professional_type": profile.get("professional_type"),
+                "linked_therapist_id": profile.get("linked_therapist_id"),
+                "created_at": user.get("created_at"),
+                "stats": {
+                    "emotional_logs": emotional_count,
+                    "habits": habit_count
+                }
+            })
+    
+    total = await db.user_profiles.count_documents(profile_filter)
+    
+    return {
+        "users": users,
+        "total": total,
+        "limit": limit,
+        "skip": skip
+    }
+
+@app.get("/api/admin/activity")
+async def get_admin_activity(current_user: User = Depends(get_current_user)):
+    """Get recent platform activity - Admin only"""
+    if not await is_admin(current_user):
+        raise HTTPException(status_code=403, detail="Acceso solo para administradores")
+    
+    activity = []
+    
+    # Recent emotional logs
+    recent_logs = await db.emotional_logs.find(
+        {},
+        {"_id": 0}
+    ).sort("date", -1).limit(20).to_list(20)
+    
+    for log in recent_logs:
+        user = await db.users.find_one({"user_id": log["user_id"]}, {"name": 1, "_id": 0})
+        activity.append({
+            "type": "emotional_log",
+            "user_id": log["user_id"],
+            "user_name": user.get("name") if user else "Usuario",
+            "description": f"Registró estado emocional (Ánimo: {log.get('mood', 0)}/5)",
+            "date": log.get("date"),
+            "icon": "heart"
+        })
+    
+    # Recent relapses
+    recent_relapses = await db.relapses.find(
+        {},
+        {"_id": 0}
+    ).sort("reported_at", -1).limit(10).to_list(10)
+    
+    for relapse in recent_relapses:
+        user = await db.users.find_one({"user_id": relapse["user_id"]}, {"name": 1, "_id": 0})
+        activity.append({
+            "type": "relapse",
+            "user_id": relapse["user_id"],
+            "user_name": user.get("name") if user else "Usuario",
+            "description": f"Reportó una recaída",
+            "date": relapse.get("date"),
+            "icon": "warning"
+        })
+    
+    # Sort by date
+    activity.sort(key=lambda x: x.get("date", ""), reverse=True)
+    
+    return activity[:30]
+
+@app.post("/api/admin/set-role")
+async def admin_set_user_role(
+    user_id: str,
+    new_role: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Change a user's role - Admin only"""
+    if not await is_admin(current_user):
+        raise HTTPException(status_code=403, detail="Acceso solo para administradores")
+    
+    if new_role not in ["patient", "professional", "admin"]:
+        raise HTTPException(status_code=400, detail="Rol inválido")
+    
+    result = await db.user_profiles.update_one(
+        {"user_id": user_id},
+        {"$set": {"role": new_role}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    
+    return {"success": True, "message": f"Rol actualizado a {new_role}"}
+
 # ============== HABIT ENDPOINTS ==============
 
 @app.get("/api/habits")
