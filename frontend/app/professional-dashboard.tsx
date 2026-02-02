@@ -63,6 +63,11 @@ export default function ProfessionalDashboard() {
       } else {
         setError('Error al cargar pacientes');
       }
+      
+      if (alertsRes.ok) {
+        const alertData = await alertsRes.json();
+        setAlertSummary(alertData);
+      }
     } catch (err) {
       setError('Error de conexión');
     } finally {
