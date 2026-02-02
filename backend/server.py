@@ -2544,24 +2544,78 @@ async def get_educational_content():
                 {
                     "title": "¿Qué es la adicción?",
                     "content": "La adicción es una enfermedad crónica del cerebro que afecta el sistema de recompensa, la motivación y la memoria. No es una falta de voluntad ni un defecto moral. Tu cerebro ha sido alterado por el consumo de sustancias, creando una necesidad compulsiva de consumir a pesar de las consecuencias negativas.",
-                    "icon": "brain"
+                    "icon": "brain",
+                    "video_url": "https://www.youtube.com/watch?v=HUngLgGRJpo",
+                    "video_title": "La adicción explicada - TED-Ed"
                 },
                 {
                     "title": "El papel de la dopamina",
                     "content": "La dopamina es el neurotransmisor del placer y la recompensa. Las drogas inundan tu cerebro con dopamina, creando una sensación de euforia artificial. Con el tiempo, tu cerebro reduce su producción natural de dopamina, haciendo que necesites la sustancia solo para sentirte 'normal'. Por eso las actividades cotidianas ya no te producen placer.",
-                    "icon": "pulse"
+                    "icon": "pulse",
+                    "video_url": "https://www.youtube.com/watch?v=GgwE94KZJ7E",
+                    "video_title": "Cómo la dopamina afecta tu cerebro"
                 },
                 {
                     "title": "El craving (antojo intenso)",
                     "content": "El craving es esa urgencia intensa e incontrolable de consumir. No es debilidad, es tu cerebro enviando señales de alarma porque cree que necesita la sustancia para sobrevivir. Los cravings son más intensos en los primeros días pero van disminuyendo con el tiempo. Cada vez que resistes un craving, tu cerebro se reprograma un poco más.",
-                    "icon": "flame"
+                    "icon": "flame",
+                    "video_url": "https://www.youtube.com/watch?v=l6fpQIxBUm8",
+                    "video_title": "Cómo manejar los cravings"
                 },
                 {
                     "title": "No es tu culpa, pero sí tu responsabilidad",
                     "content": "Nadie elige volverse adicto. La genética, el ambiente, traumas y otros factores contribuyen al desarrollo de la adicción. Sin embargo, la recuperación sí es tu responsabilidad. No puedes cambiar cómo llegaste aquí, pero sí puedes decidir hacia dónde vas. Pedir ayuda no es debilidad, es el acto más valiente que puedes hacer.",
-                    "icon": "heart"
+                    "icon": "heart",
+                    "video_url": "https://www.youtube.com/watch?v=ao8L-0nSYzg",
+                    "video_title": "La recuperación es posible"
                 }
             ]
+        },
+        "craving_management": {
+            "title": "Manejo del Craving Intenso",
+            "description": "El craving es una respuesta neurológica normal en la recuperación. Aquí aprenderás a reconocerlo y superarlo.",
+            "sections": [
+                {
+                    "title": "¿Qué es el craving?",
+                    "content": "El craving es un deseo intenso y a veces abrumador de consumir una sustancia. Es una respuesta del cerebro que ha sido condicionado a asociar la sustancia con alivio o placer. Puede manifestarse como pensamientos intrusivos, sensaciones físicas (sudoración, aceleración cardíaca), o emociones intensas.",
+                    "icon": "alert-circle"
+                },
+                {
+                    "title": "Los 4 tipos de disparadores",
+                    "content": "1. EMOCIONALES: Estrés, ansiedad, tristeza, aburrimiento, enojo, soledad.\n2. AMBIENTALES: Lugares, personas, objetos asociados al consumo.\n3. SOCIALES: Presión de grupo, celebraciones, conflictos.\n4. FÍSICOS: Hambre, cansancio, dolor, síndrome de abstinencia.",
+                    "icon": "list"
+                },
+                {
+                    "title": "La regla de los 15 minutos",
+                    "content": "Los cravings intensos generalmente duran entre 15-30 minutos. Si puedes distraerte durante este tiempo, la intensidad bajará significativamente. Recuerda: el craving SIEMPRE pasa. No hay un craving eterno.",
+                    "icon": "time"
+                },
+                {
+                    "title": "Técnica HALT",
+                    "content": "Cuando sientas un craving, pregúntate si estás:\n• H - Hambriento (Hungry)\n• A - Enojado (Angry)\n• L - Solo (Lonely)\n• T - Cansado (Tired)\n\nEstos estados aumentan la vulnerabilidad al craving. Atender estas necesidades básicas puede reducir dramáticamente la intensidad.",
+                    "icon": "hand-left"
+                },
+                {
+                    "title": "Técnica de los 5 sentidos (Grounding)",
+                    "content": "Cuando el craving sea intenso, ancla tu mente al presente:\n• 5 cosas que puedes VER\n• 4 cosas que puedes TOCAR\n• 3 cosas que puedes OÍR\n• 2 cosas que puedes OLER\n• 1 cosa que puedes SABOREAR\n\nEsto interrumpe el ciclo de pensamiento obsesivo.",
+                    "icon": "eye"
+                },
+                {
+                    "title": "Surfear el craving",
+                    "content": "Imagina el craving como una ola del mar. Viene, crece, llega a su pico y luego se disipa. No tienes que luchar contra la ola, solo observarla pasar. Respira profundo, observa las sensaciones sin juzgarlas, y deja que la ola pase naturalmente.",
+                    "icon": "water"
+                }
+            ],
+            "emergency_actions": [
+                {"action": "Llama a tu persona de apoyo AHORA", "icon": "call", "priority": 1},
+                {"action": "Sal del lugar donde estás", "icon": "walk", "priority": 2},
+                {"action": "Pon hielo en tus manos o cara", "icon": "snow", "priority": 3},
+                {"action": "Haz 20 respiraciones profundas", "icon": "fitness", "priority": 4},
+                {"action": "Escribe lo que sientes", "icon": "create", "priority": 5},
+                {"action": "Toma una ducha fría", "icon": "water", "priority": 6}
+            ],
+            "video_url": "https://www.youtube.com/watch?v=tTb3d5cjSFI",
+            "video_title": "Técnicas para superar el craving"
         },
         "first_days": {
             "title": "Qué esperar los primeros días",
