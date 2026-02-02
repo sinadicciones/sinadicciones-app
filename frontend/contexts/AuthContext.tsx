@@ -309,13 +309,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           headers: {
             'Authorization': `Bearer ${token}`,
           },
+          credentials: 'include',
         });
       }
       
       await removeToken();
       setUser(null);
+      
+      // Force page reload on web to clear all state
+      if (Platform.OS === 'web' && typeof window !== 'undefined') {
+        window.location.href = '/';
+      }
     } catch (error) {
       console.error('Logout failed:', error);
+      // Even if API fails, clear local state
+      await removeToken();
+      setUser(null);
+      if (Platform.OS === 'web' && typeof window !== 'undefined') {
+        window.location.href = '/';
+      }
     }
   };
 
