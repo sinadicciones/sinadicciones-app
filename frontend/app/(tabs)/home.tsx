@@ -197,8 +197,21 @@ export default function HomeScreen() {
       if (profileResponse.ok) {
         const profileData = await profileResponse.json();
         setProfile(profileData);
+        
+        // Redirect active_user to challenge dashboard
+        if (profileData.role === 'active_user') {
+          router.replace('/(tabs)/challenge-dashboard');
+          return;
+        }
+        
         if (!profileData.profile_completed) {
-          router.replace('/onboarding');
+          if (profileData.role === 'professional') {
+            router.replace('/onboarding-professional');
+          } else if (profileData.role === 'active_user') {
+            router.replace('/onboarding-active');
+          } else {
+            router.replace('/onboarding');
+          }
           return;
         }
       }
