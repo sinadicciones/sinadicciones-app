@@ -442,11 +442,71 @@ export default function ChallengeDashboard() {
           </View>
         )}
 
+        {/* Craving Management Section */}
+        {education?.craving_management && (
+          <View style={styles.section}>
+            <TouchableOpacity 
+              style={styles.sectionHeader}
+              onPress={() => setExpandedSection(expandedSection === 'craving' ? null : 'craving')}
+            >
+              <View style={styles.sectionTitleRow}>
+                <Ionicons name="flame" size={22} color="#EF4444" />
+                <Text style={styles.sectionTitle}>Manejo del Craving</Text>
+              </View>
+              <Ionicons 
+                name={expandedSection === 'craving' ? 'chevron-up' : 'chevron-down'} 
+                size={20} 
+                color="#9CA3AF" 
+              />
+            </TouchableOpacity>
+            
+            {expandedSection === 'craving' && (
+              <View style={styles.educationList}>
+                {education.craving_management.sections.map((section: any, index: number) => (
+                  <TouchableOpacity 
+                    key={index} 
+                    style={styles.educationItem}
+                    onPress={() => router.push({ pathname: '/education-detail', params: { section: JSON.stringify(section) } })}
+                  >
+                    <Ionicons name={section.icon as any} size={24} color="#EF4444" />
+                    <Text style={styles.educationTitle}>{section.title}</Text>
+                    <Ionicons name="chevron-forward" size={18} color="#6B7280" />
+                  </TouchableOpacity>
+                ))}
+                
+                {/* Video Link */}
+                {education.craving_management.video_url && (
+                  <TouchableOpacity 
+                    style={[styles.educationItem, styles.videoItem]}
+                    onPress={() => Linking.openURL(education.craving_management.video_url)}
+                  >
+                    <Ionicons name="logo-youtube" size={24} color="#FF0000" />
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.educationTitle}>Ver Video</Text>
+                      <Text style={styles.videoSubtitle}>{education.craving_management.video_title}</Text>
+                    </View>
+                    <Ionicons name="open-outline" size={18} color="#6B7280" />
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
+          </View>
+        )}
+
         {/* Emergency Tips */}
         <TouchableOpacity 
           style={styles.emergencyCard}
           onPress={() => {
-            if (education?.emergency_tips) {
+            if (education?.craving_management?.emergency_actions) {
+              const actions = education.craving_management.emergency_actions
+                .map((a: any) => `${a.priority}. ${a.action}`)
+                .join('\n');
+              Alert.alert(
+                '🆘 Acciones de Emergencia',
+                `Cuando el craving sea muy intenso:\n\n${actions}`,
+                [{ text: 'Entendido' }]
+              );
+            } else if (education?.emergency_tips) {
               Alert.alert(
                 '🆘 Si sientes un craving intenso',
                 education.emergency_tips.tips.join('\n\n'),
