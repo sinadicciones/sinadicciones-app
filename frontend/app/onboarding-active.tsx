@@ -47,6 +47,19 @@ const TRIGGERS = [
   { id: 'insomnia', label: 'Insomnio', icon: 'moon' },
 ];
 
+const PROTECTIVE_FACTORS = [
+  { id: 'family', label: 'Familia', icon: 'people' },
+  { id: 'friends', label: 'Amigos que apoyan', icon: 'heart' },
+  { id: 'work', label: 'Trabajo/Estudios', icon: 'briefcase' },
+  { id: 'hobbies', label: 'Hobbies/Pasatiempos', icon: 'color-palette' },
+  { id: 'sports', label: 'Deporte/Ejercicio', icon: 'fitness' },
+  { id: 'spirituality', label: 'Espiritualidad/Fe', icon: 'sparkles' },
+  { id: 'therapy', label: 'Terapia/Profesional', icon: 'medkit' },
+  { id: 'pets', label: 'Mascotas', icon: 'paw' },
+  { id: 'nature', label: 'Naturaleza', icon: 'leaf' },
+  { id: 'music', label: 'Música/Arte', icon: 'musical-notes' },
+];
+
 export default function OnboardingActiveScreen() {
   const router = useRouter();
   const [step, setStep] = useState(1);
@@ -59,12 +72,13 @@ export default function OnboardingActiveScreen() {
   const [yearsUsing, setYearsUsing] = useState('');
   const [frequency, setFrequency] = useState('');
   const [selectedTriggers, setSelectedTriggers] = useState<string[]>([]);
+  const [selectedProtective, setSelectedProtective] = useState<string[]>([]);
   const [whyQuit, setWhyQuit] = useState('');
   const [supportName, setSupportName] = useState('');
   const [supportPhone, setSupportPhone] = useState('');
   const [supportRelationship, setSupportRelationship] = useState('');
 
-  const totalSteps = 5;
+  const totalSteps = 6; // Added one more step for protective factors
 
   const toggleSubstance = (id: string) => {
     if (selectedSubstances.includes(id)) {
