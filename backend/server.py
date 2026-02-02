@@ -461,6 +461,146 @@ async def change_password(data: ChangePasswordRequest, current_user: User = Depe
     
     return {"success": True, "message": "Contraseña actualizada correctamente"}
 
+# ============== ROLE & THERAPIST ENDPOINTS ==============
+
+class SetRoleRequest(BaseModel):
+    role: str  # patient, professional
+    country: Optional[str] = None
+    identification: Optional[str] = None  # RUT, DNI, etc.
+
+@app.post("/api/profile/set-role")
+async def set_user_role(data: SetRoleRequest, current_user: User = Depends(get_current_user)):
+    """Set user's role (patient or professional)"""
+    if data.role not in ["patient", "professional"]:
+        raise HTTPException(status_code=400, detail="Rol inválido")
+    
+    await db.user_profiles.update_one(
+        {"user_id": current_user.user_id},
+        {"$set": {
+            "role": data.role,
+            "country": data.country,
+            "identification": data.identification,
+            "updated_at": datetime.now(timezone.utc)
+        }}
+    )
+    
+    return {"success": True, "role": data.role}
+
+class ProfessionalOnboardingRequest(BaseModel):
+    professional_type: str  # psychologist, psychiatrist, therapist, counselor
+    specialization: Optional[str] = None
+    years_experience: Optional[int] = None
+    license_number: Optional[str] = None
+    institution: Optional[str] = None
+    bio: Optional[str] = None
+
+@app.post("/api/profile/professional-onboarding")
+async def professional_onboarding(data: ProfessionalOnboardingRequest, current_user: User = Depends(get_current_user)):
+    """Complete professional onboarding"""
+    await db.user_profiles.update_one(
+        {"user_id": current_user.user_id},
+        {"$set": {
+            "professional_type": data.professional_type,
+            "specialization": data.specialization,
+            "years_experience": data.years_experience,
+            "license_number": data.license_number,
+            "institution": data.institution,
+            "bio": data.bio,
+            "profile_completed": True,
+            "updated_at": datetime.now(timezone.utc)
+        }}
+    )
+    
+    return {"success": True}
+
+@app.get("/api/therapists/search")
+async def search_therapists(query: str = "", current_user: User = Depends(get_current_user)):
+    """Search for therapists by name"""
+    # Find professionals with matching names
+    search_filter = {
+        "role": "professional",
+        "profile_completed": True
+    }
+    
+    profiles = await db.user_profiles.find(
+        search_filter,
+        {"_id": 0, "user_id": 1, "professional_type": 1, "specialization": 1, "institution": 1, "years_experience": 1}
+    ).to_list(100)
+    
+    results = []
+    for profile in profiles:
+        # Get user name
+        user = await db.users.find_one({"user_id": profile["user_id"]}, {"_id": 0, "name": 1})
+        if user:
+            name = user.get("name", "")
+            # Filter by query if provided
+            if query.lower() in name.lower() or not query:
+                results.append({
+                    "user_id": profile["user_id"],
+                    "name": name,
+                    "professional_type": profile.get("professional_type"),
+                    "specialization": profile.get("specialization"),
+                    "institution": profile.get("institution"),
+                    "years_experience": profile.get("years_experience")
+                })
+    
+    return results
+
+@app.post("/api/patient/link-therapist")
+async def link_therapist(data: LinkTherapistRequest, current_user: User = Depends(get_current_user)):
+    """Link patient to a therapist"""
+    # Verify the therapist exists and is a professional
+    therapist_profile = await db.user_profiles.find_one({
+        "user_id": data.therapist_id,
+        "role": "professional"
+    })
+    
+    if not therapist_profile:
+        raise HTTPException(status_code=404, detail="Terapeuta no encontrado")
+    
+    # Update patient's profile with therapist link
+    await db.user_profiles.update_one(
+        {"user_id": current_user.user_id},
+        {"$set": {
+            "linked_therapist_id": data.therapist_id,
+            "updated_at": datetime.now(timezone.utc)
+        }}
+    )
+    
+    return {"success": True, "message": "Terapeuta vinculado correctamente"}
+
+@app.get("/api/professional/patients")
+async def get_professional_patients(current_user: User = Depends(get_current_user)):
+    """Get all patients linked to this professional"""
+    # Check if user is a professional
+    profile = await db.user_profiles.find_one({"user_id": current_user.user_id})
+    
+    if not profile or profile.get("role") != "professional":
+        raise HTTPException(status_code=403, detail="Solo profesionales pueden ver pacientes")
+    
+    # Find all patients linked to this professional
+    patients = await db.user_profiles.find(
+        {"linked_therapist_id": current_user.user_id},
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Enrich with user data
+    results = []
+    for patient in patients:
+        user = await db.users.find_one({"user_id": patient["user_id"]}, {"_id": 0})
+        if user:
+            results.append({
+                "user_id": patient["user_id"],
+                "name": user.get("name"),
+                "email": user.get("email"),
+                "picture": user.get("picture"),
+                "clean_since": patient.get("clean_since"),
+                "addiction_type": patient.get("addiction_type"),
+                "profile": patient
+            })
+    
+    return results
+
 # ============== HABIT ENDPOINTS ==============
 
 @app.get("/api/habits")
