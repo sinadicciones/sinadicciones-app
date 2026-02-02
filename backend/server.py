@@ -85,6 +85,11 @@ class EmotionalLog(BaseModel):
 
 class UserProfile(BaseModel):
     user_id: str
+    role: str = "patient"  # patient, professional, admin
+    # Common fields
+    country: Optional[str] = None
+    identification: Optional[str] = None  # RUT, DNI, etc.
+    # Patient-specific fields
     addiction_type: Optional[str] = None
     secondary_addictions: List[str] = []
     years_using: Optional[int] = None
@@ -98,8 +103,28 @@ class UserProfile(BaseModel):
     life_story: Optional[str] = None
     emergency_contacts: List[dict] = []  # [{name, phone, relationship}]
     my_why: Optional[str] = None
+    linked_therapist_id: Optional[str] = None  # For patients linked to a therapist
+    # Professional-specific fields
+    professional_type: Optional[str] = None  # psychologist, psychiatrist, therapist, counselor
+    specialization: Optional[str] = None
+    years_experience: Optional[int] = None
+    license_number: Optional[str] = None
+    institution: Optional[str] = None
+    bio: Optional[str] = None
+    # Common
     profile_completed: bool = False
     updated_at: datetime
+
+class TherapistSearchResult(BaseModel):
+    user_id: str
+    name: str
+    professional_type: Optional[str]
+    specialization: Optional[str]
+    institution: Optional[str]
+    years_experience: Optional[int]
+
+class LinkTherapistRequest(BaseModel):
+    therapist_id: str
 
 class PurposeTest(BaseModel):
     user_id: str
