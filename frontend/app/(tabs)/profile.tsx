@@ -1111,6 +1111,9 @@ const styles = StyleSheet.create({
   relapseButton: {
     backgroundColor: '#FEE2E2',
   },
+  adminButton: {
+    backgroundColor: '#EDE9FE',
+  },
   // Estilos para el modal de contraseña
   modalOverlay: {
     flex: 1,
