@@ -172,9 +172,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async () => {
     try {
       // Create redirect URL based on platform
-      const redirectUrl = Platform.OS === 'web'
-        ? window.location.origin + window.location.pathname
-        : Linking.createURL('/');
+      // Always use the public preview URL for web to avoid localhost issues
+      let redirectUrl: string;
+      
+      if (Platform.OS === 'web') {
+        // Check if we're on localhost or the actual preview URL
+        const currentOrigin = window.location.origin;
+        if (currentOrigin.includes('localhost') || currentOrigin.includes('127.0.0.1')) {
+          // Use the public preview URL instead of localhost
+          redirectUrl = 'https://heal-journey-4.preview.emergentagent.com/';
+        } else {
+          redirectUrl = currentOrigin + window.location.pathname;
+        }
+      } else {
+        redirectUrl = Linking.createURL('/');
+      }
 
       const authUrl = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
 
