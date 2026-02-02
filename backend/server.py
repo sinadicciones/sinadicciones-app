@@ -506,14 +506,14 @@ async def change_password(data: ChangePasswordRequest, current_user: User = Depe
 # ============== ROLE & THERAPIST ENDPOINTS ==============
 
 class SetRoleRequest(BaseModel):
-    role: str  # patient, professional
+    role: str  # patient, professional, active_user
     country: Optional[str] = None
     identification: Optional[str] = None  # RUT, DNI, etc.
 
 @app.post("/api/profile/set-role")
 async def set_user_role(data: SetRoleRequest, current_user: User = Depends(get_current_user)):
-    """Set user's role (patient or professional)"""
-    if data.role not in ["patient", "professional"]:
+    """Set user's role (patient, professional, or active_user)"""
+    if data.role not in ["patient", "professional", "active_user"]:
         raise HTTPException(status_code=400, detail="Rol inválido")
     
     await db.user_profiles.update_one(
