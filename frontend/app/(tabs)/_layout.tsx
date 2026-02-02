@@ -1,17 +1,42 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useEffect, useState } from 'react';
+import { authenticatedFetch, getBackendURL } from '../../utils/api';
+
+const BACKEND_URL = getBackendURL();
 
 export default function TabsLayout() {
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Load user profile to determine role
+    const loadProfile = async () => {
+      try {
+        const response = await authenticatedFetch(`${BACKEND_URL}/api/profile`);
+        if (response.ok) {
+          const data = await response.json();
+          setUserRole(data.role);
+        }
+      } catch (error) {
+        console.error('Failed to load profile for tabs:', error);
+      }
+    };
+    loadProfile();
+  }, []);
+
+  // For active_user, show different tab configuration
+  const isActiveUser = userRole === 'active_user';
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#F59E0B',
+        tabBarActiveTintColor: isActiveUser ? '#F59E0B' : '#10B981',
         tabBarInactiveTintColor: '#9CA3AF',
         tabBarStyle: {
-          backgroundColor: '#FFFFFF',
+          backgroundColor: isActiveUser ? '#1A1A1A' : '#FFFFFF',
           borderTopWidth: 1,
-          borderTopColor: '#E5E7EB',
+          borderTopColor: isActiveUser ? '#333333' : '#E5E7EB',
           height: 70,
           paddingBottom: 8,
           paddingTop: 8,
