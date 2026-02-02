@@ -908,6 +908,14 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 14,
   },
+  videoItem: {
+    backgroundColor: 'rgba(255, 0, 0, 0.1)',
+  },
+  videoSubtitle: {
+    color: '#9CA3AF',
+    fontSize: 12,
+    marginTop: 2,
+  },
   timelineList: {
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 12,
