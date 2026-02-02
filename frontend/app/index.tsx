@@ -30,10 +30,60 @@ export default function WelcomeScreen() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (user && !isLoading) {
-      router.replace('/(tabs)/home');
-    }
+    const checkUserAndRedirect = async () => {
+      if (user && !isLoading) {
+        try {
+          // Check if user has a profile with role
+          const token = await getStoredToken();
+          const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+          if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+          }
+          
+          const response = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL || 'https://sober-path-3.preview.emergentagent.com'}/api/profile`, {
+            headers,
+            credentials: 'include',
+          });
+          
+          if (response.ok) {
+            const profile = await response.json();
+            // Check if role is set
+            if (!profile.role || profile.role === '') {
+              // New user - go to role selection
+              router.replace('/role-select');
+            } else if (!profile.profile_completed) {
+              // Has role but not completed onboarding
+              if (profile.role === 'professional') {
+                router.replace('/onboarding-professional');
+              } else {
+                router.replace('/onboarding');
+              }
+            } else {
+              // Profile complete - go to home
+              router.replace('/(tabs)/home');
+            }
+          } else {
+            // No profile yet, go to role selection
+            router.replace('/role-select');
+          }
+        } catch (err) {
+          console.error('Error checking profile:', err);
+          router.replace('/(tabs)/home');
+        }
+      }
+    };
+    
+    checkUserAndRedirect();
   }, [user, isLoading]);
+
+  // Helper to get token
+  const getStoredToken = async () => {
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      return localStorage.getItem('session_token');
+    }
+    const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+    return await AsyncStorage.getItem('session_token');
+  };
 
   const handleEmailSubmit = async () => {
     console.log('handleEmailSubmit called');
