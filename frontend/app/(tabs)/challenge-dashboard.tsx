@@ -62,10 +62,13 @@ export default function ChallengeDashboard() {
         }
       }
 
-      // Load educational content
-      const eduRes = await authenticatedFetch(`${BACKEND_URL}/api/education/content`);
+      // Load educational content (no auth needed)
+      const eduRes = await fetch(`${BACKEND_URL}/api/education/content`);
       if (eduRes.ok) {
-        setEducation(await eduRes.json());
+        const eduData = await eduRes.json();
+        setEducation(eduData);
+      } else {
+        console.error('Education content failed:', eduRes.status);
       }
     } catch (error) {
       console.error('Failed to load challenge data:', error);
