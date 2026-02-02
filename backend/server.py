@@ -986,10 +986,12 @@ async def get_admin_stats(current_user: User = Depends(get_current_user)):
     
     # Average mood (last 7 days)
     pipeline = [
-        {"$group": {"_id": None, "avg_mood": {"$avg": "$mood"}}}
+        {"$group": {"_id": None, "avg_mood": {"$avg": "$mood_scale"}}}
     ]
     mood_result = await db.emotional_logs.aggregate(pipeline).to_list(1)
-    avg_mood = round(mood_result[0]["avg_mood"], 1) if mood_result else 0
+    avg_mood = 0
+    if mood_result and mood_result[0].get("avg_mood") is not None:
+        avg_mood = round(mood_result[0]["avg_mood"], 1)
     
     # Registrations over time (last 30 days) - simplified
     # We'll estimate based on user_id patterns
