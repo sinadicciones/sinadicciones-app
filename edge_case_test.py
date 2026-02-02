@@ -11,7 +11,7 @@ import uuid
 from datetime import datetime, timezone
 
 # Configuration
-BACKEND_URL = "https://sober-path-3.preview.emergentagent.com/api"
+BACKEND_URL = "https://heal-journey-4.preview.emergentagent.com/api"
 
 class EdgeCaseTester:
     def __init__(self):

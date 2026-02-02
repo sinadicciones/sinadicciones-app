@@ -13,7 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'https://sober-path-3.preview.emergentagent.com';
+const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'https://heal-journey-4.preview.emergentagent.com';
 const SINADICCIONES_URL = 'https://sinadicciones.cl';
 
 const QUICK_FILTERS = [

@@ -40,7 +40,7 @@ export default function WelcomeScreen() {
             headers['Authorization'] = `Bearer ${token}`;
           }
           
-          const response = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL || 'https://sober-path-3.preview.emergentagent.com'}/api/profile`, {
+          const response = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL || 'https://heal-journey-4.preview.emergentagent.com'}/api/profile`, {
             headers,
             credentials: 'include',
           });
