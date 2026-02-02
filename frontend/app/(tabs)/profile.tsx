@@ -1334,4 +1334,55 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  // Professional Profile Styles
+  resourceCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  resourceIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 14,
+  },
+  resourceInfo: {
+    flex: 1,
+  },
+  resourceTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+  resourceDesc: {
+    fontSize: 13,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+  tipCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    padding: 14,
+    borderRadius: 10,
+    marginBottom: 10,
+    gap: 10,
+  },
+  tipText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#374151',
+    lineHeight: 20,
+  },
+  tipBold: {
+    fontWeight: '700',
+    color: '#10B981',
+  },
 });
