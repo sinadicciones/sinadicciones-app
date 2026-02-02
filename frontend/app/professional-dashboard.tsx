@@ -96,21 +96,34 @@ export default function ProfessionalDashboard() {
     }
 
     setIsSearching(true);
+    setSearchResults([]);
+    
     try {
       const response = await authenticatedFetch(
-        `${BACKEND_URL}/api/therapists/search-patient?email=${encodeURIComponent(searchEmail)}`
+        `${BACKEND_URL}/api/therapists/search-patient?email=${encodeURIComponent(searchEmail.trim().toLowerCase())}`
       );
+      
       if (response.ok) {
         const data = await response.json();
+        console.log('Search result:', data);
+        
         if (data.patient) {
           setSearchResults([data.patient]);
+          Alert.alert('¡Encontrado!', `Paciente: ${data.patient.name}`);
         } else {
           setSearchResults([]);
-          Alert.alert('No encontrado', 'No se encontró un paciente con ese email');
+          Alert.alert(
+            'No encontrado', 
+            data.message || 'No se encontró un paciente registrado con ese email. Verifica que:\n\n• El email esté correcto\n• El usuario tenga una cuenta en la app\n• Haya seleccionado rol de paciente o "Quiero dejarlo"'
+          );
         }
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        Alert.alert('Error', errorData.detail || 'Error al buscar paciente');
       }
     } catch (error) {
-      Alert.alert('Error', 'Error al buscar paciente');
+      console.error('Search error:', error);
+      Alert.alert('Error', 'Error de conexión. Intenta de nuevo.');
     } finally {
       setIsSearching(false);
     }
