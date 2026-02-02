@@ -8,12 +8,15 @@ import {
   Linking,
   RefreshControl,
   ActivityIndicator,
+  TextInput,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { authenticatedFetch, getBackendURL } from '../../utils/api';
 
-const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'https://healingpath-17.preview.emergentagent.com';
+const BACKEND_URL = getBackendURL();
 const SINADICCIONES_URL = 'https://sinadicciones.cl';
 
 const QUICK_FILTERS = [
@@ -23,17 +26,31 @@ const QUICK_FILTERS = [
   { label: 'Online', value: 'online' },
 ];
 
+const TABS = [
+  { label: 'Centros', value: 'centers', icon: 'business' },
+  { label: 'Terapeutas', value: 'therapists', icon: 'people' },
+];
+
 export default function CentersScreen() {
+  const [activeTab, setActiveTab] = useState('centers');
   const [centers, setCenters] = useState<any[]>([]);
+  const [therapists, setTherapists] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [activeFilter, setActiveFilter] = useState('all');
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    fetchCenters();
+    fetchData();
   }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    await Promise.all([fetchCenters(), fetchTherapists()]);
+    setLoading(false);
+  };
 
   const fetchCenters = async () => {
     try {
@@ -50,16 +67,26 @@ export default function CentersScreen() {
     } catch (err) {
       console.error('Error fetching centers:', err);
       setError('No se pudieron cargar los centros');
-      // Keep existing centers if we have them
+    }
+  };
+
+  const fetchTherapists = async () => {
+    try {
+      const response = await authenticatedFetch(`${BACKEND_URL}/api/therapists/search?query=`);
+      if (response.ok) {
+        const data = await response.json();
+        setTherapists(data || []);
+      }
+    } catch (err) {
+      console.error('Error fetching therapists:', err);
     } finally {
-      setLoading(false);
       setRefreshing(false);
     }
   };
 
   const onRefresh = () => {
     setRefreshing(true);
-    fetchCenters();
+    fetchData();
   };
 
   const handleOpenCenter = (url: string) => {
@@ -70,7 +97,7 @@ export default function CentersScreen() {
     Linking.openURL(`${SINADICCIONES_URL}/explore-no-map/?type=place&sort=latest`);
   };
 
-  const handleWhatsApp = (phone: string, centerName: string) => {
+  const handleWhatsApp = (phone: string, name: string, isTherapist: boolean = false) => {
     // Limpiar el número de teléfono
     let cleanPhone = phone.replace(/\s/g, '').replace(/[^0-9+]/g, '');
     
@@ -86,7 +113,9 @@ export default function CentersScreen() {
     }
     
     // Mensaje predefinido
-    const message = `Hola estoy interesado, encontré tu servicio en Sinadicciones.cl, puedes darme más información del centro`;
+    const message = isTherapist 
+      ? `Hola ${name}, encontré tu perfil en la app SinAdicciones y me gustaría consultar sobre una sesión de terapia.`
+      : `Hola estoy interesado, encontré tu servicio en Sinadicciones.cl, puedes darme más información del centro`;
     const encodedMessage = encodeURIComponent(message);
     
     // Remover el + para la URL de WhatsApp
@@ -97,6 +126,28 @@ export default function CentersScreen() {
     }
   };
 
+  const handleContactTherapist = (therapist: any) => {
+    if (!therapist.whatsapp) {
+      Alert.alert(
+        'Sin información de contacto',
+        'Este terapeuta no ha agregado su número de WhatsApp aún.'
+      );
+      return;
+    }
+
+    Alert.alert(
+      'Contactar Terapeuta',
+      `${therapist.consultation_fee ? `💰 Tarifa: ${therapist.consultation_fee}\n\n` : ''}Este servicio puede tener un costo indicado por el terapeuta. ¿Deseas contactar por WhatsApp?`,
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { 
+          text: 'Contactar', 
+          onPress: () => handleWhatsApp(therapist.whatsapp, therapist.name, true)
+        }
+      ]
+    );
+  };
+
   const filteredCenters = centers.filter((center) => {
     if (activeFilter === 'all') return true;
     const modalities = center.modalities || [];
@@ -105,10 +156,30 @@ export default function CentersScreen() {
     );
   });
 
+  const filteredTherapists = therapists.filter((t) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      t.name?.toLowerCase().includes(query) ||
+      t.specialization?.toLowerCase().includes(query) ||
+      t.institution?.toLowerCase().includes(query)
+    );
+  });
+
   const formatLastUpdated = () => {
     if (!lastUpdated) return '';
     const date = new Date(lastUpdated);
     return date.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const getProfessionalTypeLabel = (type: string) => {
+    const types: Record<string, string> = {
+      'psychologist': 'Psicólogo/a',
+      'psychiatrist': 'Psiquiatra',
+      'therapist': 'Terapeuta',
+      'counselor': 'Consejero/a',
+    };
+    return types[type] || type;
   };
 
   if (loading) {
@@ -122,12 +193,12 @@ export default function CentersScreen() {
         >
           <View style={styles.headerTitleContainer}>
             <Ionicons name="medical" size={24} color="#FFFFFF" />
-            <Text style={styles.headerTitle}>Centros de Rehabilitación</Text>
+            <Text style={styles.headerTitle}>Buscar Ayuda</Text>
           </View>
         </LinearGradient>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#10B981" />
-          <Text style={styles.loadingText}>Cargando centros actualizados...</Text>
+          <Text style={styles.loadingText}>Cargando...</Text>
         </View>
       </SafeAreaView>
     );
@@ -145,175 +216,325 @@ export default function CentersScreen() {
         <View style={styles.headerTop}>
           <View style={styles.headerTitleContainer}>
             <Ionicons name="medical" size={24} color="#FFFFFF" />
-            <Text style={styles.headerTitle}>Centros de Rehabilitación</Text>
+            <Text style={styles.headerTitle}>Buscar Ayuda</Text>
           </View>
           <TouchableOpacity style={styles.refreshButton} onPress={onRefresh}>
             <Ionicons name="refresh" size={20} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
         <Text style={styles.headerSubtitle}>
-          {centers.length} centros disponibles • Actualizado {formatLastUpdated()}
+          {centers.length} centros • {therapists.length} terapeutas
         </Text>
       </LinearGradient>
 
-      {/* Search Button */}
-      <TouchableOpacity style={styles.searchButton} onPress={handleOpenDirectory}>
-        <View style={styles.searchContent}>
-          <Ionicons name="search" size={20} color="#6B7280" />
-          <Text style={styles.searchText}>Buscar con filtros avanzados...</Text>
-        </View>
-        <Ionicons name="open-outline" size={18} color="#10B981" />
-      </TouchableOpacity>
-
-      {/* Quick Filters */}
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false}
-        style={styles.filtersContainer}
-        contentContainerStyle={styles.filtersContent}
-      >
-        {QUICK_FILTERS.map((filter) => (
+      {/* Tab Switcher */}
+      <View style={styles.tabContainer}>
+        {TABS.map((tab) => (
           <TouchableOpacity
-            key={filter.value}
-            style={[
-              styles.filterChip,
-              activeFilter === filter.value && styles.filterChipActive,
-            ]}
-            onPress={() => setActiveFilter(filter.value)}
+            key={tab.value}
+            style={[styles.tab, activeTab === tab.value && styles.tabActive]}
+            onPress={() => setActiveTab(tab.value)}
           >
-            <Text
-              style={[
-                styles.filterText,
-                activeFilter === filter.value && styles.filterTextActive,
-              ]}
-            >
-              {filter.label}
+            <Ionicons 
+              name={tab.icon as any} 
+              size={20} 
+              color={activeTab === tab.value ? '#10B981' : '#6B7280'} 
+            />
+            <Text style={[styles.tabText, activeTab === tab.value && styles.tabTextActive]}>
+              {tab.label}
             </Text>
           </TouchableOpacity>
         ))}
-      </ScrollView>
+      </View>
+
+      {activeTab === 'centers' ? (
+        <>
+          {/* Search Button for Centers */}
+          <TouchableOpacity style={styles.searchButton} onPress={handleOpenDirectory}>
+            <View style={styles.searchContent}>
+              <Ionicons name="search" size={20} color="#6B7280" />
+              <Text style={styles.searchText}>Buscar con filtros avanzados...</Text>
+            </View>
+            <Ionicons name="open-outline" size={18} color="#10B981" />
+          </TouchableOpacity>
+
+          {/* Quick Filters */}
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            style={styles.filtersContainer}
+            contentContainerStyle={styles.filtersContent}
+          >
+            {QUICK_FILTERS.map((filter) => (
+              <TouchableOpacity
+                key={filter.value}
+                style={[
+                  styles.filterChip,
+                  activeFilter === filter.value && styles.filterChipActive,
+                ]}
+                onPress={() => setActiveFilter(filter.value)}
+              >
+                <Text
+                  style={[
+                    styles.filterText,
+                    activeFilter === filter.value && styles.filterTextActive,
+                  ]}
+                >
+                  {filter.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </>
+      ) : (
+        /* Search Input for Therapists */
+        <View style={styles.searchInputContainer}>
+          <Ionicons name="search" size={20} color="#6B7280" />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Buscar por nombre, especialización..."
+            placeholderTextColor="#9CA3AF"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')}>
+              <Ionicons name="close-circle" size={20} color="#6B7280" />
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
 
       {/* Error Message */}
       {error && (
         <View style={styles.errorBanner}>
           <Ionicons name="warning" size={18} color="#DC2626" />
           <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity onPress={fetchCenters}>
+          <TouchableOpacity onPress={fetchData}>
             <Text style={styles.retryText}>Reintentar</Text>
           </TouchableOpacity>
         </View>
       )}
 
-      {/* Centers List */}
+      {/* Content */}
       <ScrollView
         style={styles.content}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {filteredCenters.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Ionicons name="search" size={48} color="#D1D5DB" />
-            <Text style={styles.emptyTitle}>No se encontraron centros</Text>
-            <Text style={styles.emptyText}>
-              Prueba con otro filtro o busca en el sitio web
-            </Text>
-            <TouchableOpacity style={styles.emptyButton} onPress={handleOpenDirectory}>
-              <Text style={styles.emptyButtonText}>Ir a sinadicciones.cl</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <>
-            <Text style={styles.sectionTitle}>
-              {filteredCenters.length} {filteredCenters.length === 1 ? 'centro encontrado' : 'centros encontrados'}
-            </Text>
+        {activeTab === 'centers' ? (
+          /* Centers List */
+          filteredCenters.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Ionicons name="search" size={48} color="#D1D5DB" />
+              <Text style={styles.emptyTitle}>No se encontraron centros</Text>
+              <Text style={styles.emptyText}>
+                Prueba con otro filtro o busca en el sitio web
+              </Text>
+              <TouchableOpacity style={styles.emptyButton} onPress={handleOpenDirectory}>
+                <Text style={styles.emptyButtonText}>Ir a sinadicciones.cl</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <>
+              <Text style={styles.sectionTitle}>
+                {filteredCenters.length} {filteredCenters.length === 1 ? 'centro encontrado' : 'centros encontrados'}
+              </Text>
 
-            {filteredCenters.map((center, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.centerCard}
-                onPress={() => handleOpenCenter(center.url)}
-              >
-                <View style={styles.centerHeader}>
-                  <View style={styles.centerIcon}>
-                    <Ionicons name="home" size={24} color="#10B981" />
+              {filteredCenters.map((center, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.centerCard}
+                  onPress={() => handleOpenCenter(center.url)}
+                >
+                  <View style={styles.centerHeader}>
+                    <View style={styles.centerIcon}>
+                      <Ionicons name="home" size={24} color="#10B981" />
+                    </View>
+                    <View style={styles.centerInfo}>
+                      <Text style={styles.centerName} numberOfLines={2}>{center.name}</Text>
+                      {center.description ? (
+                        <Text style={styles.centerDescription} numberOfLines={2}>
+                          {center.description}
+                        </Text>
+                      ) : null}
+                    </View>
                   </View>
-                  <View style={styles.centerInfo}>
-                    <Text style={styles.centerName} numberOfLines={2}>{center.name}</Text>
-                    {center.description ? (
-                      <Text style={styles.centerDescription} numberOfLines={2}>
-                        {center.description}
-                      </Text>
+
+                  <View style={styles.centerDetails}>
+                    {center.address ? (
+                      <View style={styles.detailRow}>
+                        <Ionicons name="location" size={16} color="#6B7280" />
+                        <Text style={styles.detailText} numberOfLines={1}>{center.address}</Text>
+                      </View>
+                    ) : null}
+                    {center.price ? (
+                      <View style={styles.detailRow}>
+                        <Ionicons name="cash" size={16} color="#6B7280" />
+                        <Text style={styles.detailText}>{center.price}</Text>
+                      </View>
                     ) : null}
                   </View>
-                </View>
 
-                <View style={styles.centerDetails}>
-                  {center.address ? (
-                    <View style={styles.detailRow}>
-                      <Ionicons name="location" size={16} color="#6B7280" />
-                      <Text style={styles.detailText} numberOfLines={1}>{center.address}</Text>
+                  {center.modalities && center.modalities.length > 0 && (
+                    <View style={styles.modalityContainer}>
+                      {center.modalities.slice(0, 4).map((mod: string, idx: number) => (
+                        <View key={idx} style={styles.modalityBadge}>
+                          <Text style={styles.modalityText}>{mod}</Text>
+                        </View>
+                      ))}
                     </View>
-                  ) : null}
-                  {center.price ? (
-                    <View style={styles.detailRow}>
-                      <Ionicons name="cash" size={16} color="#6B7280" />
-                      <Text style={styles.detailText}>{center.price}</Text>
-                    </View>
-                  ) : null}
-                </View>
+                  )}
 
-                {center.modalities && center.modalities.length > 0 && (
-                  <View style={styles.modalityContainer}>
-                    {center.modalities.slice(0, 4).map((mod: string, idx: number) => (
-                      <View key={idx} style={styles.modalityBadge}>
-                        <Text style={styles.modalityText}>{mod}</Text>
-                      </View>
-                    ))}
-                  </View>
-                )}
-
-                <View style={styles.centerActions}>
-                  {center.phone ? (
+                  <View style={styles.centerActions}>
+                    {center.phone ? (
+                      <TouchableOpacity
+                        style={styles.whatsappButton}
+                        onPress={() => handleWhatsApp(center.phone, center.name)}
+                      >
+                        <Ionicons name="logo-whatsapp" size={18} color="#FFFFFF" />
+                        <Text style={styles.whatsappButtonText}>WhatsApp</Text>
+                      </TouchableOpacity>
+                    ) : null}
                     <TouchableOpacity
-                      style={styles.whatsappButton}
-                      onPress={() => handleWhatsApp(center.phone, center.name)}
+                      style={[styles.viewButton, !center.phone && styles.viewButtonFull]}
+                      onPress={() => handleOpenCenter(center.url)}
                     >
-                      <Ionicons name="logo-whatsapp" size={18} color="#FFFFFF" />
-                      <Text style={styles.whatsappButtonText}>WhatsApp</Text>
+                      <Text style={styles.viewButtonText}>Ver detalles</Text>
+                      <Ionicons name="chevron-forward" size={18} color="#10B981" />
                     </TouchableOpacity>
-                  ) : null}
-                  <TouchableOpacity
-                    style={[styles.viewButton, !center.phone && styles.viewButtonFull]}
-                    onPress={() => handleOpenCenter(center.url)}
-                  >
-                    <Text style={styles.viewButtonText}>Ver detalles</Text>
-                    <Ionicons name="chevron-forward" size={18} color="#10B981" />
-                  </TouchableOpacity>
-                </View>
-              </TouchableOpacity>
-            ))}
+                  </View>
+                </TouchableOpacity>
+              ))}
 
-            {/* CTA to view more */}
-            <TouchableOpacity style={styles.viewMoreCard} onPress={handleOpenDirectory}>
-              <LinearGradient
-                colors={['#10B981', '#059669']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.viewMoreGradient}
-              >
-                <Ionicons name="globe" size={32} color="#FFFFFF" />
-                <Text style={styles.viewMoreTitle}>Ver directorio completo</Text>
-                <Text style={styles.viewMoreText}>
-                  Explora más centros con filtros avanzados en sinadicciones.cl
+              {/* CTA to view more */}
+              <TouchableOpacity style={styles.viewMoreCard} onPress={handleOpenDirectory}>
+                <LinearGradient
+                  colors={['#10B981', '#059669']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.viewMoreGradient}
+                >
+                  <Ionicons name="globe" size={32} color="#FFFFFF" />
+                  <Text style={styles.viewMoreTitle}>Ver directorio completo</Text>
+                  <Text style={styles.viewMoreText}>
+                    Explora más centros con filtros avanzados en sinadicciones.cl
+                  </Text>
+                  <View style={styles.viewMoreButton}>
+                    <Text style={styles.viewMoreButtonText}>Abrir sitio web</Text>
+                    <Ionicons name="open-outline" size={18} color="#10B981" />
+                  </View>
+                </LinearGradient>
+              </TouchableOpacity>
+            </>
+          )
+        ) : (
+          /* Therapists List */
+          filteredTherapists.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Ionicons name="people" size={48} color="#D1D5DB" />
+              <Text style={styles.emptyTitle}>No se encontraron terapeutas</Text>
+              <Text style={styles.emptyText}>
+                {searchQuery 
+                  ? 'Prueba con otro término de búsqueda'
+                  : 'Aún no hay terapeutas registrados en la plataforma'}
+              </Text>
+            </View>
+          ) : (
+            <>
+              <Text style={styles.sectionTitle}>
+                {filteredTherapists.length} {filteredTherapists.length === 1 ? 'terapeuta encontrado' : 'terapeutas encontrados'}
+              </Text>
+
+              {/* Info Banner */}
+              <View style={styles.infoBanner}>
+                <Ionicons name="information-circle" size={20} color="#3B82F6" />
+                <Text style={styles.infoBannerText}>
+                  Los terapeutas establecen sus propias tarifas. Consulta directamente para conocer costos y disponibilidad.
                 </Text>
-                <View style={styles.viewMoreButton}>
-                  <Text style={styles.viewMoreButtonText}>Abrir sitio web</Text>
-                  <Ionicons name="open-outline" size={18} color="#10B981" />
+              </View>
+
+              {filteredTherapists.map((therapist, index) => (
+                <View key={index} style={styles.therapistCard}>
+                  <View style={styles.therapistHeader}>
+                    <View style={styles.therapistAvatar}>
+                      <Ionicons name="person" size={28} color="#8B5CF6" />
+                    </View>
+                    <View style={styles.therapistInfo}>
+                      <Text style={styles.therapistName}>{therapist.name}</Text>
+                      <Text style={styles.therapistType}>
+                        {getProfessionalTypeLabel(therapist.professional_type)}
+                      </Text>
+                    </View>
+                    {therapist.accepts_patients !== false && (
+                      <View style={styles.availableBadge}>
+                        <Text style={styles.availableBadgeText}>Disponible</Text>
+                      </View>
+                    )}
+                  </View>
+
+                  {therapist.specialization && (
+                    <View style={styles.therapistDetail}>
+                      <Ionicons name="medical" size={16} color="#6B7280" />
+                      <Text style={styles.therapistDetailText}>{therapist.specialization}</Text>
+                    </View>
+                  )}
+
+                  {therapist.institution && (
+                    <View style={styles.therapistDetail}>
+                      <Ionicons name="business" size={16} color="#6B7280" />
+                      <Text style={styles.therapistDetailText}>{therapist.institution}</Text>
+                    </View>
+                  )}
+
+                  {therapist.years_experience && (
+                    <View style={styles.therapistDetail}>
+                      <Ionicons name="time" size={16} color="#6B7280" />
+                      <Text style={styles.therapistDetailText}>{therapist.years_experience} años de experiencia</Text>
+                    </View>
+                  )}
+
+                  {therapist.consultation_fee && (
+                    <View style={styles.feeContainer}>
+                      <Ionicons name="cash" size={16} color="#10B981" />
+                      <Text style={styles.feeText}>{therapist.consultation_fee}</Text>
+                    </View>
+                  )}
+
+                  {therapist.bio && (
+                    <Text style={styles.therapistBio} numberOfLines={3}>{therapist.bio}</Text>
+                  )}
+
+                  <TouchableOpacity
+                    style={[
+                      styles.contactButton,
+                      !therapist.whatsapp && styles.contactButtonDisabled
+                    ]}
+                    onPress={() => handleContactTherapist(therapist)}
+                  >
+                    <Ionicons 
+                      name="logo-whatsapp" 
+                      size={20} 
+                      color={therapist.whatsapp ? '#FFFFFF' : '#9CA3AF'} 
+                    />
+                    <Text style={[
+                      styles.contactButtonText,
+                      !therapist.whatsapp && styles.contactButtonTextDisabled
+                    ]}>
+                      {therapist.whatsapp ? 'Contactar por WhatsApp' : 'Sin WhatsApp disponible'}
+                    </Text>
+                  </TouchableOpacity>
+
+                  {therapist.consultation_fee && (
+                    <Text style={styles.feeDisclaimer}>
+                      💰 Este servicio tiene un costo definido por el terapeuta
+                    </Text>
+                  )}
                 </View>
-              </LinearGradient>
-            </TouchableOpacity>
-          </>
+              ))}
+            </>
+          )
         )}
 
         <View style={{ height: 40 }} />
