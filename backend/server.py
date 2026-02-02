@@ -2731,8 +2731,10 @@ class ActiveUserOnboardingRequest(BaseModel):
     identification: Optional[str] = None
 
 @app.post("/api/profile/active-onboarding")
-async def complete_active_user_onboarding(data: ActiveUserOnboardingRequest, user_id: str = Depends(get_current_user)):
+async def complete_active_user_onboarding(data: ActiveUserOnboardingRequest, current_user: User = Depends(get_current_user)):
     """Complete onboarding for active user (wants to quit)"""
+    
+    user_id = current_user.user_id
     
     update_data = {
         "role": "active_user",
