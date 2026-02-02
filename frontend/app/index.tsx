@@ -134,7 +134,7 @@ export default function WelcomeScreen() {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#10B981" />
+        <ActivityIndicator size="large" color="#FFFFFF" />
       </View>
     );
   }
@@ -145,7 +145,7 @@ export default function WelcomeScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <LinearGradient
-        colors={['#10B981', '#059669', '#047857']}
+        colors={['#1A1A1A', '#2D2D2D', '#1A1A1A']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.gradient}
@@ -155,10 +155,13 @@ export default function WelcomeScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.content}>
-            {/* Header */}
+            {/* Header with Logo */}
             <View style={styles.header}>
-              <Text style={styles.logo}>🌱</Text>
-              <Text style={styles.title}>SinAdicciones</Text>
+              <Image 
+                source={{ uri: LOGO_URL }}
+                style={styles.logoImage}
+                resizeMode="contain"
+              />
               <Text style={styles.subtitle}>Tu camino hacia una vida con propósito</Text>
             </View>
 
