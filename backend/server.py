@@ -2400,6 +2400,10 @@ async def get_current_challenge(current_user: User = Depends(get_current_user)):
     if isinstance(start_date, str):
         start_date = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
     
+    # Ensure start_date is timezone-aware
+    if start_date.tzinfo is None:
+        start_date = start_date.replace(tzinfo=timezone.utc)
+    
     days_passed = (datetime.now(timezone.utc) - start_date).days + 1
     challenge["current_day"] = min(days_passed, 21)
     
