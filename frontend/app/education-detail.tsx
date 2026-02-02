@@ -119,6 +119,25 @@ export default function EducationDetailScreen() {
           </View>
         )}
 
+        {/* Video if available */}
+        {section.video_url && (
+          <TouchableOpacity 
+            style={styles.videoSection}
+            onPress={() => Linking.openURL(section.video_url)}
+          >
+            <View style={styles.videoIconContainer}>
+              <Ionicons name="logo-youtube" size={32} color="#FF0000" />
+            </View>
+            <View style={styles.videoInfo}>
+              <Text style={styles.videoTitle}>🎬 Ver Video Explicativo</Text>
+              {section.video_title && (
+                <Text style={styles.videoSubtitle}>{section.video_title}</Text>
+              )}
+            </View>
+            <Ionicons name="open-outline" size={20} color="#FFFFFF" />
+          </TouchableOpacity>
+        )}
+
         {/* Back Button */}
         <TouchableOpacity 
           style={styles.bottomBackButton}
