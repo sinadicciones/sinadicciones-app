@@ -25,6 +25,9 @@ const getToken = async (): Promise<string | null> => {
 const removeToken = async () => {
   if (Platform.OS === 'web' && typeof window !== 'undefined') {
     localStorage.removeItem('session_token');
+    sessionStorage.removeItem('session_token');
+    // Clear cookies
+    document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
   }
   await AsyncStorage.removeItem('session_token');
 };
