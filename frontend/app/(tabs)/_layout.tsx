@@ -54,6 +54,8 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),
+          // Hide for active users - they use challenge-dashboard
+          href: isActiveUser ? null : '/(tabs)/home',
         }}
       />
       <Tabs.Screen
@@ -74,6 +76,8 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="checkmark-circle" size={size} color={color} />
           ),
+          // Hide for active users - simplified experience
+          href: isActiveUser ? null : '/(tabs)/habits',
         }}
       />
       <Tabs.Screen
@@ -83,6 +87,8 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="heart" size={size} color={color} />
           ),
+          // Hide for active users - simplified experience
+          href: isActiveUser ? null : '/(tabs)/emotional',
         }}
       />
       <Tabs.Screen
@@ -92,6 +98,8 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="star" size={size} color={color} />
           ),
+          // Hide for active users
+          href: isActiveUser ? null : '/(tabs)/purpose',
         }}
       />
       <Tabs.Screen
