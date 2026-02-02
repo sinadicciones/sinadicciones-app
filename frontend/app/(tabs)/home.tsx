@@ -21,6 +21,9 @@ import Svg, { Circle, G, Text as SvgText } from 'react-native-svg';
 const BACKEND_URL = getBackendURL();
 const { width } = Dimensions.get('window');
 
+// Import Professional Dashboard component
+import ProfessionalDashboardContent from '../professional-dashboard';
+
 // Componente de Rueda de Bienestar
 const WellnessWheel = ({ scores }: { scores: any }) => {
   const size = 160;
