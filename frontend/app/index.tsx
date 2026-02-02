@@ -155,14 +155,10 @@ export default function WelcomeScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.content}>
-            {/* Header with Logo */}
+            {/* Header */}
             <View style={styles.header}>
-              <Image 
-                source={{ uri: LOGO_URL }}
-                style={styles.logoImage}
-                resizeMode="contain"
-              />
-              <Text style={styles.subtitle}>Tu camino hacia una vida con propósito</Text>
+              <Text style={styles.title}>Sinadicciones.cl</Text>
+              <Text style={styles.subtitle}>Tu primer paso en tu recuperación</Text>
             </View>
 
             {!showEmailForm ? (
