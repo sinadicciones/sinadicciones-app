@@ -2287,6 +2287,437 @@ async def get_centers():
 async def health_check():
     return {"status": "ok", "timestamp": datetime.now(timezone.utc).isoformat()}
 
+# ============== RETO 21 DÍAS (CONSUMO ACTIVO) ==============
+
+class StartChallengeRequest(BaseModel):
+    goal: Optional[str] = None
+
+@app.post("/api/challenge/start")
+async def start_21_day_challenge(data: StartChallengeRequest, user_id: str = Depends(get_current_user)):
+    """Start the 21-day challenge for active users"""
+    # Check if user already has an active challenge
+    existing = await db.challenges.find_one({
+        "user_id": user_id,
+        "status": "active"
+    })
+    
+    if existing:
+        return {"message": "Ya tienes un reto activo", "challenge": existing}
+    
+    challenge = {
+        "challenge_id": f"challenge_{uuid.uuid4().hex[:12]}",
+        "user_id": user_id,
+        "start_date": datetime.now(timezone.utc),
+        "target_days": 21,
+        "current_day": 1,
+        "status": "active",  # active, completed, failed, paused
+        "goal": data.goal,
+        "daily_logs": [],
+        "created_at": datetime.now(timezone.utc)
+    }
+    
+    await db.challenges.insert_one(challenge)
+    
+    return {"message": "¡Reto de 21 días iniciado!", "challenge": challenge}
+
+@app.get("/api/challenge/current")
+async def get_current_challenge(user_id: str = Depends(get_current_user)):
+    """Get user's current active challenge"""
+    challenge = await db.challenges.find_one({
+        "user_id": user_id,
+        "status": "active"
+    })
+    
+    if not challenge:
+        return {"challenge": None}
+    
+    # Calculate current day
+    start_date = challenge["start_date"]
+    if isinstance(start_date, str):
+        start_date = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+    
+    days_passed = (datetime.now(timezone.utc) - start_date).days + 1
+    challenge["current_day"] = min(days_passed, 21)
+    
+    # Check if completed
+    if days_passed >= 21 and challenge["status"] == "active":
+        await db.challenges.update_one(
+            {"challenge_id": challenge["challenge_id"]},
+            {"$set": {"status": "completed", "completed_at": datetime.now(timezone.utc)}}
+        )
+        challenge["status"] = "completed"
+    
+    challenge["_id"] = str(challenge["_id"])
+    return {"challenge": challenge}
+
+class DailyLogRequest(BaseModel):
+    stayed_clean: bool
+    actions_completed: list = []
+    habits_completed: list = []
+    mood: int = 5  # 1-10
+    notes: Optional[str] = None
+    cravings_level: int = 5  # 1-10
+
+@app.post("/api/challenge/log")
+async def log_challenge_day(data: DailyLogRequest, user_id: str = Depends(get_current_user)):
+    """Log a day in the 21-day challenge"""
+    challenge = await db.challenges.find_one({
+        "user_id": user_id,
+        "status": "active"
+    })
+    
+    if not challenge:
+        raise HTTPException(status_code=404, detail="No tienes un reto activo")
+    
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
+    # Check if already logged today
+    existing_log = next((log for log in challenge.get("daily_logs", []) if log["date"] == today), None)
+    
+    log_entry = {
+        "date": today,
+        "stayed_clean": data.stayed_clean,
+        "actions_completed": data.actions_completed,
+        "habits_completed": data.habits_completed,
+        "mood": data.mood,
+        "cravings_level": data.cravings_level,
+        "notes": data.notes,
+        "logged_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    if existing_log:
+        # Update existing log
+        await db.challenges.update_one(
+            {"challenge_id": challenge["challenge_id"], "daily_logs.date": today},
+            {"$set": {"daily_logs.$": log_entry}}
+        )
+    else:
+        # Add new log
+        await db.challenges.update_one(
+            {"challenge_id": challenge["challenge_id"]},
+            {"$push": {"daily_logs": log_entry}}
+        )
+    
+    # If user didn't stay clean, mark challenge as needing restart
+    if not data.stayed_clean:
+        await db.challenges.update_one(
+            {"challenge_id": challenge["challenge_id"]},
+            {"$set": {"status": "restart_needed", "last_relapse": today}}
+        )
+        return {"message": "Registrado. No te rindas, puedes reiniciar mañana.", "restart_needed": True}
+    
+    return {"message": "¡Día registrado exitosamente!", "log": log_entry}
+
+@app.post("/api/challenge/restart")
+async def restart_challenge(user_id: str = Depends(get_current_user)):
+    """Restart the 21-day challenge after a relapse"""
+    # Archive old challenge
+    await db.challenges.update_many(
+        {"user_id": user_id, "status": {"$in": ["active", "restart_needed"]}},
+        {"$set": {"status": "archived", "archived_at": datetime.now(timezone.utc)}}
+    )
+    
+    # Start new challenge
+    challenge = {
+        "challenge_id": f"challenge_{uuid.uuid4().hex[:12]}",
+        "user_id": user_id,
+        "start_date": datetime.now(timezone.utc),
+        "target_days": 21,
+        "current_day": 1,
+        "status": "active",
+        "attempt_number": await db.challenges.count_documents({"user_id": user_id}) + 1,
+        "daily_logs": [],
+        "created_at": datetime.now(timezone.utc)
+    }
+    
+    await db.challenges.insert_one(challenge)
+    
+    return {"message": "¡Nuevo reto iniciado! Cada intento te hace más fuerte.", "challenge": challenge}
+
+@app.post("/api/challenge/complete")
+async def complete_challenge_and_graduate(user_id: str = Depends(get_current_user)):
+    """Complete challenge and transition user to 'patient' role (in recovery)"""
+    challenge = await db.challenges.find_one({
+        "user_id": user_id,
+        "status": "completed"
+    })
+    
+    if not challenge:
+        raise HTTPException(status_code=400, detail="Debes completar el reto de 21 días primero")
+    
+    # Update user role to patient
+    await db.user_profiles.update_one(
+        {"user_id": user_id},
+        {
+            "$set": {
+                "role": "patient",
+                "clean_since": challenge["start_date"],
+                "graduated_from_challenge": True,
+                "challenge_completed_at": datetime.now(timezone.utc)
+            }
+        }
+    )
+    
+    return {"message": "¡Felicidades! Has completado el reto. Ahora eres un usuario en recuperación.", "new_role": "patient"}
+
+# ============== CONTENIDO EDUCATIVO ==============
+
+@app.get("/api/education/content")
+async def get_educational_content():
+    """Get educational content about addiction and recovery"""
+    content = {
+        "understanding_addiction": {
+            "title": "Entendiendo la Adicción",
+            "sections": [
+                {
+                    "title": "¿Qué es la adicción?",
+                    "content": "La adicción es una enfermedad crónica del cerebro que afecta el sistema de recompensa, la motivación y la memoria. No es una falta de voluntad ni un defecto moral. Tu cerebro ha sido alterado por el consumo de sustancias, creando una necesidad compulsiva de consumir a pesar de las consecuencias negativas.",
+                    "icon": "brain"
+                },
+                {
+                    "title": "El papel de la dopamina",
+                    "content": "La dopamina es el neurotransmisor del placer y la recompensa. Las drogas inundan tu cerebro con dopamina, creando una sensación de euforia artificial. Con el tiempo, tu cerebro reduce su producción natural de dopamina, haciendo que necesites la sustancia solo para sentirte 'normal'. Por eso las actividades cotidianas ya no te producen placer.",
+                    "icon": "pulse"
+                },
+                {
+                    "title": "El craving (antojo intenso)",
+                    "content": "El craving es esa urgencia intensa e incontrolable de consumir. No es debilidad, es tu cerebro enviando señales de alarma porque cree que necesita la sustancia para sobrevivir. Los cravings son más intensos en los primeros días pero van disminuyendo con el tiempo. Cada vez que resistes un craving, tu cerebro se reprograma un poco más.",
+                    "icon": "flame"
+                },
+                {
+                    "title": "No es tu culpa, pero sí tu responsabilidad",
+                    "content": "Nadie elige volverse adicto. La genética, el ambiente, traumas y otros factores contribuyen al desarrollo de la adicción. Sin embargo, la recuperación sí es tu responsabilidad. No puedes cambiar cómo llegaste aquí, pero sí puedes decidir hacia dónde vas. Pedir ayuda no es debilidad, es el acto más valiente que puedes hacer.",
+                    "icon": "heart"
+                }
+            ]
+        },
+        "first_days": {
+            "title": "Qué esperar los primeros días",
+            "timeline": [
+                {
+                    "day_range": "Días 1-3",
+                    "title": "Desintoxicación",
+                    "description": "Los más difíciles. Tu cuerpo está eliminando las toxinas. Puedes experimentar ansiedad, insomnio, sudoración, irritabilidad y cravings intensos. Es NORMAL y TEMPORAL.",
+                    "tips": ["Mantente hidratado", "Descansa lo más posible", "Evita estar solo", "Ten a mano tu contacto de emergencia"],
+                    "color": "#EF4444"
+                },
+                {
+                    "day_range": "Días 4-7",
+                    "title": "Adaptación",
+                    "description": "Los síntomas físicos empiezan a disminuir. Pueden aparecer síntomas emocionales: tristeza, vacío, aburrimiento. Tu cerebro está reaprendiendo a funcionar sin la sustancia.",
+                    "tips": ["Comienza rutinas simples", "Haz ejercicio ligero", "Habla de cómo te sientes", "Celebra cada día"],
+                    "color": "#F59E0B"
+                },
+                {
+                    "day_range": "Días 8-14",
+                    "title": "Estabilización",
+                    "description": "Empiezas a tener más energía y claridad mental. Los cravings son menos frecuentes pero pueden aparecer de repente. Es crucial mantener las rutinas y evitar situaciones de riesgo.",
+                    "tips": ["Fortalece tus nuevos hábitos", "Identifica y evita triggers", "Conecta con personas que te apoyan", "Empieza a pensar en metas"],
+                    "color": "#10B981"
+                },
+                {
+                    "day_range": "Días 15-21",
+                    "title": "Consolidación",
+                    "description": "Tu cerebro está creando nuevas conexiones neuronales. Te sientes más fuerte y capaz. Este es el momento de construir una base sólida para tu recuperación a largo plazo.",
+                    "tips": ["Define tu propósito de vida", "Planifica tu futuro", "Considera buscar apoyo profesional continuo", "Ayuda a otros si puedes"],
+                    "color": "#3B82F6"
+                }
+            ]
+        },
+        "why_21_days": {
+            "title": "¿Por qué 21 días?",
+            "content": "Aunque la ciencia moderna sugiere que formar un hábito puede tomar entre 18 y 254 días, los primeros 21 días son críticos. En este período:\n\n• Tu cuerpo elimina la mayoría de las toxinas\n• Los síntomas de abstinencia más intensos pasan\n• Tu cerebro comienza a reequilibrar sus químicos\n• Empiezas a crear nuevas rutinas\n• Demuestras a ti mismo que SÍ PUEDES\n\nCompletar 21 días no significa que estés 'curado', pero es una base sólida para continuar tu recuperación."
+        },
+        "primary_actions": {
+            "title": "Acciones Primordiales",
+            "description": "Estas son las acciones más importantes para proteger tu recuperación:",
+            "actions": [
+                {
+                    "id": "no_consume",
+                    "title": "No consumir hoy",
+                    "description": "Solo por hoy, no consumiré. Mañana tomaré la misma decisión.",
+                    "icon": "shield-checkmark",
+                    "priority": 1
+                },
+                {
+                    "id": "delete_apps",
+                    "title": "Eliminar apps de riesgo",
+                    "description": "Borra apps donde contactas dealers o que te exponen a tentaciones.",
+                    "icon": "trash",
+                    "priority": 2
+                },
+                {
+                    "id": "block_contacts",
+                    "title": "Bloquear contactos negativos",
+                    "description": "Dealers, compañeros de consumo, personas que te incitan a usar.",
+                    "icon": "person-remove",
+                    "priority": 3
+                },
+                {
+                    "id": "no_cash",
+                    "title": "Limitar acceso al dinero",
+                    "description": "Pide a alguien de confianza que administre tu dinero temporalmente.",
+                    "icon": "cash",
+                    "priority": 4
+                },
+                {
+                    "id": "avoid_exposure",
+                    "title": "Evitar lugares y situaciones de riesgo",
+                    "description": "No vayas a lugares donde consumías o donde hay acceso a sustancias.",
+                    "icon": "location",
+                    "priority": 5
+                },
+                {
+                    "id": "tell_someone",
+                    "title": "Contarle a alguien de confianza",
+                    "description": "No hagas esto solo. Una persona que sepa puede salvarte la vida.",
+                    "icon": "people",
+                    "priority": 6
+                }
+            ]
+        },
+        "positive_habits": {
+            "title": "Hábitos Positivos",
+            "description": "Reemplaza el tiempo y energía que dedicabas al consumo con estas actividades:",
+            "habits": [
+                {
+                    "id": "exercise",
+                    "title": "Ejercicio físico",
+                    "description": "30 minutos de caminata, deporte o gym. Libera endorfinas naturales.",
+                    "icon": "fitness",
+                    "recommended_time": "30 min"
+                },
+                {
+                    "id": "meditation",
+                    "title": "Meditación o respiración",
+                    "description": "10 minutos de calma. Aprende a estar presente sin huir.",
+                    "icon": "leaf",
+                    "recommended_time": "10 min"
+                },
+                {
+                    "id": "reading",
+                    "title": "Lectura",
+                    "description": "Lee algo que te inspire o te eduque sobre recuperación.",
+                    "icon": "book",
+                    "recommended_time": "20 min"
+                },
+                {
+                    "id": "call_support",
+                    "title": "Llamar a persona de confianza",
+                    "description": "Padrino, familiar, amigo. No tienes que hablar de adicción, solo conecta.",
+                    "icon": "call",
+                    "recommended_time": "15 min"
+                },
+                {
+                    "id": "journal",
+                    "title": "Escribir un diario",
+                    "description": "Expresa tus emociones, miedos y logros. Procesa lo que sientes.",
+                    "icon": "document-text",
+                    "recommended_time": "10 min"
+                },
+                {
+                    "id": "healthy_meal",
+                    "title": "Comer saludable",
+                    "description": "Tu cuerpo necesita nutrientes para recuperarse. Evita azúcar excesiva.",
+                    "icon": "nutrition",
+                    "recommended_time": ""
+                },
+                {
+                    "id": "sleep",
+                    "title": "Dormir 7-8 horas",
+                    "description": "El sueño es cuando tu cerebro se repara. Priorízalo.",
+                    "icon": "moon",
+                    "recommended_time": "8 hrs"
+                },
+                {
+                    "id": "gratitude",
+                    "title": "Practicar gratitud",
+                    "description": "Escribe 3 cosas por las que estás agradecido hoy.",
+                    "icon": "heart",
+                    "recommended_time": "5 min"
+                }
+            ]
+        },
+        "emergency_tips": {
+            "title": "Si sientes un craving intenso",
+            "tips": [
+                "🕐 Espera 15 minutos - los cravings pasan",
+                "📞 Llama a tu persona de confianza AHORA",
+                "🚶 Sal a caminar, cambia de ambiente",
+                "💧 Toma un vaso de agua fría",
+                "🧊 Pon hielo en tus manos - la sensación física distrae",
+                "📝 Escribe qué estás sintiendo",
+                "🎵 Pon música que te calme o te anime",
+                "🏃 Haz 20 sentadillas o flexiones",
+                "🙏 Si eres espiritual, ora o medita",
+                "🏥 Si es muy intenso, busca ayuda profesional"
+            ]
+        }
+    }
+    
+    return content
+
+# ============== ONBOARDING ACTIVE USER ==============
+
+class ActiveUserOnboardingRequest(BaseModel):
+    substances: list = []  # List of substances
+    primary_substance: str
+    years_using: int
+    frequency: str  # daily, weekly, monthly, occasional
+    triggers: list = []
+    why_quit: str  # Their motivation
+    support_person: Optional[dict] = None  # {name, phone, relationship}
+    country: Optional[str] = None
+    identification: Optional[str] = None
+
+@app.post("/api/profile/active-onboarding")
+async def complete_active_user_onboarding(data: ActiveUserOnboardingRequest, user_id: str = Depends(get_current_user)):
+    """Complete onboarding for active user (wants to quit)"""
+    
+    update_data = {
+        "role": "active_user",
+        "addiction_type": data.primary_substance,
+        "secondary_addictions": [s for s in data.substances if s != data.primary_substance],
+        "years_using": data.years_using,
+        "consumption_frequency": data.frequency,
+        "triggers": data.triggers,
+        "my_why": data.why_quit,
+        "country": data.country,
+        "identification": data.identification,
+        "profile_completed": True,
+        "updated_at": datetime.now(timezone.utc)
+    }
+    
+    if data.support_person:
+        update_data["emergency_contacts"] = [data.support_person]
+    
+    result = await db.user_profiles.update_one(
+        {"user_id": user_id},
+        {"$set": update_data},
+        upsert=True
+    )
+    
+    # Automatically start the 21-day challenge
+    challenge = {
+        "challenge_id": f"challenge_{uuid.uuid4().hex[:12]}",
+        "user_id": user_id,
+        "start_date": datetime.now(timezone.utc),
+        "target_days": 21,
+        "current_day": 1,
+        "status": "active",
+        "goal": data.why_quit,
+        "daily_logs": [],
+        "created_at": datetime.now(timezone.utc)
+    }
+    
+    await db.challenges.insert_one(challenge)
+    
+    return {
+        "message": "¡Perfil completado! Tu reto de 21 días ha comenzado.",
+        "profile_completed": True,
+        "challenge_started": True
+    }
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
