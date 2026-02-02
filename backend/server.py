@@ -535,6 +535,9 @@ class ProfessionalOnboardingRequest(BaseModel):
     license_number: Optional[str] = None
     institution: Optional[str] = None
     bio: Optional[str] = None
+    whatsapp: Optional[str] = None  # WhatsApp number for contact
+    consultation_fee: Optional[str] = None  # Fee info e.g. "$50.000 CLP / sesión"
+    accepts_patients: bool = True  # Whether accepting new patients
 
 @app.post("/api/profile/professional-onboarding")
 async def professional_onboarding(data: ProfessionalOnboardingRequest, current_user: User = Depends(get_current_user)):
@@ -548,6 +551,9 @@ async def professional_onboarding(data: ProfessionalOnboardingRequest, current_u
             "license_number": data.license_number,
             "institution": data.institution,
             "bio": data.bio,
+            "whatsapp": data.whatsapp,
+            "consultation_fee": data.consultation_fee,
+            "accepts_patients": data.accepts_patients,
             "profile_completed": True,
             "updated_at": datetime.now(timezone.utc)
         }}
