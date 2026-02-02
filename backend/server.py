@@ -647,20 +647,33 @@ async def professional_link_patient(data: LinkPatientRequest, current_user: User
     
     # Verify patient exists and is a patient/active_user
     patient_profile = await db.user_profiles.find_one({"user_id": data.patient_id})
-    if not patient_profile or patient_profile.get("role") not in ["patient", "active_user"]:
-        raise HTTPException(status_code=404, detail="Paciente no encontrado")
+    if not patient_profile:
+        raise HTTPException(status_code=404, detail="Paciente no encontrado en el sistema")
     
-    # Check if already linked
+    if patient_profile.get("role") not in ["patient", "active_user"]:
+        raise HTTPException(status_code=400, detail=f"El usuario tiene rol '{patient_profile.get('role')}', no es un paciente")
+    
+    # Check if already linked to this professional
     if patient_profile.get("linked_therapist_id") == current_user.user_id:
         raise HTTPException(status_code=400, detail="Este paciente ya está vinculado contigo")
     
+    # Check if linked to another professional
     if patient_profile.get("linked_therapist_id"):
         raise HTTPException(status_code=400, detail="Este paciente ya está vinculado con otro profesional")
     
-    # Link patient to professional
+    # Link patient to professional - update patient's profile
     await db.user_profiles.update_one(
         {"user_id": data.patient_id},
-        {"$set": {"linked_therapist_id": current_user.user_id}}
+        {"$set": {
+            "linked_therapist_id": current_user.user_id,
+            "linked_at": datetime.now(timezone.utc)
+        }}
+    )
+    
+    # Also add patient to professional's list of patients
+    await db.user_profiles.update_one(
+        {"user_id": current_user.user_id},
+        {"$addToSet": {"linked_patients": data.patient_id}}
     )
     
     return {"success": True, "message": "Paciente vinculado correctamente"}
