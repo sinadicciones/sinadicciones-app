@@ -59,11 +59,12 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="challenge-dashboard"
         options={{
-          title: 'Reto',
+          title: 'Mi Reto',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="flame" size={size} color={color} />
           ),
-          href: null, // Hide from tab bar - accessed via redirect
+          // Visible for active users, hidden for others
+          href: isActiveUser ? '/(tabs)/challenge-dashboard' : null,
         }}
       />
       <Tabs.Screen
