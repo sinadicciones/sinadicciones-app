@@ -757,6 +757,42 @@ export default function ProfileScreen() {
               )}
             </View>
 
+            {/* Linked Therapist Section */}
+            {profile?.linked_therapist_id ? (
+              <View style={styles.section}>
+                <View style={styles.sectionHeaderRow}>
+                  <Ionicons name="medical" size={22} color="#8B5CF6" />
+                  <Text style={[styles.sectionTitle, { marginLeft: 8 }]}>Mi Terapeuta</Text>
+                </View>
+                <View style={styles.therapistLinkedCard}>
+                  <View style={styles.therapistLinkedAvatar}>
+                    <Ionicons name="person" size={28} color="#8B5CF6" />
+                  </View>
+                  <View style={styles.therapistLinkedInfo}>
+                    <Text style={styles.therapistLinkedName}>
+                      Terapeuta vinculado
+                    </Text>
+                    <Text style={styles.therapistLinkedStatus}>
+                      ✓ Tu progreso es monitoreado por tu profesional
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            ) : (
+              <View style={styles.section}>
+                <View style={styles.sectionHeaderRow}>
+                  <Ionicons name="medical" size={22} color="#6B7280" />
+                  <Text style={[styles.sectionTitle, { marginLeft: 8 }]}>Mi Terapeuta</Text>
+                </View>
+                <View style={styles.noTherapistCard}>
+                  <Ionicons name="person-add" size={24} color="#6B7280" />
+                  <Text style={styles.noTherapistText}>
+                    No tienes un terapeuta vinculado. Puedes buscar uno en la sección "Centros" → "Terapeutas"
+                  </Text>
+                </View>
+              </View>
+            )}
+
             {/* My Why */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Mi "Para Qué" 🎯</Text>
