@@ -417,6 +417,34 @@ export default function ProfileScreen() {
           </View>
           
           <View style={styles.accountActions}>
+            {/* Botón para buscar terapeuta (solo pacientes) */}
+            {profile?.role !== 'professional' && (
+              <TouchableOpacity 
+                style={[styles.accountButton, styles.therapistButton]}
+                onPress={() => router.push('/find-therapist')}
+              >
+                <Ionicons name="medical" size={20} color="#3B82F6" />
+                <Text style={[styles.accountButtonText, { color: '#3B82F6' }]}>
+                  {profile?.linked_therapist_id ? 'Mi Terapeuta' : 'Buscar Terapeuta'}
+                </Text>
+                <Ionicons name="chevron-forward" size={20} color="#3B82F6" />
+              </TouchableOpacity>
+            )}
+            
+            {/* Botón para dashboard profesional */}
+            {profile?.role === 'professional' && (
+              <TouchableOpacity 
+                style={[styles.accountButton, styles.therapistButton]}
+                onPress={() => router.push('/professional-dashboard')}
+              >
+                <Ionicons name="people" size={20} color="#3B82F6" />
+                <Text style={[styles.accountButtonText, { color: '#3B82F6' }]}>
+                  Ver Mis Pacientes
+                </Text>
+                <Ionicons name="chevron-forward" size={20} color="#3B82F6" />
+              </TouchableOpacity>
+            )}
+
             <TouchableOpacity 
               style={styles.accountButton}
               onPress={() => setShowPasswordModal(true)}
