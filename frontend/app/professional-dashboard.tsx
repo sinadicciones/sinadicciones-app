@@ -162,10 +162,34 @@ export default function ProfessionalDashboard() {
             {patients.length} {patients.length === 1 ? 'paciente' : 'pacientes'} vinculados
           </Text>
         </View>
-        <TouchableOpacity style={styles.headerButton}>
-          <Ionicons name="notifications-outline" size={24} color="#1F2937" />
+        <TouchableOpacity 
+          style={styles.headerButton}
+          onPress={() => router.push('/alerts')}
+        >
+          <Ionicons name="notifications" size={24} color="#1F2937" />
+          {alertSummary && alertSummary.total > 0 && (
+            <View style={styles.alertBadge}>
+              <Text style={styles.alertBadgeText}>
+                {alertSummary.total > 99 ? '99+' : alertSummary.total}
+              </Text>
+            </View>
+          )}
         </TouchableOpacity>
       </View>
+
+      {/* Alert Banner (if critical alerts) */}
+      {alertSummary && alertSummary.critical > 0 && (
+        <TouchableOpacity 
+          style={styles.alertBanner}
+          onPress={() => router.push('/alerts')}
+        >
+          <Ionicons name="warning" size={20} color="#DC2626" />
+          <Text style={styles.alertBannerText}>
+            {alertSummary.critical} {alertSummary.critical === 1 ? 'alerta crítica' : 'alertas críticas'} requieren atención
+          </Text>
+          <Ionicons name="chevron-forward" size={20} color="#DC2626" />
+        </TouchableOpacity>
+      )}
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
