@@ -1077,6 +1077,9 @@ const styles = StyleSheet.create({
   logoutText: {
     color: '#EF4444',
   },
+  therapistButton: {
+    backgroundColor: '#EBF5FF',
+  },
   // Estilos para el modal de contraseña
   modalOverlay: {
     flex: 1,
