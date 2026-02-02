@@ -236,8 +236,18 @@ export default function RecommendationsScreen() {
         end={{ x: 1, y: 1 }}
         style={styles.header}
       >
-        <Text style={styles.headerTitle}>🎯 Tu Plan de Recuperación</Text>
-        <Text style={styles.headerSubtitle}>Recomendaciones personalizadas para ti</Text>
+        <View style={styles.headerRow}>
+          <TouchableOpacity 
+            style={styles.headerBackBtn}
+            onPress={() => router.back()}
+          >
+            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+          <View style={styles.headerTextContainer}>
+            <Text style={styles.headerTitle}>🎯 Tu Plan de Recuperación</Text>
+            <Text style={styles.headerSubtitle}>Recomendaciones personalizadas para ti</Text>
+          </View>
+        </View>
       </LinearGradient>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
