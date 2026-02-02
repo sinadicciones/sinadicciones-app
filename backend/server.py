@@ -563,16 +563,19 @@ async def professional_onboarding(data: ProfessionalOnboardingRequest, current_u
 
 @app.get("/api/therapists/search")
 async def search_therapists(query: str = "", current_user: User = Depends(get_current_user)):
-    """Search for therapists by name"""
-    # Find professionals with matching names
+    """Search for therapists by name, specialization, or institution"""
+    # Find professionals with completed profiles who accept patients
     search_filter = {
         "role": "professional",
-        "profile_completed": True
+        "profile_completed": True,
+        "accepts_patients": {"$ne": False}  # Include those who accept or haven't set the field
     }
     
     profiles = await db.user_profiles.find(
         search_filter,
-        {"_id": 0, "user_id": 1, "professional_type": 1, "specialization": 1, "institution": 1, "years_experience": 1}
+        {"_id": 0, "user_id": 1, "professional_type": 1, "specialization": 1, 
+         "institution": 1, "years_experience": 1, "bio": 1, "whatsapp": 1, 
+         "consultation_fee": 1, "accepts_patients": 1}
     ).to_list(100)
     
     results = []
@@ -581,15 +584,23 @@ async def search_therapists(query: str = "", current_user: User = Depends(get_cu
         user = await db.users.find_one({"user_id": profile["user_id"]}, {"_id": 0, "name": 1})
         if user:
             name = user.get("name", "")
-            # Filter by query if provided
-            if query.lower() in name.lower() or not query:
+            specialization = profile.get("specialization", "")
+            institution = profile.get("institution", "")
+            
+            # Filter by query if provided (search in name, specialization, institution)
+            query_lower = query.lower()
+            if not query or query_lower in name.lower() or query_lower in specialization.lower() or query_lower in institution.lower():
                 results.append({
                     "user_id": profile["user_id"],
                     "name": name,
                     "professional_type": profile.get("professional_type"),
-                    "specialization": profile.get("specialization"),
-                    "institution": profile.get("institution"),
-                    "years_experience": profile.get("years_experience")
+                    "specialization": specialization,
+                    "institution": institution,
+                    "years_experience": profile.get("years_experience"),
+                    "bio": profile.get("bio"),
+                    "whatsapp": profile.get("whatsapp"),
+                    "consultation_fee": profile.get("consultation_fee"),
+                    "accepts_patients": profile.get("accepts_patients", True)
                 })
     
     return results
