@@ -671,6 +671,136 @@ export default function ProfileScreen() {
               </View>
             </View>
           </>
+        ) : profile?.role === 'family' ? (
+          <>
+            {/* FAMILY PROFILE CONTENT */}
+            {/* Family Info */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Información del Familiar 👨‍👩‍👧</Text>
+              
+              <View style={styles.infoRow}>
+                <Ionicons name="people" size={20} color="#8B5CF6" />
+                <View style={styles.infoContent}>
+                  <Text style={styles.infoLabel}>Relación</Text>
+                  <Text style={styles.infoValue}>
+                    {profile?.relationship_to_addict === 'parent' ? 'Padre/Madre' :
+                     profile?.relationship_to_addict === 'spouse' ? 'Pareja' :
+                     profile?.relationship_to_addict === 'child' ? 'Hijo/a' :
+                     profile?.relationship_to_addict === 'sibling' ? 'Hermano/a' :
+                     'Otro familiar'}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.infoRow}>
+                <Ionicons name="school" size={20} color="#8B5CF6" />
+                <View style={styles.infoContent}>
+                  <Text style={styles.infoLabel}>Conocimiento sobre adicciones</Text>
+                  <Text style={styles.infoValue}>
+                    {profile?.knowledge_level === 'none' ? 'Ninguno' :
+                     profile?.knowledge_level === 'basic' ? 'Básico' :
+                     'Intermedio'}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.infoRow}>
+                <Ionicons name="home" size={20} color="#8B5CF6" />
+                <View style={styles.infoContent}>
+                  <Text style={styles.infoLabel}>Vive con el familiar en recuperación</Text>
+                  <Text style={styles.infoValue}>
+                    {profile?.lives_with_relative ? 'Sí' : 'No'}
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            {/* Linked Relative Status */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Mi Familiar Vinculado 🔗</Text>
+              {profile?.linked_relative_id ? (
+                <View style={styles.linkedRelativeCard}>
+                  <View style={styles.linkedRelativeAvatar}>
+                    <Ionicons name="person" size={28} color="#10B981" />
+                  </View>
+                  <View style={styles.linkedRelativeInfo}>
+                    <Text style={styles.linkedRelativeName}>Familiar vinculado</Text>
+                    <Text style={styles.linkedRelativeStatus}>
+                      ✓ Puedes ver su progreso en el dashboard
+                    </Text>
+                  </View>
+                </View>
+              ) : (
+                <View style={styles.noLinkedCard}>
+                  <Ionicons name="link" size={24} color="#6B7280" />
+                  <Text style={styles.noLinkedText}>
+                    No tienes un familiar vinculado. Puedes vincular desde tu Dashboard → Mi Familiar
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* Resources for Family */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Recursos de Apoyo 📚</Text>
+              
+              <TouchableOpacity 
+                style={styles.resourceCard}
+                onPress={() => router.push('/family-dashboard')}
+              >
+                <View style={[styles.resourceIcon, { backgroundColor: 'rgba(139, 92, 246, 0.2)' }]}>
+                  <Ionicons name="home" size={24} color="#8B5CF6" />
+                </View>
+                <View style={styles.resourceInfo}>
+                  <Text style={styles.resourceTitle}>Mi Dashboard</Text>
+                  <Text style={styles.resourceDesc}>Contenido educativo y seguimiento</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#6B7280" />
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={styles.resourceCard}
+                onPress={() => router.push('/(tabs)/centers')}
+              >
+                <View style={[styles.resourceIcon, { backgroundColor: 'rgba(16, 185, 129, 0.2)' }]}>
+                  <Ionicons name="medical" size={24} color="#10B981" />
+                </View>
+                <View style={styles.resourceInfo}>
+                  <Text style={styles.resourceTitle}>Centros y Terapeutas</Text>
+                  <Text style={styles.resourceDesc}>Buscar ayuda profesional</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Self Care Tips */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Cuida tu Bienestar 💜</Text>
+              
+              <View style={[styles.tipCard, { backgroundColor: 'rgba(139, 92, 246, 0.1)' }]}>
+                <Ionicons name="heart" size={20} color="#8B5CF6" />
+                <Text style={styles.tipText}>
+                  <Text style={[styles.tipBold, { color: '#8B5CF6' }]}>No eres responsable:</Text> de la adicción de tu familiar. Puedes apoyar, pero la recuperación es su proceso.
+                </Text>
+              </View>
+              
+              <View style={[styles.tipCard, { backgroundColor: 'rgba(139, 92, 246, 0.1)' }]}>
+                <Ionicons name="shield" size={20} color="#8B5CF6" />
+                <Text style={styles.tipText}>
+                  <Text style={[styles.tipBold, { color: '#8B5CF6' }]}>Establece límites:</Text> Los límites saludables son actos de amor, no de castigo.
+                </Text>
+              </View>
+              
+              <View style={[styles.tipCard, { backgroundColor: 'rgba(139, 92, 246, 0.1)' }]}>
+                <Ionicons name="people" size={20} color="#8B5CF6" />
+                <Text style={styles.tipText}>
+                  <Text style={[styles.tipBold, { color: '#8B5CF6' }]}>Busca apoyo:</Text> Grupos como Al-Anon o Nar-Anon son para familias como tú.
+                </Text>
+              </View>
+            </View>
+
+            <View style={{ height: 40 }} />
+          </>
         ) : (
           <>
             {/* PATIENT/ACTIVE_USER PROFILE CONTENT */}
