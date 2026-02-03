@@ -489,6 +489,56 @@ export default function HomeScreen() {
           </View>
         )}
 
+        {/* Tareas de mi Terapeuta */}
+        {therapistTasks.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>📋 Tareas de mi Terapeuta</Text>
+            {therapistTasks.filter(t => t.status !== 'completed').slice(0, 3).map((task: any) => (
+              <TouchableOpacity 
+                key={task.task_id} 
+                style={styles.therapistTaskCard}
+                onPress={() => handleTaskAction(task)}
+              >
+                <View style={[
+                  styles.taskStatusDot, 
+                  { backgroundColor: task.status === 'in_progress' ? '#F59E0B' : '#3B82F6' }
+                ]} />
+                <View style={styles.taskContent}>
+                  <Text style={styles.taskTitle}>{task.title}</Text>
+                  {task.description && (
+                    <Text style={styles.taskDescription} numberOfLines={2}>
+                      {task.description}
+                    </Text>
+                  )}
+                  <View style={styles.taskMeta}>
+                    <Text style={styles.taskFrom}>De: {task.therapist_name || 'Tu terapeuta'}</Text>
+                    <View style={[
+                      styles.taskStatusBadge,
+                      { backgroundColor: task.status === 'in_progress' ? '#FEF3C7' : '#EFF6FF' }
+                    ]}>
+                      <Text style={[
+                        styles.taskStatusText,
+                        { color: task.status === 'in_progress' ? '#D97706' : '#2563EB' }
+                      ]}>
+                        {task.status === 'in_progress' ? 'En progreso' : 'Pendiente'}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+              </TouchableOpacity>
+            ))}
+            {therapistTasks.filter(t => t.status === 'completed').length > 0 && (
+              <View style={styles.completedTasksCount}>
+                <Ionicons name="checkmark-circle" size={16} color="#10B981" />
+                <Text style={styles.completedTasksText}>
+                  {therapistTasks.filter(t => t.status === 'completed').length} tarea(s) completada(s)
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
+
         {/* Rueda de Bienestar */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>🎯 Tu Bienestar</Text>
