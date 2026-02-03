@@ -191,10 +191,49 @@ export default function RoleSelectScreen() {
                   </View>
                 )}
               </TouchableOpacity>
+
+              {/* Family Card */}
+              <TouchableOpacity
+                style={[
+                  styles.roleCard,
+                  selectedRole === 'family' && styles.roleCardSelectedPurple,
+                ]}
+                onPress={() => setSelectedRole('family')}
+              >
+                <View style={[styles.roleIconContainer, styles.iconPurple]}>
+                  <Ionicons 
+                    name="people" 
+                    size={28} 
+                    color="#8B5CF6" 
+                  />
+                </View>
+                <View style={styles.roleTextContainer}>
+                  <Text style={[
+                    styles.roleTitle,
+                    selectedRole === 'family' && styles.roleTitleSelectedPurple
+                  ]}>
+                    Soy Familiar
+                  </Text>
+                  <Text style={styles.roleDescription}>
+                    Quiero apoyar a mi ser querido en su recuperación
+                  </Text>
+                  <View style={styles.badgeContainer}>
+                    <View style={[styles.badge, { backgroundColor: 'rgba(139, 92, 246, 0.1)' }]}>
+                      <Ionicons name="heart" size={12} color="#8B5CF6" />
+                      <Text style={[styles.badgeText, { color: '#8B5CF6' }]}>Contenido educativo</Text>
+                    </View>
+                  </View>
+                </View>
+                {selectedRole === 'family' && (
+                  <View style={styles.checkmark}>
+                    <Ionicons name="checkmark-circle" size={24} color="#8B5CF6" />
+                  </View>
+                )}
+              </TouchableOpacity>
             </View>
 
             {/* Identification Section - Only for patient and professional */}
-            {selectedRole && selectedRole !== 'active_user' && (
+            {selectedRole && selectedRole !== 'active_user' && selectedRole !== 'family' && (
               <View style={styles.identificationSection}>
                 <Text style={styles.sectionTitle}>Información adicional</Text>
                 
