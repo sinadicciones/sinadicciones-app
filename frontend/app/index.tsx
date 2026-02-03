@@ -163,10 +163,10 @@ export default function WelcomeScreen() {
 
             {!showEmailForm ? (
               <>
-                {/* Features for Users */}
+                {/* For Recovery - Patient */}
                 <View style={styles.sectionHeader}>
-                  <Ionicons name="person" size={18} color="#10B981" />
-                  <Text style={styles.sectionTitle}>Para Usuarios</Text>
+                  <Ionicons name="heart" size={18} color="#10B981" />
+                  <Text style={styles.sectionTitle}>En Recuperación</Text>
                 </View>
                 <View style={styles.features}>
                   <View style={styles.feature}>
@@ -190,7 +190,34 @@ export default function WelcomeScreen() {
                   </View>
                 </View>
 
-                {/* Features for Professionals */}
+                {/* For Active Users - Challenge */}
+                <View style={styles.sectionHeader}>
+                  <Ionicons name="flame" size={18} color="#F59E0B" />
+                  <Text style={[styles.sectionTitle, { color: '#F59E0B' }]}>Quiero Dejarlo</Text>
+                </View>
+                <View style={styles.features}>
+                  <View style={[styles.feature, { borderColor: 'rgba(245, 158, 11, 0.3)' }]}>
+                    <View style={[styles.featureIconContainer, { backgroundColor: '#F59E0B' }]}>
+                      <Ionicons name="trophy" size={20} color="#FFFFFF" />
+                    </View>
+                    <View style={styles.featureTextContainer}>
+                      <Text style={styles.featureTitle}>Reto de 21 días</Text>
+                      <Text style={styles.featureText}>Programa guiado para comenzar</Text>
+                    </View>
+                  </View>
+                  
+                  <View style={[styles.feature, { borderColor: 'rgba(245, 158, 11, 0.3)' }]}>
+                    <View style={[styles.featureIconContainer, { backgroundColor: '#F59E0B' }]}>
+                      <Ionicons name="school" size={20} color="#FFFFFF" />
+                    </View>
+                    <View style={styles.featureTextContainer}>
+                      <Text style={styles.featureTitle}>Contenido educativo</Text>
+                      <Text style={styles.featureText}>Entiende la adicción y el craving</Text>
+                    </View>
+                  </View>
+                </View>
+
+                {/* For Professionals */}
                 <View style={styles.sectionHeader}>
                   <Ionicons name="medical" size={18} color="#3B82F6" />
                   <Text style={styles.sectionTitlePro}>Para Profesionales</Text>
@@ -202,7 +229,7 @@ export default function WelcomeScreen() {
                     </View>
                     <View style={styles.featureTextContainer}>
                       <Text style={styles.featureTitle}>Gestión de Pacientes</Text>
-                      <Text style={styles.featureText}>Dashboard con pacientes vinculados</Text>
+                      <Text style={styles.featureText}>Vincula y monitorea pacientes</Text>
                     </View>
                   </View>
                   
@@ -212,7 +239,34 @@ export default function WelcomeScreen() {
                     </View>
                     <View style={styles.featureTextContainer}>
                       <Text style={styles.featureTitle}>Alertas Inteligentes</Text>
-                      <Text style={styles.featureText}>Recaídas, inactividad y emociones</Text>
+                      <Text style={styles.featureText}>Recaídas, inactividad, emociones</Text>
+                    </View>
+                  </View>
+                </View>
+
+                {/* For Family */}
+                <View style={styles.sectionHeader}>
+                  <Ionicons name="people" size={18} color="#8B5CF6" />
+                  <Text style={[styles.sectionTitle, { color: '#8B5CF6' }]}>Para Familiares</Text>
+                </View>
+                <View style={styles.features}>
+                  <View style={[styles.feature, { borderColor: 'rgba(139, 92, 246, 0.3)' }]}>
+                    <View style={[styles.featureIconContainer, { backgroundColor: '#8B5CF6' }]}>
+                      <Ionicons name="book" size={20} color="#FFFFFF" />
+                    </View>
+                    <View style={styles.featureTextContainer}>
+                      <Text style={styles.featureTitle}>Educación familiar</Text>
+                      <Text style={styles.featureText}>Aprende a apoyar sin habilitar</Text>
+                    </View>
+                  </View>
+                  
+                  <View style={[styles.feature, { borderColor: 'rgba(139, 92, 246, 0.3)' }]}>
+                    <View style={[styles.featureIconContainer, { backgroundColor: '#8B5CF6' }]}>
+                      <Ionicons name="link" size={20} color="#FFFFFF" />
+                    </View>
+                    <View style={styles.featureTextContainer}>
+                      <Text style={styles.featureTitle}>Seguimiento de tu familiar</Text>
+                      <Text style={styles.featureText}>Ve su progreso con su permiso</Text>
                     </View>
                   </View>
                 </View>
