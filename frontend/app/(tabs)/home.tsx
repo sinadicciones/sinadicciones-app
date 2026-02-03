@@ -208,12 +208,19 @@ export default function HomeScreen() {
           router.replace('/professional-dashboard');
           return;
         }
+
+        if (profileData.role === 'family') {
+          router.replace('/family-dashboard');
+          return;
+        }
         
         if (!profileData.profile_completed) {
           if (profileData.role === 'professional') {
             router.replace('/onboarding-professional');
           } else if (profileData.role === 'active_user') {
             router.replace('/onboarding-active');
+          } else if (profileData.role === 'family') {
+            router.replace('/onboarding-family');
           } else {
             router.replace('/onboarding');
           }
