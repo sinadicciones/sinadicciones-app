@@ -362,7 +362,7 @@ export default function ProfessionalDashboard() {
                     style={styles.patientCard}
                     onPress={() => router.push({
                       pathname: '/patient-detail',
-                      params: { patientId: patient.user_id }
+                      params: { patientId: patient.user_id, patientName: patient.name }
                     })}
                   >
                     <View style={styles.patientAvatar}>
