@@ -371,6 +371,10 @@ const styles = StyleSheet.create({
     borderColor: '#3B82F6',
     backgroundColor: 'rgba(59, 130, 246, 0.15)',
   },
+  roleCardSelectedPurple: {
+    borderColor: '#8B5CF6',
+    backgroundColor: 'rgba(139, 92, 246, 0.15)',
+  },
   roleIconContainer: {
     width: 50,
     height: 50,
