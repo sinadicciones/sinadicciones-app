@@ -240,6 +240,16 @@ export default function HomeScreen() {
       if (habitsResponse.ok) {
         setHabits(await habitsResponse.json());
       }
+
+      // Load therapist tasks (if patient has a linked therapist)
+      try {
+        const tasksResponse = await authenticatedFetch(`${BACKEND_URL}/api/patient/tasks`);
+        if (tasksResponse.ok) {
+          setTherapistTasks(await tasksResponse.json());
+        }
+      } catch (err) {
+        console.log('No therapist tasks available');
+      }
     } catch (error) {
       console.error('Failed to load data:', error);
     } finally {
