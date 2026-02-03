@@ -388,6 +388,9 @@ const styles = StyleSheet.create({
   iconBlue: {
     backgroundColor: 'rgba(59, 130, 246, 0.2)',
   },
+  iconPurple: {
+    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+  },
   roleTextContainer: {
     flex: 1,
   },
@@ -405,6 +408,9 @@ const styles = StyleSheet.create({
   },
   roleTitleSelectedBlue: {
     color: '#3B82F6',
+  },
+  roleTitleSelectedPurple: {
+    color: '#8B5CF6',
   },
   roleDescription: {
     fontSize: 13,
