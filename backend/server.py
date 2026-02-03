@@ -123,9 +123,6 @@ class TherapistSearchResult(BaseModel):
     institution: Optional[str]
     years_experience: Optional[int]
 
-class LinkTherapistRequest(BaseModel):
-    therapist_id: str
-
 # Alert Models
 class Alert(BaseModel):
     alert_id: str
@@ -678,28 +675,8 @@ async def professional_link_patient(data: LinkPatientRequest, current_user: User
     
     return {"success": True, "message": "Paciente vinculado correctamente"}
 
-@app.post("/api/patient/link-therapist")
-async def link_therapist(data: LinkTherapistRequest, current_user: User = Depends(get_current_user)):
-    """Link patient to a therapist"""
-    # Verify the therapist exists and is a professional
-    therapist_profile = await db.user_profiles.find_one({
-        "user_id": data.therapist_id,
-        "role": "professional"
-    })
-    
-    if not therapist_profile:
-        raise HTTPException(status_code=404, detail="Terapeuta no encontrado")
-    
-    # Update patient's profile with therapist link
-    await db.user_profiles.update_one(
-        {"user_id": current_user.user_id},
-        {"$set": {
-            "linked_therapist_id": data.therapist_id,
-            "updated_at": datetime.now(timezone.utc)
-        }}
-    )
-    
-    return {"success": True, "message": "Terapeuta vinculado correctamente"}
+# NOTE: Patient-initiated linking has been removed. 
+# Only professionals can link patients via /api/professional/link-patient
 
 @app.get("/api/professional/patients")
 async def get_professional_patients(current_user: User = Depends(get_current_user)):
