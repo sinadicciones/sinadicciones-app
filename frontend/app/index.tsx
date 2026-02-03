@@ -59,12 +59,24 @@ export default function WelcomeScreen() {
               // Has role but not completed onboarding
               if (profile.role === 'professional') {
                 router.replace('/onboarding-professional');
+              } else if (profile.role === 'active_user') {
+                router.replace('/onboarding-active');
+              } else if (profile.role === 'family') {
+                router.replace('/onboarding-family');
               } else {
                 router.replace('/onboarding');
               }
             } else {
-              // Profile complete - go to home
-              router.replace('/(tabs)/home');
+              // Profile complete - redirect based on role
+              if (profile.role === 'professional') {
+                router.replace('/professional-dashboard');
+              } else if (profile.role === 'family') {
+                router.replace('/family-dashboard');
+              } else if (profile.role === 'active_user') {
+                router.replace('/(tabs)/challenge-dashboard');
+              } else {
+                router.replace('/(tabs)/home');
+              }
             }
           } else {
             // No profile yet, go to role selection
