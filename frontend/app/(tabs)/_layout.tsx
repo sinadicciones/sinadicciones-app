@@ -24,19 +24,39 @@ export default function TabsLayout() {
     loadProfile();
   }, []);
 
-  // For active_user, show different tab configuration
+  // Role-based configurations
   const isActiveUser = userRole === 'active_user';
+  const isFamily = userRole === 'family';
+  const isProfessional = userRole === 'professional';
+
+  // Get theme colors based on role
+  const getThemeColor = () => {
+    if (isActiveUser) return '#F59E0B';
+    if (isFamily) return '#8B5CF6';
+    if (isProfessional) return '#3B82F6';
+    return '#10B981';
+  };
+
+  const getBgColor = () => {
+    if (isActiveUser) return '#1A1A1A';
+    return '#FFFFFF';
+  };
+
+  const getBorderColor = () => {
+    if (isActiveUser) return '#333333';
+    return '#E5E7EB';
+  };
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: isActiveUser ? '#F59E0B' : '#10B981',
+        tabBarActiveTintColor: getThemeColor(),
         tabBarInactiveTintColor: '#9CA3AF',
         tabBarStyle: {
-          backgroundColor: isActiveUser ? '#1A1A1A' : '#FFFFFF',
+          backgroundColor: getBgColor(),
           borderTopWidth: 1,
-          borderTopColor: isActiveUser ? '#333333' : '#E5E7EB',
+          borderTopColor: getBorderColor(),
           height: 70,
           paddingBottom: 8,
           paddingTop: 8,
@@ -54,8 +74,8 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),
-          // Hide for active users - they use challenge-dashboard
-          href: isActiveUser ? null : '/(tabs)/home',
+          // Hide for active users (use challenge-dashboard), family and professional (use their dashboards)
+          href: (isActiveUser || isFamily || isProfessional) ? null : '/(tabs)/home',
         }}
       />
       <Tabs.Screen
@@ -65,7 +85,7 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="flame" size={size} color={color} />
           ),
-          // Visible for active users, hidden for others
+          // Visible only for active users
           href: isActiveUser ? '/(tabs)/challenge-dashboard' : null,
         }}
       />
@@ -76,6 +96,8 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="checkmark-circle" size={size} color={color} />
           ),
+          // Hide for family and professional - they don't track habits
+          href: (isFamily || isProfessional) ? null : '/(tabs)/habits',
         }}
       />
       <Tabs.Screen
@@ -85,6 +107,8 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="heart" size={size} color={color} />
           ),
+          // Hide for family and professional
+          href: (isFamily || isProfessional) ? null : '/(tabs)/emotional',
         }}
       />
       <Tabs.Screen
@@ -94,6 +118,8 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="star" size={size} color={color} />
           ),
+          // Hide for family and professional
+          href: (isFamily || isProfessional) ? null : '/(tabs)/purpose',
         }}
       />
       <Tabs.Screen
@@ -103,6 +129,7 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="search" size={size} color={color} />
           ),
+          // Visible for all roles
         }}
       />
       <Tabs.Screen
@@ -112,6 +139,7 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />
           ),
+          // Visible for all roles
         }}
       />
     </Tabs>
