@@ -1152,4 +1152,68 @@ const styles = StyleSheet.create({
     color: '#374151',
     textAlign: 'center',
   },
+  // Therapist Tasks styles
+  therapistTaskCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    padding: 14,
+    borderRadius: 12,
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  taskStatusDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginRight: 12,
+  },
+  taskContent: {
+    flex: 1,
+  },
+  taskTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+  taskDescription: {
+    fontSize: 13,
+    color: '#6B7280',
+    marginTop: 4,
+  },
+  taskMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    gap: 10,
+  },
+  taskFrom: {
+    fontSize: 12,
+    color: '#9CA3AF',
+  },
+  taskStatusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  taskStatusText: {
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  completedTasksCount: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    gap: 6,
+  },
+  completedTasksText: {
+    fontSize: 13,
+    color: '#10B981',
+    fontWeight: '500',
+  },
 });
