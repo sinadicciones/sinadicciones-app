@@ -12,7 +12,7 @@ from datetime import datetime, timezone, timedelta
 import uuid
 
 # Configuration
-BACKEND_URL = "https://healingpath-17.preview.emergentagent.com/api"
+BACKEND_URL = "https://addiction-helper-13.preview.emergentagent.com/api"
 TEST_USER_EMAIL = f"test.user.{int(datetime.now().timestamp())}@example.com"
 
 class BackendTester:
