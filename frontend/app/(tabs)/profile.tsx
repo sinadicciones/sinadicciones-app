@@ -901,9 +901,9 @@ export default function ProfileScreen() {
                   <Text style={[styles.sectionTitle, { marginLeft: 8 }]}>Mi Terapeuta</Text>
                 </View>
                 <View style={styles.noTherapistCard}>
-                  <Ionicons name="person-add" size={24} color="#6B7280" />
+                  <Ionicons name="information-circle" size={24} color="#6B7280" />
                   <Text style={styles.noTherapistText}>
-                    No tienes un terapeuta vinculado. Puedes buscar uno en la sección "Centros" → "Terapeutas"
+                    No tienes un terapeuta vinculado aún. Tu terapeuta puede vincularte desde su panel profesional usando tu email de registro.
                   </Text>
                 </View>
               </View>
