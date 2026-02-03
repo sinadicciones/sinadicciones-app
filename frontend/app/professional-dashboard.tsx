@@ -610,6 +610,28 @@ export default function ProfessionalDashboard() {
 
           <View style={styles.bottomSpacing} />
         </ScrollView>
+
+        {/* Bottom Navigation */}
+        <View style={styles.bottomNav}>
+          <TouchableOpacity style={styles.navItem} onPress={() => {}}>
+            <Ionicons name="home" size={24} color="#3B82F6" />
+            <Text style={[styles.navLabel, { color: '#3B82F6' }]}>Inicio</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.navItem}
+            onPress={() => router.push('/(tabs)/centers')}
+          >
+            <Ionicons name="search" size={24} color="#6B7280" />
+            <Text style={styles.navLabel}>Centros</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.navItem}
+            onPress={() => router.push('/(tabs)/profile')}
+          >
+            <Ionicons name="person" size={24} color="#6B7280" />
+            <Text style={styles.navLabel}>Perfil</Text>
+          </TouchableOpacity>
+        </View>
       </LinearGradient>
     </SafeAreaView>
   );
