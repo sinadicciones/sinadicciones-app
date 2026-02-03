@@ -15,7 +15,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { authenticatedFetch } from '../utils/api';
 
-type Role = 'patient' | 'professional' | 'active_user' | null;
+type Role = 'patient' | 'professional' | 'active_user' | 'family' | null;
 
 export default function RoleSelectScreen() {
   const router = useRouter();
@@ -52,6 +52,8 @@ export default function RoleSelectScreen() {
           router.replace('/onboarding-professional');
         } else if (selectedRole === 'active_user') {
           router.replace('/onboarding-active');
+        } else if (selectedRole === 'family') {
+          router.replace('/onboarding-family');
         }
       } else {
         const data = await response.json();
