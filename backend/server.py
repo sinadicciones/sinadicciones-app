@@ -2813,6 +2813,513 @@ async def get_educational_content():
     
     return content
 
+# ============== FAMILY EDUCATION CONTENT ==============
+
+@app.get("/api/family/education")
+async def get_family_education_content():
+    """Get educational content for family members"""
+    content = {
+        "understanding_addiction": {
+            "title": "Entendiendo la Adicción",
+            "description": "Aprende sobre la adicción desde la perspectiva familiar",
+            "sections": [
+                {
+                    "title": "La adicción es una enfermedad",
+                    "content": "La adicción no es falta de voluntad, moral débil ni un defecto de carácter. Es una enfermedad crónica del cerebro que afecta el sistema de recompensa, motivación y memoria. Tu ser querido no eligió ser adicto, así como nadie elige tener diabetes o cáncer. Entender esto es el primer paso para poder ayudar sin juzgar.",
+                    "icon": "medical",
+                    "video_url": "https://www.youtube.com/watch?v=HUngLgGRJpo",
+                    "video_title": "La adicción explicada"
+                },
+                {
+                    "title": "El cerebro adicto",
+                    "content": "Las sustancias adictivas 'secuestran' el sistema de recompensa del cerebro. La dopamina, el químico del placer, se libera en cantidades masivas con la droga. Con el tiempo, el cerebro se adapta y necesita la sustancia solo para funcionar normalmente. Por eso tu familiar puede parecer que 'no le importa nada más' - su cerebro literalmente ha sido reprogramado.",
+                    "icon": "pulse",
+                    "video_url": "https://www.youtube.com/watch?v=GgwE94KZJ7E",
+                    "video_title": "Cómo las drogas afectan el cerebro"
+                },
+                {
+                    "title": "Por qué no puede 'simplemente dejarlo'",
+                    "content": "Pedirle a un adicto que 'solo deje de usar' es como pedirle a alguien con depresión que 'solo sea feliz'. Los cambios en el cerebro hacen que dejar sea extremadamente difícil. Los síntomas de abstinencia pueden ser físicamente dolorosos y psicológicamente aterradores. La recuperación requiere tiempo, tratamiento profesional y mucho apoyo.",
+                    "icon": "help-circle"
+                },
+                {
+                    "title": "La genética juega un rol",
+                    "content": "Estudios muestran que la genética representa entre el 40-60% del riesgo de adicción. Si hay historial de adicción en la familia, el riesgo es mayor. Esto no es excusa, pero ayuda a entender que algunos cerebros son más vulnerables que otros. Tu familiar no es 'malo' - puede tener una predisposición biológica.",
+                    "icon": "people"
+                }
+            ]
+        },
+        "enabling_vs_helping": {
+            "title": "Habilitar vs Ayudar",
+            "description": "Aprende la diferencia crucial entre ayudar y habilitar",
+            "sections": [
+                {
+                    "title": "¿Qué es habilitar?",
+                    "content": "Habilitar es hacer cosas que permiten que la adicción continúe sin consecuencias. Es proteger al adicto de las consecuencias naturales de su comportamiento. Aunque se hace por amor, habilitar prolonga la adicción y retrasa la recuperación. Es una de las trampas más comunes para las familias.",
+                    "icon": "warning",
+                    "examples": [
+                        "Darle dinero sabiendo que lo usará para drogas",
+                        "Mentir a su jefe cuando falta al trabajo",
+                        "Pagar sus deudas repetidamente",
+                        "Minimizar o negar el problema",
+                        "Hacer sus responsabilidades por él/ella"
+                    ]
+                },
+                {
+                    "title": "Señales de que estás habilitando",
+                    "content": "Pregúntate: ¿Estoy evitando que experimente las consecuencias de su adicción? ¿Lo estoy rescatando constantemente? ¿Estoy ignorando el problema esperando que desaparezca? ¿Estoy poniendo sus necesidades siempre antes que las mías? Si respondes sí, podrías estar habilitando.",
+                    "icon": "alert-circle",
+                    "checklist": [
+                        "Le doy dinero aunque sospecho para qué es",
+                        "Pongo excusas por su comportamiento",
+                        "Evito hablar del problema",
+                        "Me siento responsable de su adicción",
+                        "He descuidado mi propia salud o relaciones"
+                    ]
+                },
+                {
+                    "title": "Amor con límites",
+                    "content": "Ayudar de verdad significa amar con límites. Es decir 'te amo, pero no voy a financiar tu destrucción'. Es ofrecer apoyo para la recuperación, no para la adicción. Puedes amar a alguien profundamente y aún así negarte a ser parte del problema.",
+                    "icon": "heart",
+                    "video_url": "https://www.youtube.com/watch?v=l6fpQIxBUm8",
+                    "video_title": "Cómo establecer límites con amor"
+                },
+                {
+                    "title": "Formas de ayudar sin habilitar",
+                    "content": "En lugar de dar dinero, ofrece pagar directamente por comida o tratamiento. En lugar de mentir por él, dile que lo amas pero no puedes cubrir sus mentiras. Investiga opciones de tratamiento y tenlas listas. Asiste a grupos de apoyo para familias. Cuida tu propia salud mental.",
+                    "icon": "checkmark-circle",
+                    "actions": [
+                        "Ofrecer pagar tratamiento directamente",
+                        "Asistir a reuniones de Al-Anon o Nar-Anon",
+                        "Establecer consecuencias claras y cumplirlas",
+                        "Buscar un terapeuta familiar",
+                        "Educarme sobre la adicción"
+                    ]
+                }
+            ]
+        },
+        "communication": {
+            "title": "Comunicación Efectiva",
+            "description": "Cómo hablar con tu ser querido sobre su adicción",
+            "sections": [
+                {
+                    "title": "Qué NO decir",
+                    "content": "Evita frases que juzguen, avergüencen o culpen. Aunque salgan de la frustración, estas palabras alejan a tu familiar y lo ponen a la defensiva.",
+                    "icon": "close-circle",
+                    "avoid": [
+                        "'¿Por qué no puedes simplemente parar?'",
+                        "'Eres una vergüenza para la familia'",
+                        "'Si me amaras, dejarías de usar'",
+                        "'Ya estoy harto de tus mentiras'",
+                        "'Vas a terminar muerto'"
+                    ]
+                },
+                {
+                    "title": "Qué SÍ decir",
+                    "content": "Usa declaraciones en primera persona ('Yo siento...'). Expresa preocupación, no juicio. Enfócate en comportamientos específicos, no en la persona. Ofrece apoyo para la recuperación.",
+                    "icon": "checkmark-circle",
+                    "say_instead": [
+                        "'Me preocupa tu salud y quiero ayudarte'",
+                        "'Te amo y veo que estás sufriendo'",
+                        "'Cuando usas, me siento asustado/a y triste'",
+                        "'Estoy aquí para apoyarte si decides buscar ayuda'",
+                        "'¿Cómo puedo ayudarte a buscar tratamiento?'"
+                    ]
+                },
+                {
+                    "title": "Escoge el momento adecuado",
+                    "content": "No intentes tener conversaciones importantes cuando tu familiar está intoxicado, con resaca o en abstinencia. Escoge un momento de calma. Evita hacerlo cuando estés muy enojado/a o frustrado/a. Prepárate emocionalmente antes de la conversación.",
+                    "icon": "time"
+                },
+                {
+                    "title": "La técnica CRAFT",
+                    "content": "CRAFT (Community Reinforcement and Family Training) es un enfoque probado para familias. Se basa en: reforzar positivamente comportamientos sin consumo, permitir consecuencias naturales del consumo, mejorar la calidad de vida del familiar, y sugerir tratamiento en momentos de receptividad.",
+                    "icon": "school",
+                    "video_url": "https://www.youtube.com/watch?v=ao8L-0nSYzg",
+                    "video_title": "Método CRAFT para familias"
+                }
+            ]
+        },
+        "boundaries": {
+            "title": "Establecer Límites",
+            "description": "Los límites son actos de amor, no de castigo",
+            "sections": [
+                {
+                    "title": "Por qué los límites son esenciales",
+                    "content": "Los límites protegen tu bienestar y también ayudan a tu familiar. Sin límites, la adicción puede consumir toda la familia. Los límites no son castigos - son declaraciones claras de lo que tolerarás y lo que no. Son necesarios para tu salud y para que tu familiar enfrente la realidad de su adicción.",
+                    "icon": "shield-checkmark"
+                },
+                {
+                    "title": "Tipos de límites saludables",
+                    "content": "Límites físicos: No permitir drogas en casa. Límites financieros: No dar dinero en efectivo. Límites emocionales: No tolerar abuso verbal. Límites de tiempo: No estar disponible 24/7 para crisis. Límites de responsabilidad: No hacer cosas que él/ella debe hacer.",
+                    "icon": "list",
+                    "examples": [
+                        "No habrá drogas ni alcohol en mi casa",
+                        "No te daré dinero en efectivo",
+                        "No toleraré que me grites o insultes",
+                        "No mentiré por ti a tu trabajo o familia",
+                        "Sí te apoyaré si decides ir a tratamiento"
+                    ]
+                },
+                {
+                    "title": "Cómo comunicar límites",
+                    "content": "Sé claro y específico. Di exactamente qué comportamiento no tolerarás y cuál será la consecuencia. No amenaces - informa. 'Si encuentro drogas en casa, llamaré a la policía' no es una amenaza, es informar de una consecuencia. Y lo más importante: cumple lo que dices.",
+                    "icon": "megaphone"
+                },
+                {
+                    "title": "Mantener los límites",
+                    "content": "Esta es la parte más difícil. Tu familiar probará tus límites. Habrá manipulación, culpa, promesas de cambio. Mantenerte firme se sentirá cruel, pero es lo más amoroso que puedes hacer. Busca apoyo en grupos como Al-Anon para mantenerte fuerte.",
+                    "icon": "fitness"
+                }
+            ]
+        },
+        "self_care": {
+            "title": "Cuidando tu Bienestar",
+            "description": "No puedes ayudar a nadie si tú te derrumbas",
+            "sections": [
+                {
+                    "title": "El impacto en la familia",
+                    "content": "La adicción de un ser querido afecta a toda la familia. Es común experimentar ansiedad, depresión, vergüenza, culpa, rabia, y agotamiento. Muchos familiares desarrollan sus propios problemas de salud. Reconocer este impacto es el primer paso para cuidarte.",
+                    "icon": "heart-dislike"
+                },
+                {
+                    "title": "Señales de burnout",
+                    "content": "¿Estás constantemente preocupado/a? ¿Has descuidado tu salud, trabajo o relaciones? ¿Te sientes agotado/a física y emocionalmente? ¿Has perdido interés en cosas que antes disfrutabas? ¿Sientes que tu vida gira solo alrededor de la adicción de tu familiar? Estas son señales de que necesitas ayuda.",
+                    "icon": "battery-dead",
+                    "symptoms": [
+                        "Insomnio o dormir demasiado",
+                        "Cambios en apetito o peso",
+                        "Dificultad para concentrarse",
+                        "Irritabilidad constante",
+                        "Aislamiento social",
+                        "Descuido de responsabilidades propias"
+                    ]
+                },
+                {
+                    "title": "Grupos de apoyo para familias",
+                    "content": "No estás solo/a. Millones de familias enfrentan lo mismo. Grupos como Al-Anon (para familias de alcohólicos) y Nar-Anon (para familias de adictos a drogas) ofrecen apoyo gratuito. En estos grupos encontrarás personas que entienden exactamente lo que vives, sin juicio.",
+                    "icon": "people",
+                    "resources": [
+                        {"name": "Al-Anon", "description": "Familias de alcohólicos", "url": "https://al-anon.org"},
+                        {"name": "Nar-Anon", "description": "Familias de adictos", "url": "https://nar-anon.org"},
+                        {"name": "CODA", "description": "Codependientes Anónimos", "url": "https://coda.org"}
+                    ]
+                },
+                {
+                    "title": "Buscar ayuda profesional",
+                    "content": "Considera buscar un terapeuta para ti. No para tu familiar - para TI. Un profesional puede ayudarte a procesar tus emociones, establecer límites saludables, y cuidar tu salud mental. No es egoísta - es necesario. Cuídate para poder seguir siendo un apoyo.",
+                    "icon": "medical"
+                }
+            ]
+        },
+        "crisis_management": {
+            "title": "Manejo de Crisis",
+            "description": "Qué hacer en situaciones de emergencia",
+            "sections": [
+                {
+                    "title": "Señales de recaída",
+                    "content": "La recaída es parte del proceso para muchos. Señales de advertencia incluyen: cambios de humor repentinos, aislamiento, volver a contactar viejos amigos de consumo, mentiras sobre su paradero, objetos de consumo encontrados, y descuido de responsabilidades.",
+                    "icon": "warning",
+                    "signs": [
+                        "Cambios bruscos de humor",
+                        "Aislamiento y secretismo",
+                        "Contacto con antiguos compañeros de consumo",
+                        "Problemas de dinero inexplicables",
+                        "Descuido de higiene personal",
+                        "Ausencias o mentiras sobre su paradero"
+                    ]
+                },
+                {
+                    "title": "Si descubres una recaída",
+                    "content": "Mantén la calma. No confrontes mientras esté intoxicado/a. No le des un sermón - ya sabe que hizo mal. Expresa preocupación, no decepción. Recuérdale que la recaída no borra el progreso anterior. Sugiere volver al tratamiento o intensificarlo.",
+                    "icon": "hand-left",
+                    "steps": [
+                        "Respira y no reacciones impulsivamente",
+                        "Espera a que esté sobrio para hablar",
+                        "Usa frases como 'Vi que recaíste. ¿Cómo puedo ayudarte?'",
+                        "Refuerza que una recaída no es el final",
+                        "Sugiere contactar a su terapeuta o grupo de apoyo"
+                    ]
+                },
+                {
+                    "title": "Emergencia: Sobredosis",
+                    "content": "Si sospechas una sobredosis, LLAMA A EMERGENCIAS INMEDIATAMENTE. Señales: respiración lenta o ausente, labios azules, no responde a estímulos, pupilas muy pequeñas (opioides) o muy grandes (estimulantes). Si tienes Naloxona (Narcan), adminístrala. Pon a la persona de lado para evitar asfixia.",
+                    "icon": "alert",
+                    "emergency_steps": [
+                        "1. Llama a emergencias (131 en Chile)",
+                        "2. Si tienes Naloxona, adminístrala",
+                        "3. Pon a la persona de lado",
+                        "4. No la dejes sola",
+                        "5. Prepárate para dar RCP si es necesario"
+                    ]
+                },
+                {
+                    "title": "Números de emergencia",
+                    "content": "Ten siempre a mano estos números. Guárdalos en tu teléfono.",
+                    "icon": "call",
+                    "numbers": [
+                        {"name": "Emergencias Chile", "number": "131"},
+                        {"name": "Fono Drogas SENDA", "number": "1412"},
+                        {"name": "Salud Responde", "number": "600 360 7777"},
+                        {"name": "Fono Familia", "number": "149"}
+                    ]
+                }
+            ]
+        }
+    }
+    
+    return content
+
+# ============== FAMILY ONBOARDING ==============
+
+class FamilyOnboardingRequest(BaseModel):
+    relationship: str  # parent, child, spouse, sibling, other
+    relative_email: Optional[str] = None  # Email of the person in recovery
+    knowledge_level: str  # none, basic, intermediate
+    lives_with_relative: bool = False
+    main_concern: str  # relapse, communication, boundaries, self_care
+    country: Optional[str] = None
+
+@app.post("/api/profile/family-onboarding")
+async def complete_family_onboarding(data: FamilyOnboardingRequest, current_user: User = Depends(get_current_user)):
+    """Complete onboarding for family member"""
+    
+    user_id = current_user.user_id
+    
+    update_data = {
+        "role": "family",
+        "relationship_to_addict": data.relationship,
+        "knowledge_level": data.knowledge_level,
+        "lives_with_relative": data.lives_with_relative,
+        "main_concern": data.main_concern,
+        "country": data.country,
+        "profile_completed": True,
+        "updated_at": datetime.now(timezone.utc)
+    }
+    
+    await db.user_profiles.update_one(
+        {"user_id": user_id},
+        {"$set": update_data},
+        upsert=True
+    )
+    
+    # If relative email provided, try to link
+    if data.relative_email:
+        relative_user = await db.users.find_one({"email": data.relative_email.lower()})
+        if relative_user:
+            relative_profile = await db.user_profiles.find_one({"user_id": relative_user["user_id"]})
+            if relative_profile and relative_profile.get("role") in ["patient", "active_user"]:
+                # Create pending link request
+                await db.family_link_requests.insert_one({
+                    "request_id": f"flr_{uuid.uuid4().hex[:12]}",
+                    "family_user_id": user_id,
+                    "patient_user_id": relative_user["user_id"],
+                    "status": "pending",
+                    "created_at": datetime.now(timezone.utc)
+                })
+    
+    return {"success": True, "message": "Perfil de familiar completado"}
+
+# ============== FAMILY LINK RELATIVE ==============
+
+class FamilyLinkRequest(BaseModel):
+    relative_email: str
+
+@app.post("/api/family/link-relative")
+async def family_link_relative(data: FamilyLinkRequest, current_user: User = Depends(get_current_user)):
+    """Family member requests to link with their relative in recovery"""
+    
+    # Verify current user is family
+    profile = await db.user_profiles.find_one({"user_id": current_user.user_id})
+    if not profile or profile.get("role") != "family":
+        raise HTTPException(status_code=403, detail="Solo familiares pueden vincular parientes")
+    
+    # Find relative by email
+    relative_user = await db.users.find_one({"email": data.relative_email.lower()})
+    if not relative_user:
+        return {"success": False, "message": "No se encontró un usuario con ese email"}
+    
+    # Check if relative is patient or active_user
+    relative_profile = await db.user_profiles.find_one({"user_id": relative_user["user_id"]})
+    if not relative_profile or relative_profile.get("role") not in ["patient", "active_user"]:
+        return {"success": False, "message": "El usuario no es un paciente en recuperación"}
+    
+    # Check if already linked
+    if profile.get("linked_relative_id") == relative_user["user_id"]:
+        return {"success": False, "message": "Ya estás vinculado con este familiar"}
+    
+    # Create link request (patient must approve)
+    existing_request = await db.family_link_requests.find_one({
+        "family_user_id": current_user.user_id,
+        "patient_user_id": relative_user["user_id"],
+        "status": "pending"
+    })
+    
+    if existing_request:
+        return {"success": False, "message": "Ya existe una solicitud pendiente"}
+    
+    await db.family_link_requests.insert_one({
+        "request_id": f"flr_{uuid.uuid4().hex[:12]}",
+        "family_user_id": current_user.user_id,
+        "patient_user_id": relative_user["user_id"],
+        "status": "pending",
+        "created_at": datetime.now(timezone.utc)
+    })
+    
+    return {
+        "success": True, 
+        "message": f"Solicitud enviada a {relative_user.get('name', 'tu familiar')}. Debe aprobar la vinculación desde su app."
+    }
+
+@app.get("/api/family/relative-stats")
+async def get_family_relative_stats(current_user: User = Depends(get_current_user)):
+    """Get stats of linked relative for family member"""
+    
+    profile = await db.user_profiles.find_one({"user_id": current_user.user_id})
+    if not profile or profile.get("role") != "family":
+        raise HTTPException(status_code=403, detail="Solo familiares pueden ver esto")
+    
+    relative_id = profile.get("linked_relative_id")
+    if not relative_id:
+        return {"linked": False, "message": "No tienes un familiar vinculado"}
+    
+    # Get relative's profile
+    relative_profile = await db.user_profiles.find_one({"user_id": relative_id})
+    relative_user = await db.users.find_one({"user_id": relative_id})
+    
+    if not relative_profile or not relative_user:
+        return {"linked": False, "message": "Familiar no encontrado"}
+    
+    # Calculate days clean
+    days_clean = 0
+    if relative_profile.get("clean_since"):
+        try:
+            clean_date = datetime.fromisoformat(relative_profile["clean_since"].replace('Z', '+00:00'))
+            days_clean = (datetime.now(timezone.utc) - clean_date).days
+        except:
+            pass
+    
+    # Get challenge info if active_user
+    challenge_day = 0
+    if relative_profile.get("role") == "active_user":
+        challenge = await db.challenges.find_one({"user_id": relative_id, "status": "active"})
+        if challenge:
+            start_date = challenge.get("start_date")
+            if start_date:
+                challenge_day = (datetime.now(timezone.utc) - start_date).days + 1
+    
+    # Get recent emotional state (simplified for privacy)
+    recent_emotion = await db.emotional_logs.find_one(
+        {"user_id": relative_id},
+        sort=[("created_at", -1)]
+    )
+    
+    emotional_state = "Sin datos"
+    if recent_emotion:
+        mood = recent_emotion.get("mood", 5)
+        if mood >= 7:
+            emotional_state = "Positivo"
+        elif mood >= 4:
+            emotional_state = "Neutral"
+        else:
+            emotional_state = "Necesita apoyo"
+    
+    # Get habit completion rate (today)
+    today = datetime.now(timezone.utc).date()
+    habits = await db.habits.find({"user_id": relative_id}).to_list(100)
+    completed_today = sum(1 for h in habits if h.get("last_completed") and 
+                         h["last_completed"].date() == today)
+    total_habits = len(habits)
+    habit_rate = int((completed_today / total_habits * 100) if total_habits > 0 else 0)
+    
+    return {
+        "linked": True,
+        "relative": {
+            "name": relative_user.get("name", "Tu familiar"),
+            "role": relative_profile.get("role"),
+            "days_clean": days_clean,
+            "challenge_day": challenge_day,
+            "challenge_total": 21 if relative_profile.get("role") == "active_user" else 0,
+            "emotional_state": emotional_state,
+            "habit_completion": habit_rate,
+            "addiction_type": relative_profile.get("addiction_type", "No especificado"),
+            "last_activity": relative_profile.get("updated_at")
+        }
+    }
+
+@app.get("/api/patient/link-requests")
+async def get_patient_link_requests(current_user: User = Depends(get_current_user)):
+    """Get pending link requests for patient (from family members)"""
+    
+    profile = await db.user_profiles.find_one({"user_id": current_user.user_id})
+    if not profile or profile.get("role") not in ["patient", "active_user"]:
+        raise HTTPException(status_code=403, detail="Solo pacientes pueden ver solicitudes")
+    
+    requests = await db.family_link_requests.find({
+        "patient_user_id": current_user.user_id,
+        "status": "pending"
+    }).to_list(100)
+    
+    results = []
+    for req in requests:
+        family_user = await db.users.find_one({"user_id": req["family_user_id"]})
+        family_profile = await db.user_profiles.find_one({"user_id": req["family_user_id"]})
+        if family_user:
+            results.append({
+                "request_id": req["request_id"],
+                "family_name": family_user.get("name", "Familiar"),
+                "relationship": family_profile.get("relationship_to_addict", "familiar"),
+                "created_at": req["created_at"]
+            })
+    
+    return results
+
+class ApproveRejectRequest(BaseModel):
+    request_id: str
+    approve: bool
+
+@app.post("/api/patient/respond-link-request")
+async def respond_to_link_request(data: ApproveRejectRequest, current_user: User = Depends(get_current_user)):
+    """Patient approves or rejects family link request"""
+    
+    request = await db.family_link_requests.find_one({
+        "request_id": data.request_id,
+        "patient_user_id": current_user.user_id,
+        "status": "pending"
+    })
+    
+    if not request:
+        raise HTTPException(status_code=404, detail="Solicitud no encontrada")
+    
+    if data.approve:
+        # Link the family member to patient
+        await db.user_profiles.update_one(
+            {"user_id": request["family_user_id"]},
+            {"$set": {"linked_relative_id": current_user.user_id}}
+        )
+        
+        # Add family to patient's family list
+        await db.user_profiles.update_one(
+            {"user_id": current_user.user_id},
+            {"$addToSet": {"linked_family_members": request["family_user_id"]}}
+        )
+        
+        # Update request status
+        await db.family_link_requests.update_one(
+            {"request_id": data.request_id},
+            {"$set": {"status": "approved", "responded_at": datetime.now(timezone.utc)}}
+        )
+        
+        return {"success": True, "message": "Familiar vinculado correctamente"}
+    else:
+        # Reject request
+        await db.family_link_requests.update_one(
+            {"request_id": data.request_id},
+            {"$set": {"status": "rejected", "responded_at": datetime.now(timezone.utc)}}
+        )
+        
+        return {"success": True, "message": "Solicitud rechazada"}
+
 # ============== ONBOARDING ACTIVE USER ==============
 
 class ActiveUserOnboardingRequest(BaseModel):
