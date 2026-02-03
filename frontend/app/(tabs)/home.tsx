@@ -342,6 +342,47 @@ export default function HomeScreen() {
     }
   };
 
+  const updateTaskStatus = async (taskId: string, newStatus: string, notes?: string) => {
+    try {
+      await authenticatedFetch(`${BACKEND_URL}/api/patient/tasks/${taskId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ status: newStatus, patient_notes: notes }),
+      });
+      Alert.alert('¡Bien!', newStatus === 'completed' ? 'Tarea completada' : 'Estado actualizado');
+      loadData();
+    } catch (error) {
+      console.error('Failed to update task:', error);
+      Alert.alert('Error', 'No se pudo actualizar la tarea');
+    }
+  };
+
+  const handleTaskAction = (task: any) => {
+    const options = [
+      { text: 'Cancelar', style: 'cancel' as const },
+    ];
+    
+    if (task.status !== 'in_progress') {
+      options.push({ 
+        text: 'En progreso', 
+        style: 'default' as const,
+        onPress: () => updateTaskStatus(task.task_id, 'in_progress') 
+      } as any);
+    }
+    if (task.status !== 'completed') {
+      options.push({ 
+        text: '✓ Completar', 
+        style: 'default' as const,
+        onPress: () => updateTaskStatus(task.task_id, 'completed') 
+      } as any);
+    }
+    
+    Alert.alert(
+      task.title,
+      task.description || 'Actualiza el estado de esta tarea',
+      options
+    );
+  };
+
   const formatMilestone = (days: number) => {
     if (days === 7) return '1 semana';
     if (days === 14) return '2 semanas';
