@@ -430,20 +430,6 @@ export default function ProfileScreen() {
                 <Ionicons name="chevron-forward" size={20} color="#8B5CF6" />
               </TouchableOpacity>
             )}
-
-            {/* Botón para buscar terapeuta (solo pacientes) */}
-            {profile?.role !== 'professional' && profile?.role !== 'admin' && (
-              <TouchableOpacity 
-                style={[styles.accountButton, styles.therapistButton]}
-                onPress={() => router.push('/find-therapist')}
-              >
-                <Ionicons name="medical" size={20} color="#3B82F6" />
-                <Text style={[styles.accountButtonText, { color: '#3B82F6' }]}>
-                  {profile?.linked_therapist_id ? 'Mi Terapeuta' : 'Buscar Terapeuta'}
-                </Text>
-                <Ionicons name="chevron-forward" size={20} color="#3B82F6" />
-              </TouchableOpacity>
-            )}
             
             {/* Botón para dashboard profesional */}
             {profile?.role === 'professional' && (
