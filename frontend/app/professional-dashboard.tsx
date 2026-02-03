@@ -1131,4 +1131,21 @@ const styles = StyleSheet.create({
   bottomSpacing: {
     height: 100,
   },
+  bottomNav: {
+    flexDirection: 'row',
+    backgroundColor: '#1A1A1A',
+    paddingVertical: 12,
+    paddingBottom: 30,
+    borderTopWidth: 1,
+    borderTopColor: '#333333',
+  },
+  navItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  navLabel: {
+    fontSize: 11,
+    color: '#6B7280',
+    marginTop: 4,
+  },
 });
