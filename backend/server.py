@@ -823,6 +823,409 @@ async def unlink_therapist(current_user: User = Depends(get_current_user)):
     
     return {"success": True, "message": "Terapeuta desvinculado"}
 
+# ============== TASK SYSTEM FOR THERAPISTS ==============
+
+class CreateTaskRequest(BaseModel):
+    patient_id: str
+    title: str
+    description: Optional[str] = None
+    category: str = "general"  # general, mindfulness, journal, reading, exercise
+    due_date: Optional[str] = None  # YYYY-MM-DD
+    priority: str = "medium"  # low, medium, high
+
+@app.post("/api/professional/tasks")
+async def create_task_for_patient(data: CreateTaskRequest, current_user: User = Depends(get_current_user)):
+    """Therapist creates a task for a patient"""
+    # Verify professional
+    profile = await db.user_profiles.find_one({"user_id": current_user.user_id})
+    if not profile or profile.get("role") != "professional":
+        raise HTTPException(status_code=403, detail="Solo profesionales pueden crear tareas")
+    
+    # Verify patient is linked
+    patient_profile = await db.user_profiles.find_one({
+        "user_id": data.patient_id,
+        "linked_therapist_id": current_user.user_id
+    })
+    if not patient_profile:
+        raise HTTPException(status_code=404, detail="Paciente no encontrado o no vinculado")
+    
+    task_id = f"task_{uuid.uuid4().hex[:12]}"
+    task = {
+        "task_id": task_id,
+        "therapist_id": current_user.user_id,
+        "patient_id": data.patient_id,
+        "title": data.title,
+        "description": data.description,
+        "category": data.category,
+        "due_date": data.due_date,
+        "priority": data.priority,
+        "status": "pending",  # pending, in_progress, completed
+        "created_at": datetime.now(timezone.utc),
+        "completed_at": None,
+        "patient_notes": None
+    }
+    
+    await db.therapist_tasks.insert_one(task)
+    return {"success": True, "task_id": task_id}
+
+@app.get("/api/professional/tasks/{patient_id}")
+async def get_patient_tasks_for_therapist(patient_id: str, current_user: User = Depends(get_current_user)):
+    """Get all tasks for a specific patient (therapist view)"""
+    profile = await db.user_profiles.find_one({"user_id": current_user.user_id})
+    if not profile or profile.get("role") != "professional":
+        raise HTTPException(status_code=403, detail="Solo profesionales pueden ver tareas")
+    
+    tasks = await db.therapist_tasks.find(
+        {"therapist_id": current_user.user_id, "patient_id": patient_id},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    return tasks
+
+@app.get("/api/patient/tasks")
+async def get_my_tasks(current_user: User = Depends(get_current_user)):
+    """Patient gets their assigned tasks"""
+    tasks = await db.therapist_tasks.find(
+        {"patient_id": current_user.user_id},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    # Get therapist names
+    for task in tasks:
+        therapist = await db.users.find_one({"user_id": task["therapist_id"]})
+        task["therapist_name"] = therapist.get("name", "Tu terapeuta") if therapist else "Tu terapeuta"
+    
+    return tasks
+
+class UpdateTaskStatusRequest(BaseModel):
+    status: str  # in_progress, completed
+    patient_notes: Optional[str] = None
+
+@app.put("/api/patient/tasks/{task_id}")
+async def update_task_status(task_id: str, data: UpdateTaskStatusRequest, current_user: User = Depends(get_current_user)):
+    """Patient updates their task status"""
+    task = await db.therapist_tasks.find_one({
+        "task_id": task_id,
+        "patient_id": current_user.user_id
+    })
+    
+    if not task:
+        raise HTTPException(status_code=404, detail="Tarea no encontrada")
+    
+    update_data = {
+        "status": data.status,
+        "patient_notes": data.patient_notes
+    }
+    
+    if data.status == "completed":
+        update_data["completed_at"] = datetime.now(timezone.utc)
+    
+    await db.therapist_tasks.update_one(
+        {"task_id": task_id},
+        {"$set": update_data}
+    )
+    
+    return {"success": True}
+
+@app.delete("/api/professional/tasks/{task_id}")
+async def delete_task(task_id: str, current_user: User = Depends(get_current_user)):
+    """Therapist deletes a task"""
+    result = await db.therapist_tasks.delete_one({
+        "task_id": task_id,
+        "therapist_id": current_user.user_id
+    })
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Tarea no encontrada")
+    
+    return {"success": True}
+
+# ============== THERAPIST SESSION NOTES ==============
+
+class CreateSessionNoteRequest(BaseModel):
+    patient_id: str
+    session_date: str  # YYYY-MM-DD
+    private_notes: str  # Only visible to therapist
+    session_summary: Optional[str] = None  # Visible to patient
+    goals_discussed: List[str] = []  # Visible to patient
+    next_session_focus: Optional[str] = None
+    mood_rating: Optional[int] = None  # 1-10, therapist observation
+
+@app.post("/api/professional/notes")
+async def create_session_note(data: CreateSessionNoteRequest, current_user: User = Depends(get_current_user)):
+    """Create session notes for a patient"""
+    profile = await db.user_profiles.find_one({"user_id": current_user.user_id})
+    if not profile or profile.get("role") != "professional":
+        raise HTTPException(status_code=403, detail="Solo profesionales pueden crear notas")
+    
+    # Verify patient is linked
+    patient_profile = await db.user_profiles.find_one({
+        "user_id": data.patient_id,
+        "linked_therapist_id": current_user.user_id
+    })
+    if not patient_profile:
+        raise HTTPException(status_code=404, detail="Paciente no vinculado")
+    
+    note_id = f"note_{uuid.uuid4().hex[:12]}"
+    note = {
+        "note_id": note_id,
+        "therapist_id": current_user.user_id,
+        "patient_id": data.patient_id,
+        "session_date": data.session_date,
+        "private_notes": data.private_notes,  # Confidential
+        "session_summary": data.session_summary,  # Patient can see
+        "goals_discussed": data.goals_discussed,  # Patient can see
+        "next_session_focus": data.next_session_focus,
+        "mood_rating": data.mood_rating,
+        "created_at": datetime.now(timezone.utc)
+    }
+    
+    await db.session_notes.insert_one(note)
+    return {"success": True, "note_id": note_id}
+
+@app.get("/api/professional/notes/{patient_id}")
+async def get_patient_notes(patient_id: str, current_user: User = Depends(get_current_user)):
+    """Get all session notes for a patient (full view for therapist)"""
+    profile = await db.user_profiles.find_one({"user_id": current_user.user_id})
+    if not profile or profile.get("role") != "professional":
+        raise HTTPException(status_code=403, detail="Solo profesionales pueden ver notas completas")
+    
+    notes = await db.session_notes.find(
+        {"therapist_id": current_user.user_id, "patient_id": patient_id},
+        {"_id": 0}
+    ).sort("session_date", -1).to_list(100)
+    
+    return notes
+
+@app.get("/api/patient/session-notes")
+async def get_my_session_summaries(current_user: User = Depends(get_current_user)):
+    """Patient gets their session summaries (without private notes)"""
+    notes = await db.session_notes.find(
+        {"patient_id": current_user.user_id},
+        {"_id": 0, "private_notes": 0, "mood_rating": 0}  # Exclude private fields
+    ).sort("session_date", -1).to_list(100)
+    
+    # Get therapist name
+    for note in notes:
+        therapist = await db.users.find_one({"user_id": note["therapist_id"]})
+        note["therapist_name"] = therapist.get("name", "Tu terapeuta") if therapist else "Tu terapeuta"
+    
+    return notes
+
+@app.put("/api/professional/notes/{note_id}")
+async def update_session_note(note_id: str, data: CreateSessionNoteRequest, current_user: User = Depends(get_current_user)):
+    """Update a session note"""
+    result = await db.session_notes.update_one(
+        {"note_id": note_id, "therapist_id": current_user.user_id},
+        {"$set": {
+            "session_date": data.session_date,
+            "private_notes": data.private_notes,
+            "session_summary": data.session_summary,
+            "goals_discussed": data.goals_discussed,
+            "next_session_focus": data.next_session_focus,
+            "mood_rating": data.mood_rating,
+            "updated_at": datetime.now(timezone.utc)
+        }}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Nota no encontrada")
+    
+    return {"success": True}
+
+# ============== PATIENT PROGRESS REPORTS ==============
+
+@app.get("/api/professional/report/{patient_id}")
+async def get_patient_progress_report(patient_id: str, days: int = 7, current_user: User = Depends(get_current_user)):
+    """Generate a progress report for a patient"""
+    profile = await db.user_profiles.find_one({"user_id": current_user.user_id})
+    if not profile or profile.get("role") != "professional":
+        raise HTTPException(status_code=403, detail="Solo profesionales pueden ver reportes")
+    
+    # Verify patient is linked
+    patient_profile = await db.user_profiles.find_one({
+        "user_id": patient_id,
+        "linked_therapist_id": current_user.user_id
+    })
+    if not patient_profile:
+        raise HTTPException(status_code=404, detail="Paciente no vinculado")
+    
+    patient_user = await db.users.find_one({"user_id": patient_id})
+    
+    # Calculate date range
+    end_date = datetime.now(timezone.utc)
+    start_date = end_date - timedelta(days=days)
+    
+    # Get emotional logs
+    emotional_logs = await db.emotional_logs.find({
+        "user_id": patient_id,
+        "created_at": {"$gte": start_date}
+    }).sort("created_at", -1).to_list(100)
+    
+    # Calculate mood stats
+    moods = [log.get("mood", 5) for log in emotional_logs]
+    avg_mood = sum(moods) / len(moods) if moods else 0
+    lowest_mood = min(moods) if moods else 0
+    highest_mood = max(moods) if moods else 0
+    
+    # Count cravings
+    cravings = [log for log in emotional_logs if log.get("craving_intensity", 0) > 5]
+    
+    # Get habit data
+    habits = await db.habits.find({"user_id": patient_id}).to_list(50)
+    habit_stats = []
+    
+    for habit in habits:
+        # Count completions in period
+        completions = await db.habit_logs.count_documents({
+            "habit_id": habit["habit_id"],
+            "completed": True,
+            "date": {"$gte": start_date.strftime("%Y-%m-%d")}
+        })
+        
+        habit_stats.append({
+            "name": habit["name"],
+            "completions": completions,
+            "target": days,  # One per day expected
+            "completion_rate": round((completions / days) * 100, 1) if days > 0 else 0
+        })
+    
+    # Get tasks completion
+    tasks = await db.therapist_tasks.find({
+        "patient_id": patient_id,
+        "therapist_id": current_user.user_id
+    }).to_list(100)
+    
+    tasks_total = len(tasks)
+    tasks_completed = len([t for t in tasks if t.get("status") == "completed"])
+    tasks_pending = len([t for t in tasks if t.get("status") == "pending"])
+    
+    # Days clean calculation
+    days_clean = 0
+    if patient_profile.get("clean_since"):
+        try:
+            clean_date = datetime.fromisoformat(patient_profile["clean_since"].replace('Z', '+00:00'))
+            days_clean = (datetime.now(timezone.utc) - clean_date).days
+        except:
+            pass
+    
+    # Check for relapses (emotional logs with relapse=True)
+    relapses = await db.emotional_logs.count_documents({
+        "user_id": patient_id,
+        "created_at": {"$gte": start_date},
+        "relapse": True
+    })
+    
+    # Build report
+    report = {
+        "patient": {
+            "user_id": patient_id,
+            "name": patient_user.get("name", "") if patient_user else "",
+            "addiction_type": patient_profile.get("addiction_type"),
+            "days_clean": days_clean
+        },
+        "period": {
+            "start": start_date.isoformat(),
+            "end": end_date.isoformat(),
+            "days": days
+        },
+        "emotional": {
+            "total_logs": len(emotional_logs),
+            "average_mood": round(avg_mood, 1),
+            "lowest_mood": lowest_mood,
+            "highest_mood": highest_mood,
+            "high_craving_episodes": len(cravings),
+            "relapses": relapses,
+            "mood_trend": "improving" if len(moods) >= 2 and moods[0] > moods[-1] else "stable" if len(moods) < 2 else "declining"
+        },
+        "habits": {
+            "total_habits": len(habits),
+            "details": habit_stats,
+            "overall_completion_rate": round(sum(h["completion_rate"] for h in habit_stats) / len(habit_stats), 1) if habit_stats else 0
+        },
+        "tasks": {
+            "total": tasks_total,
+            "completed": tasks_completed,
+            "pending": tasks_pending,
+            "completion_rate": round((tasks_completed / tasks_total) * 100, 1) if tasks_total > 0 else 0
+        },
+        "alerts": [],
+        "generated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    # Generate alerts based on data
+    if avg_mood < 4:
+        report["alerts"].append({"type": "warning", "message": "Estado emocional bajo en promedio"})
+    if relapses > 0:
+        report["alerts"].append({"type": "critical", "message": f"{relapses} recaída(s) reportada(s)"})
+    if len(cravings) > 3:
+        report["alerts"].append({"type": "warning", "message": f"{len(cravings)} episodios de craving intenso"})
+    if report["habits"]["overall_completion_rate"] < 50:
+        report["alerts"].append({"type": "info", "message": "Bajo cumplimiento de hábitos"})
+    if len(emotional_logs) == 0:
+        report["alerts"].append({"type": "info", "message": "Sin registros emocionales en el período"})
+    
+    return report
+
+@app.get("/api/patient/my-progress")
+async def get_my_progress_report(days: int = 7, current_user: User = Depends(get_current_user)):
+    """Patient gets their own progress summary"""
+    patient_profile = await db.user_profiles.find_one({"user_id": current_user.user_id})
+    
+    end_date = datetime.now(timezone.utc)
+    start_date = end_date - timedelta(days=days)
+    
+    # Emotional stats
+    emotional_logs = await db.emotional_logs.find({
+        "user_id": current_user.user_id,
+        "created_at": {"$gte": start_date}
+    }).to_list(100)
+    
+    moods = [log.get("mood", 5) for log in emotional_logs]
+    avg_mood = sum(moods) / len(moods) if moods else 0
+    
+    # Habits
+    habits = await db.habits.find({"user_id": current_user.user_id}).to_list(50)
+    total_completions = 0
+    
+    for habit in habits:
+        completions = await db.habit_logs.count_documents({
+            "habit_id": habit["habit_id"],
+            "completed": True,
+            "date": {"$gte": start_date.strftime("%Y-%m-%d")}
+        })
+        total_completions += completions
+    
+    # Tasks
+    tasks = await db.therapist_tasks.find({"patient_id": current_user.user_id}).to_list(100)
+    tasks_completed = len([t for t in tasks if t.get("status") == "completed"])
+    
+    # Days clean
+    days_clean = 0
+    if patient_profile and patient_profile.get("clean_since"):
+        try:
+            clean_date = datetime.fromisoformat(patient_profile["clean_since"].replace('Z', '+00:00'))
+            days_clean = (datetime.now(timezone.utc) - clean_date).days
+        except:
+            pass
+    
+    return {
+        "days_clean": days_clean,
+        "period_days": days,
+        "emotional": {
+            "logs_count": len(emotional_logs),
+            "average_mood": round(avg_mood, 1)
+        },
+        "habits": {
+            "total": len(habits),
+            "completions": total_completions
+        },
+        "tasks": {
+            "total": len(tasks),
+            "completed": tasks_completed
+        }
+    }
+
 # ============== ALERT SYSTEM ENDPOINTS ==============
 
 @app.get("/api/professional/alerts")
