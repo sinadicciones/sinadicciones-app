@@ -1,0 +1,39 @@
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Heart with infinity - white for green background -->
+  <g transform="translate(200, 160)">
+    <!-- Main heart shape -->
+    <path d="M0 -70 
+             C-50 -120 -120 -120 -145 -50
+             C-170 30 -120 100 0 170
+             C120 100 170 30 145 -50
+             C120 -120 50 -120 0 -70Z" 
+          fill="white"/>
+    
+    <!-- Infinity symbol inside -->
+    <path d="M-60 35 
+             C-85 10 -85 -10 -60 -35
+             C-35 -60 -10 -60 15 -35
+             C40 -10 40 10 15 35
+             C-10 60 -35 60 -60 35
+             M60 35 
+             C35 10 35 -10 60 -35
+             C85 -60 110 -60 135 -35
+             C160 -10 160 10 135 35
+             C110 60 85 60 60 35" 
+          fill="none" 
+          stroke="#10B981" 
+          stroke-width="14"
+          stroke-linecap="round"
+          transform="translate(-37, 25) scale(0.6)"/>
+  </g>
+  
+  <!-- App name -->
+  <text x="200" y="360" 
+        font-family="Arial, sans-serif" 
+        font-size="36" 
+        font-weight="bold" 
+        fill="white" 
+        text-anchor="middle">
+    SinAdicciones
+  </text>
+</svg>
