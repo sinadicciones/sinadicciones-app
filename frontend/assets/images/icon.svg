@@ -1,0 +1,43 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1024" height="1024" fill="#10B981" rx="200"/>
+  
+  <!-- Heart with infinity symbol -->
+  <g transform="translate(512, 480)">
+    <!-- Main heart shape -->
+    <path d="M0 -120 
+             C-80 -200 -200 -200 -240 -80
+             C-280 40 -200 160 0 280
+             C200 160 280 40 240 -80
+             C200 -200 80 -200 0 -120Z" 
+          fill="white" 
+          opacity="0.95"/>
+    
+    <!-- Infinity symbol inside -->
+    <path d="M-100 60 
+             C-140 20 -140 -20 -100 -60
+             C-60 -100 -20 -100 20 -60
+             C60 -20 60 20 20 60
+             C-20 100 -60 100 -100 60
+             M100 60 
+             C60 20 60 -20 100 -60
+             C140 -100 180 -100 220 -60
+             C260 -20 260 20 220 60
+             C180 100 140 100 100 60" 
+          fill="none" 
+          stroke="#10B981" 
+          stroke-width="24"
+          stroke-linecap="round"
+          transform="translate(-60, 40) scale(0.6)"/>
+  </g>
+  
+  <!-- App name at bottom -->
+  <text x="512" y="920" 
+        font-family="Arial, sans-serif" 
+        font-size="100" 
+        font-weight="bold" 
+        fill="white" 
+        text-anchor="middle">
+    SinAdicciones
+  </text>
+</svg>
