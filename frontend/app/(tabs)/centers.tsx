@@ -561,25 +561,51 @@ export default function CentersScreen() {
               </View>
 
               {filteredTherapists.map((therapist, index) => (
-                <View key={index} style={styles.therapistCard}>
+                <View key={therapist.id || index} style={styles.therapistCard}>
                   <View style={styles.therapistHeader}>
                     <View style={styles.therapistAvatar}>
-                      <Ionicons name="person" size={28} color="#8B5CF6" />
+                      {therapist.photo ? (
+                        <Ionicons name="person" size={28} color="#8B5CF6" />
+                      ) : (
+                        <Ionicons name="person" size={28} color="#8B5CF6" />
+                      )}
                     </View>
                     <View style={styles.therapistInfo}>
                       <Text style={styles.therapistName}>{therapist.name}</Text>
                       <Text style={styles.therapistType}>
-                        {getProfessionalTypeLabel(therapist.professional_type)}
+                        {therapist.specialty || getProfessionalTypeLabel(therapist.professional_type)}
                       </Text>
                     </View>
-                    {therapist.accepts_patients !== false && (
-                      <View style={styles.availableBadge}>
-                        <Text style={styles.availableBadgeText}>Disponible</Text>
+                    {therapist.is_verified && (
+                      <View style={[styles.availableBadge, { backgroundColor: '#ECFDF5' }]}>
+                        <Ionicons name="shield-checkmark" size={12} color="#10B981" />
+                        <Text style={[styles.availableBadgeText, { color: '#10B981' }]}>Verificado</Text>
                       </View>
                     )}
                   </View>
 
-                  {therapist.specialization && (
+                  {/* Location */}
+                  {(therapist.city || therapist.region) && (
+                    <View style={styles.therapistDetail}>
+                      <Ionicons name="location" size={16} color="#6B7280" />
+                      <Text style={styles.therapistDetailText}>
+                        {[therapist.city, therapist.region].filter(Boolean).join(', ')}
+                      </Text>
+                    </View>
+                  )}
+
+                  {/* Subspecialties */}
+                  {therapist.subspecialties && therapist.subspecialties.length > 0 && (
+                    <View style={styles.therapistDetail}>
+                      <Ionicons name="medical" size={16} color="#6B7280" />
+                      <Text style={styles.therapistDetailText}>
+                        {therapist.subspecialties.slice(0, 3).join(', ')}
+                      </Text>
+                    </View>
+                  )}
+
+                  {/* Old fields for backwards compatibility */}
+                  {therapist.specialization && !therapist.subspecialties && (
                     <View style={styles.therapistDetail}>
                       <Ionicons name="medical" size={16} color="#6B7280" />
                       <Text style={styles.therapistDetailText}>{therapist.specialization}</Text>
@@ -593,17 +619,31 @@ export default function CentersScreen() {
                     </View>
                   )}
 
-                  {therapist.years_experience && (
-                    <View style={styles.therapistDetail}>
-                      <Ionicons name="time" size={16} color="#6B7280" />
-                      <Text style={styles.therapistDetailText}>{therapist.years_experience} años de experiencia</Text>
+                  {/* Modalities */}
+                  {therapist.modality && therapist.modality.length > 0 && (
+                    <View style={styles.modalityContainer}>
+                      {(Array.isArray(therapist.modality) ? therapist.modality : [therapist.modality]).map((mod: string, idx: number) => (
+                        <View key={idx} style={[styles.modalityBadge, { backgroundColor: '#F3E8FF' }]}>
+                          <Text style={[styles.modalityText, { color: '#7C3AED' }]}>{mod}</Text>
+                        </View>
+                      ))}
                     </View>
                   )}
 
-                  {therapist.consultation_fee && (
+                  {/* Rating */}
+                  {therapist.rating && (
+                    <View style={styles.therapistDetail}>
+                      <Ionicons name="star" size={16} color="#F59E0B" />
+                      <Text style={styles.therapistDetailText}>
+                        {therapist.rating} ({therapist.review_count || 0} reseñas)
+                      </Text>
+                    </View>
+                  )}
+
+                  {(therapist.consultation_fee || therapist.session_fee) && (
                     <View style={styles.feeContainer}>
                       <Ionicons name="cash" size={16} color="#10B981" />
-                      <Text style={styles.feeText}>{therapist.consultation_fee}</Text>
+                      <Text style={styles.feeText}>{therapist.consultation_fee || therapist.session_fee}</Text>
                     </View>
                   )}
 
@@ -614,24 +654,24 @@ export default function CentersScreen() {
                   <TouchableOpacity
                     style={[
                       styles.contactButton,
-                      !therapist.whatsapp && styles.contactButtonDisabled
+                      !(therapist.whatsapp || therapist.phone) && styles.contactButtonDisabled
                     ]}
                     onPress={() => handleContactTherapist(therapist)}
                   >
                     <Ionicons 
                       name="logo-whatsapp" 
                       size={20} 
-                      color={therapist.whatsapp ? '#FFFFFF' : '#9CA3AF'} 
+                      color={(therapist.whatsapp || therapist.phone) ? '#FFFFFF' : '#9CA3AF'} 
                     />
                     <Text style={[
                       styles.contactButtonText,
-                      !therapist.whatsapp && styles.contactButtonTextDisabled
+                      !(therapist.whatsapp || therapist.phone) && styles.contactButtonTextDisabled
                     ]}>
-                      {therapist.whatsapp ? 'Contactar por WhatsApp' : 'Sin WhatsApp disponible'}
+                      {(therapist.whatsapp || therapist.phone) ? 'Contactar por WhatsApp' : 'Sin contacto disponible'}
                     </Text>
                   </TouchableOpacity>
 
-                  {therapist.consultation_fee && (
+                  {(therapist.consultation_fee || therapist.session_fee) && (
                     <Text style={styles.feeDisclaimer}>
                       💰 Este servicio tiene un costo definido por el terapeuta
                     </Text>
