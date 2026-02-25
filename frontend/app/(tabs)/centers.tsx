@@ -188,10 +188,11 @@ export default function CentersScreen() {
   };
 
   const handleContactTherapist = (therapist: any) => {
-    if (!therapist.whatsapp) {
+    const phone = therapist.whatsapp || therapist.phone;
+    if (!phone) {
       Alert.alert(
         'Sin información de contacto',
-        'Este terapeuta no ha agregado su número de WhatsApp aún.'
+        'Este terapeuta no ha agregado su número de contacto aún.'
       );
       return;
     }
@@ -203,27 +204,32 @@ export default function CentersScreen() {
         { text: 'Cancelar', style: 'cancel' },
         { 
           text: 'Contactar', 
-          onPress: () => handleWhatsApp(therapist.whatsapp, therapist.name, true)
+          onPress: () => handleWhatsApp(phone, therapist.name, true)
         }
       ]
     );
   };
 
+  // Filter centers based on search query
   const filteredCenters = centers.filter((center) => {
-    if (activeFilter === 'all') return true;
-    const modalities = center.modalities || [];
-    return modalities.some((m: string) => 
-      m.toLowerCase().includes(activeFilter.toLowerCase())
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      center.name?.toLowerCase().includes(query) ||
+      center.city?.toLowerCase().includes(query) ||
+      center.description?.toLowerCase().includes(query)
     );
   });
 
+  // Filter therapists based on search query
   const filteredTherapists = therapists.filter((t) => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
       t.name?.toLowerCase().includes(query) ||
-      t.specialization?.toLowerCase().includes(query) ||
-      t.institution?.toLowerCase().includes(query)
+      t.specialty?.toLowerCase().includes(query) ||
+      t.subspecialties?.some((s: string) => s.toLowerCase().includes(query)) ||
+      t.city?.toLowerCase().includes(query)
     );
   });
 
