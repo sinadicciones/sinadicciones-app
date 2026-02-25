@@ -38,6 +38,7 @@ const CITY_FILTERS = [
 const TABS = [
   { label: 'Centros', value: 'centers', icon: 'business' },
   { label: 'Terapeutas', value: 'therapists', icon: 'people' },
+  { label: 'Talleres', value: 'workshops', icon: 'calendar' },
 ];
 
 export default function CentersScreen() {
