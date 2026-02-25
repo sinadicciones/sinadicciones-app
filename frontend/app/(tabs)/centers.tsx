@@ -17,13 +17,22 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { authenticatedFetch, getBackendURL } from '../../utils/api';
 
 const BACKEND_URL = getBackendURL();
-const SINADICCIONES_URL = 'https://sinadicciones.cl';
+const SINADICCIONES_API = 'https://sinadicciones.org/api';
 
 const QUICK_FILTERS = [
   { label: 'Todos', value: 'all' },
-  { label: 'Residencial', value: 'residencial' },
-  { label: 'Ambulatorio', value: 'ambulatorio' },
-  { label: 'Online', value: 'online' },
+  { label: 'Residencial', value: 'Residencial' },
+  { label: 'Ambulatorio', value: 'Ambulatorio' },
+  { label: 'Online', value: 'Online' },
+];
+
+const CITY_FILTERS = [
+  { label: 'Todas', value: 'all' },
+  { label: 'Santiago', value: 'Santiago' },
+  { label: 'Valparaíso', value: 'Valparaíso' },
+  { label: 'Concepción', value: 'Concepción' },
+  { label: 'Antofagasta', value: 'Antofagasta' },
+  { label: 'Temuco', value: 'Temuco' },
 ];
 
 const TABS = [
