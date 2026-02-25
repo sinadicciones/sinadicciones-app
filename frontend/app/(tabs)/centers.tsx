@@ -731,6 +731,124 @@ export default function CentersScreen() {
           )
         )}
 
+        {/* Workshops List */}
+        {activeTab === 'workshops' && (
+          workshops.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Ionicons name="calendar" size={48} color="#D1D5DB" />
+              <Text style={styles.emptyTitle}>No se encontraron talleres</Text>
+              <Text style={styles.emptyText}>
+                Prueba con otra ciudad o visita el sitio web
+              </Text>
+              <TouchableOpacity style={styles.emptyButton} onPress={() => Linking.openURL('https://sinadicciones.org/talleres')}>
+                <Text style={styles.emptyButtonText}>Ver talleres en la web</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <>
+              <Text style={styles.sectionTitle}>
+                {workshops.length} {workshops.length === 1 ? 'taller encontrado' : 'talleres encontrados'}
+              </Text>
+
+              {/* Info Banner */}
+              <View style={[styles.infoBanner, { backgroundColor: '#FEF3C7' }]}>
+                <Ionicons name="sparkles" size={20} color="#D97706" />
+                <Text style={[styles.infoBannerText, { color: '#92400E' }]}>
+                  Talleres de bienestar y apoyo: yoga, meditación, arte terapia y más actividades para tu recuperación.
+                </Text>
+              </View>
+
+              {workshops.map((workshop: any, index: number) => (
+                <View key={workshop.id || index} style={styles.workshopCard}>
+                  <View style={styles.workshopHeader}>
+                    <View style={[styles.workshopIcon, { backgroundColor: workshop.type === 'Yoga' ? '#ECFDF5' : workshop.type === 'Meditación' ? '#EEF2FF' : '#FEF3C7' }]}>
+                      <Ionicons 
+                        name={workshop.type === 'Yoga' ? 'body' : workshop.type === 'Meditación' ? 'leaf' : 'color-palette'} 
+                        size={24} 
+                        color={workshop.type === 'Yoga' ? '#10B981' : workshop.type === 'Meditación' ? '#6366F1' : '#F59E0B'} 
+                      />
+                    </View>
+                    <View style={styles.workshopInfo}>
+                      <Text style={styles.workshopName}>{workshop.name || workshop.title}</Text>
+                      <Text style={styles.workshopType}>{workshop.type || 'Taller'}</Text>
+                    </View>
+                  </View>
+
+                  {workshop.description && (
+                    <Text style={styles.workshopDescription} numberOfLines={2}>
+                      {workshop.description}
+                    </Text>
+                  )}
+
+                  <View style={styles.workshopDetails}>
+                    {(workshop.city || workshop.location) && (
+                      <View style={styles.workshopDetail}>
+                        <Ionicons name="location" size={14} color="#6B7280" />
+                        <Text style={styles.workshopDetailText}>{workshop.city || workshop.location}</Text>
+                      </View>
+                    )}
+                    {workshop.schedule && (
+                      <View style={styles.workshopDetail}>
+                        <Ionicons name="time" size={14} color="#6B7280" />
+                        <Text style={styles.workshopDetailText}>{workshop.schedule}</Text>
+                      </View>
+                    )}
+                    {workshop.price && (
+                      <View style={styles.workshopDetail}>
+                        <Ionicons name="cash" size={14} color="#10B981" />
+                        <Text style={[styles.workshopDetailText, { color: '#10B981', fontWeight: '600' }]}>{workshop.price}</Text>
+                      </View>
+                    )}
+                  </View>
+
+                  {workshop.modality && (
+                    <View style={styles.modalityContainer}>
+                      {(Array.isArray(workshop.modality) ? workshop.modality : [workshop.modality]).map((mod: string, idx: number) => (
+                        <View key={idx} style={[styles.modalityBadge, { backgroundColor: '#FEF3C7' }]}>
+                          <Text style={[styles.modalityText, { color: '#D97706' }]}>{mod}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+
+                  {(workshop.phone || workshop.whatsapp || workshop.contact) && (
+                    <TouchableOpacity
+                      style={[styles.contactButton, { backgroundColor: '#10B981' }]}
+                      onPress={() => {
+                        const phone = workshop.phone || workshop.whatsapp || workshop.contact;
+                        handleWhatsApp(phone, workshop.name || workshop.title, false);
+                      }}
+                    >
+                      <Ionicons name="logo-whatsapp" size={20} color="#FFFFFF" />
+                      <Text style={styles.contactButtonText}>Consultar disponibilidad</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              ))}
+
+              {/* CTA to view more */}
+              <TouchableOpacity style={styles.viewMoreCard} onPress={() => Linking.openURL('https://sinadicciones.org/talleres')}>
+                <LinearGradient
+                  colors={['#F59E0B', '#D97706']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.viewMoreGradient}
+                >
+                  <Ionicons name="calendar" size={32} color="#FFFFFF" />
+                  <Text style={styles.viewMoreTitle}>Ver todos los talleres</Text>
+                  <Text style={styles.viewMoreText}>
+                    Explora más talleres de yoga, meditación, arte terapia y más
+                  </Text>
+                  <View style={styles.viewMoreButton}>
+                    <Text style={[styles.viewMoreButtonText, { color: '#D97706' }]}>Abrir sitio web</Text>
+                    <Ionicons name="open-outline" size={18} color="#D97706" />
+                  </View>
+                </LinearGradient>
+              </TouchableOpacity>
+            </>
+          )
+        )}
+
         <View style={{ height: 40 }} />
       </ScrollView>
     </SafeAreaView>
