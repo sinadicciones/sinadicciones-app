@@ -47,6 +47,7 @@ export default function CentersScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [activeFilter, setActiveFilter] = useState('all');
+  const [cityFilter, setCityFilter] = useState('all');
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -54,6 +55,13 @@ export default function CentersScreen() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Re-fetch when filters change
+  useEffect(() => {
+    if (!loading) {
+      fetchCenters();
+    }
+  }, [activeFilter, cityFilter]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -64,29 +72,73 @@ export default function CentersScreen() {
   const fetchCenters = async () => {
     try {
       setError(null);
-      const response = await fetch(`${BACKEND_URL}/api/centers`);
+      // Build query params for sinadicciones.org API
+      const params = new URLSearchParams();
+      if (activeFilter !== 'all') {
+        params.append('modality', activeFilter);
+      }
+      if (cityFilter !== 'all') {
+        params.append('city', cityFilter);
+      }
+      params.append('limit', '50');
+      
+      const url = `${SINADICCIONES_API}/centers/public?${params.toString()}`;
+      console.log('Fetching centers from:', url);
+      
+      const response = await fetch(url);
       
       if (response.ok) {
         const data = await response.json();
         setCenters(data.centers || []);
-        setLastUpdated(data.last_updated);
+        setLastUpdated(new Date().toISOString());
       } else {
         throw new Error('Error fetching centers');
       }
     } catch (err) {
       console.error('Error fetching centers:', err);
       setError('No se pudieron cargar los centros');
+      // Fallback to local backend
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/centers`);
+        if (response.ok) {
+          const data = await response.json();
+          setCenters(data.centers || []);
+        }
+      } catch (fallbackErr) {
+        console.error('Fallback also failed:', fallbackErr);
+      }
     }
   };
 
   const fetchTherapists = async () => {
     try {
-      const response = await authenticatedFetch(`${BACKEND_URL}/api/therapists/search?query=`);
+      // Fetch from sinadicciones.org API
+      const params = new URLSearchParams();
+      if (cityFilter !== 'all') {
+        params.append('city', cityFilter);
+      }
+      
+      const url = `${SINADICCIONES_API}/professionals/public?${params.toString()}`;
+      console.log('Fetching professionals from:', url);
+      
+      const response = await fetch(url);
       if (response.ok) {
         const data = await response.json();
-        setTherapists(data || []);
+        setTherapists(data.professionals || []);
       }
     } catch (err) {
+      console.error('Error fetching therapists:', err);
+      // Fallback to local backend
+      try {
+        const response = await authenticatedFetch(`${BACKEND_URL}/api/therapists/search?query=`);
+        if (response.ok) {
+          const data = await response.json();
+          setTherapists(data || []);
+        }
+      } catch (fallbackErr) {
+        console.error('Fallback also failed:', fallbackErr);
+      }
+    }
       console.error('Error fetching therapists:', err);
     } finally {
       setRefreshing(false);
