@@ -45,6 +45,7 @@ export default function CentersScreen() {
   const [activeTab, setActiveTab] = useState('centers');
   const [centers, setCenters] = useState<any[]>([]);
   const [therapists, setTherapists] = useState<any[]>([]);
+  const [workshops, setWorkshops] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [activeFilter, setActiveFilter] = useState('all');
@@ -61,12 +62,13 @@ export default function CentersScreen() {
   useEffect(() => {
     if (!loading) {
       fetchCenters();
+      fetchWorkshops();
     }
   }, [activeFilter, cityFilter]);
 
   const fetchData = async () => {
     setLoading(true);
-    await Promise.all([fetchCenters(), fetchTherapists()]);
+    await Promise.all([fetchCenters(), fetchTherapists(), fetchWorkshops()]);
     setLoading(false);
   };
 
