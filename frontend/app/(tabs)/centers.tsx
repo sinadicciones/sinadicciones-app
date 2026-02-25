@@ -411,13 +411,17 @@ export default function CentersScreen() {
 
               {filteredCenters.map((center, index) => (
                 <TouchableOpacity
-                  key={index}
+                  key={center.center_id || index}
                   style={styles.centerCard}
-                  onPress={() => handleOpenCenter(center.url)}
+                  onPress={() => center.website ? handleOpenCenter(center.website) : null}
                 >
                   <View style={styles.centerHeader}>
                     <View style={styles.centerIcon}>
-                      <Ionicons name="home" size={24} color="#10B981" />
+                      {center.is_verified ? (
+                        <Ionicons name="shield-checkmark" size={24} color="#10B981" />
+                      ) : (
+                        <Ionicons name="home" size={24} color="#10B981" />
+                      )}
                     </View>
                     <View style={styles.centerInfo}>
                       <Text style={styles.centerName} numberOfLines={2}>{center.name}</Text>
@@ -430,27 +434,51 @@ export default function CentersScreen() {
                   </View>
 
                   <View style={styles.centerDetails}>
-                    {center.address ? (
+                    {center.city || center.region ? (
                       <View style={styles.detailRow}>
                         <Ionicons name="location" size={16} color="#6B7280" />
+                        <Text style={styles.detailText} numberOfLines={1}>
+                          {[center.city, center.region].filter(Boolean).join(', ')}
+                        </Text>
+                      </View>
+                    ) : null}
+                    {center.address ? (
+                      <View style={styles.detailRow}>
+                        <Ionicons name="navigate" size={16} color="#6B7280" />
                         <Text style={styles.detailText} numberOfLines={1}>{center.address}</Text>
                       </View>
                     ) : null}
-                    {center.price ? (
+                    {center.price_range ? (
                       <View style={styles.detailRow}>
                         <Ionicons name="cash" size={16} color="#6B7280" />
-                        <Text style={styles.detailText}>{center.price}</Text>
+                        <Text style={styles.detailText}>{center.price_range}</Text>
+                      </View>
+                    ) : null}
+                    {center.rating ? (
+                      <View style={styles.detailRow}>
+                        <Ionicons name="star" size={16} color="#F59E0B" />
+                        <Text style={styles.detailText}>{center.rating} ({center.review_count || 0} reseñas)</Text>
                       </View>
                     ) : null}
                   </View>
 
-                  {center.modalities && center.modalities.length > 0 && (
+                  {/* Services/Specialties */}
+                  {center.specialties && center.specialties.length > 0 && (
                     <View style={styles.modalityContainer}>
-                      {center.modalities.slice(0, 4).map((mod: string, idx: number) => (
-                        <View key={idx} style={styles.modalityBadge}>
-                          <Text style={styles.modalityText}>{mod}</Text>
+                      {center.specialties.slice(0, 3).map((spec: string, idx: number) => (
+                        <View key={idx} style={[styles.modalityBadge, { backgroundColor: '#EEF2FF' }]}>
+                          <Text style={[styles.modalityText, { color: '#4F46E5' }]}>{spec}</Text>
                         </View>
                       ))}
+                    </View>
+                  )}
+
+                  {/* Modality badge */}
+                  {center.modality && (
+                    <View style={styles.modalityContainer}>
+                      <View style={styles.modalityBadge}>
+                        <Text style={styles.modalityText}>{center.modality}</Text>
+                      </View>
                     </View>
                   )}
 
@@ -464,13 +492,23 @@ export default function CentersScreen() {
                         <Text style={styles.whatsappButtonText}>WhatsApp</Text>
                       </TouchableOpacity>
                     ) : null}
-                    <TouchableOpacity
-                      style={[styles.viewButton, !center.phone && styles.viewButtonFull]}
-                      onPress={() => handleOpenCenter(center.url)}
-                    >
-                      <Text style={styles.viewButtonText}>Ver detalles</Text>
-                      <Ionicons name="chevron-forward" size={18} color="#10B981" />
-                    </TouchableOpacity>
+                    {center.website ? (
+                      <TouchableOpacity
+                        style={[styles.viewButton, !center.phone && styles.viewButtonFull]}
+                        onPress={() => handleOpenCenter(center.website)}
+                      >
+                        <Text style={styles.viewButtonText}>Ver detalles</Text>
+                        <Ionicons name="chevron-forward" size={18} color="#10B981" />
+                      </TouchableOpacity>
+                    ) : (
+                      <TouchableOpacity
+                        style={[styles.viewButton, styles.viewButtonFull]}
+                        onPress={() => center.email ? Linking.openURL(`mailto:${center.email}`) : null}
+                      >
+                        <Ionicons name="mail" size={18} color="#10B981" />
+                        <Text style={styles.viewButtonText}>Contactar</Text>
+                      </TouchableOpacity>
+                    )}
                   </View>
                 </TouchableOpacity>
               ))}
