@@ -140,9 +140,25 @@ export default function CentersScreen() {
         console.error('Fallback also failed:', fallbackErr);
       }
     }
-      console.error('Error fetching therapists:', err);
-    } finally {
-      setRefreshing(false);
+  };
+
+  const fetchWorkshops = async () => {
+    try {
+      const params = new URLSearchParams();
+      if (cityFilter !== 'all') {
+        params.append('city', cityFilter);
+      }
+      
+      const url = `${SINADICCIONES_API}/workshops/public?${params.toString()}`;
+      console.log('Fetching workshops from:', url);
+      
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = await response.json();
+        setWorkshops(data.workshops || []);
+      }
+    } catch (err) {
+      console.error('Error fetching workshops:', err);
     }
   };
 
