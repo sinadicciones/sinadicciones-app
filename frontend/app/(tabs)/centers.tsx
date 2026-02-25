@@ -325,7 +325,7 @@ export default function CentersScreen() {
             <Ionicons name="open-outline" size={18} color="#10B981" />
           </TouchableOpacity>
 
-          {/* Quick Filters */}
+          {/* Quick Filters - Modalidad */}
           <ScrollView 
             horizontal 
             showsHorizontalScrollIndicator={false}
@@ -345,6 +345,36 @@ export default function CentersScreen() {
                   style={[
                     styles.filterText,
                     activeFilter === filter.value && styles.filterTextActive,
+                  ]}
+                >
+                  {filter.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+
+          {/* City Filters */}
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            style={styles.filtersContainer}
+            contentContainerStyle={styles.filtersContent}
+          >
+            <Text style={styles.filterLabel}>Ciudad:</Text>
+            {CITY_FILTERS.map((filter) => (
+              <TouchableOpacity
+                key={filter.value}
+                style={[
+                  styles.filterChip,
+                  { borderColor: '#8B5CF6' },
+                  cityFilter === filter.value && [styles.filterChipActive, { backgroundColor: '#8B5CF6' }],
+                ]}
+                onPress={() => setCityFilter(filter.value)}
+              >
+                <Text
+                  style={[
+                    styles.filterText,
+                    { color: cityFilter === filter.value ? '#FFFFFF' : '#8B5CF6' },
                   ]}
                 >
                   {filter.label}
