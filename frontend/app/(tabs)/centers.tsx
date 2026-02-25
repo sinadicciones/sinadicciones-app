@@ -1332,4 +1332,64 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 8,
   },
+  // Workshop styles
+  workshopCard: {
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 16,
+    marginBottom: 12,
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  workshopHeader: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 10,
+  },
+  workshopIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  workshopInfo: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  workshopName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1F2937',
+  },
+  workshopType: {
+    fontSize: 13,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+  workshopDescription: {
+    fontSize: 13,
+    color: '#6B7280',
+    marginBottom: 10,
+    lineHeight: 18,
+  },
+  workshopDetails: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginBottom: 10,
+  },
+  workshopDetail: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  workshopDetailText: {
+    fontSize: 12,
+    color: '#6B7280',
+  },
 });
