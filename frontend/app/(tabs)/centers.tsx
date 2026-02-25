@@ -155,7 +155,7 @@ export default function CentersScreen() {
   };
 
   const handleOpenDirectory = () => {
-    Linking.openURL(`${SINADICCIONES_URL}/explore-no-map/?type=place&sort=latest`);
+    Linking.openURL('https://sinadicciones.org/centros');
   };
 
   const handleWhatsApp = (phone: string, name: string, isTherapist: boolean = false) => {
