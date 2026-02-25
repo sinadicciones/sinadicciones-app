@@ -859,6 +859,13 @@ const styles = StyleSheet.create({
   filterTextActive: {
     color: '#FFFFFF',
   },
+  filterLabel: {
+    fontSize: 14,
+    color: '#4B5563',
+    fontWeight: '600',
+    marginRight: 8,
+    alignSelf: 'center',
+  },
   errorBanner: {
     flexDirection: 'row',
     alignItems: 'center',
