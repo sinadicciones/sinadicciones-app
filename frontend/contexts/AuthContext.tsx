@@ -95,22 +95,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const setupDeepLinkListener = () => {
-    // Handle cold start (app opened from killed state)
-    Linking.getInitialURL().then(url => {
-      if (url) {
-        handleDeepLink(url);
-      }
-    });
-
-    // Handle hot links (app already running)
-    const subscription = Linking.addEventListener('url', ({ url }) => {
-      handleDeepLink(url);
-    });
-
-    return () => subscription.remove();
-  };
-
   const handleDeepLink = async (url: string) => {
     // Extract session_id from URL (support both hash and query)
     let sessionId = null;
