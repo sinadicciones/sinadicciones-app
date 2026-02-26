@@ -49,7 +49,18 @@ interface AuthContextType {
   refreshUser: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// Default auth values for SSR and initial render
+const defaultAuthValue: AuthContextType = {
+  user: null,
+  isLoading: true,
+  login: async () => {},
+  loginWithEmail: async () => ({ success: false, error: 'Not initialized' }),
+  registerWithEmail: async () => ({ success: false, error: 'Not initialized' }),
+  logout: async () => {},
+  refreshUser: async () => {},
+};
+
+const AuthContext = createContext<AuthContextType>(defaultAuthValue);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
