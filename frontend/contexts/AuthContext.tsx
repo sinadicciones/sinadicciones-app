@@ -60,17 +60,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     if (Platform.OS === 'web') {
       // Check for session_id in URL hash on web
-      const hash = window.location.hash;
-      if (hash.includes('session_id=')) {
-        const sessionId = hash.split('session_id=')[1]?.split('&')[0];
-        if (sessionId) {
-          handleDeepLink(window.location.href);
-          // Clean the URL
-          window.history.replaceState({}, document.title, window.location.pathname);
+      if (typeof window !== 'undefined') {
+        const hash = window.location.hash;
+        if (hash.includes('session_id=')) {
+          const sessionId = hash.split('session_id=')[1]?.split('&')[0];
+          if (sessionId) {
+            handleDeepLink(window.location.href);
+            // Clean the URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }
         }
       }
     } else {
-      setupDeepLinkListener();
+      // Only setup deep link listener on native platforms
+      const setupLinks = async () => {
+        try {
+          // Handle cold start (app opened from killed state)
+          const url = await Linking.getInitialURL();
+          if (url) {
+            handleDeepLink(url);
+          }
+
+          // Handle hot links (app already running)
+          const subscription = Linking.addEventListener('url', ({ url }) => {
+            handleDeepLink(url);
+          });
+
+          return () => subscription.remove();
+        } catch (error) {
+          console.log('Deep linking setup error:', error);
+        }
+      };
+      setupLinks();
     }
   }, []);
 
