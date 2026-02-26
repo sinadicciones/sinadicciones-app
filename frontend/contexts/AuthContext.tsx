@@ -355,22 +355,5 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  // During SSR or if provider is not yet mounted, return default values
-  if (context === undefined) {
-    // Check if we're on server-side rendering
-    if (typeof window === 'undefined') {
-      return {
-        user: null,
-        isLoading: true,
-        login: async () => {},
-        loginWithEmail: async () => ({ success: false, error: 'Not initialized' }),
-        registerWithEmail: async () => ({ success: false, error: 'Not initialized' }),
-        logout: async () => {},
-        refreshUser: async () => {},
-      };
-    }
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  return useContext(AuthContext);
 };
