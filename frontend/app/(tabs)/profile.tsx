@@ -336,10 +336,17 @@ export default function ProfileScreen() {
   const handleLogout = async () => {
     // En web, usar confirm nativo
     if (Platform.OS === 'web') {
-      const confirmed = window.confirm('¿Estás seguro que quieres cerrar sesión?');
-      if (confirmed) {
-        await logout();
-        router.replace('/');
+      if (typeof window !== 'undefined') {
+        const confirmed = window.confirm('¿Estás seguro que quieres cerrar sesión?');
+        if (confirmed) {
+          try {
+            await logout();
+          } catch (e) {
+            console.error('Logout error:', e);
+          }
+          // Forzar recarga de la página
+          window.location.href = '/';
+        }
       }
       return;
     }
