@@ -6,12 +6,16 @@ from datetime import datetime, timedelta
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 from dotenv import load_dotenv
-import bcrypt
+import hashlib
 import uuid
 
 load_dotenv()
 
 MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017")
+
+def hash_password(password: str) -> str:
+    """Hash password using SHA256 (same as server.py)"""
+    return hashlib.sha256(password.encode()).hexdigest()
 
 async def create_professional_demo():
     client = AsyncIOMotorClient(MONGO_URL)
@@ -33,7 +37,7 @@ async def create_professional_demo():
     print(f"✅ Paciente demo encontrado: {demo_patient.get('name')}")
     
     # 2. Crear el usuario profesional
-    password_hash = bcrypt.hashpw("Terapeuta123!".encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    password_hash = hash_password("Terapeuta123!")
     
     professional_user = {
         "user_id": professional_id,
