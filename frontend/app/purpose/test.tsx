@@ -477,17 +477,17 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#FFFFFF',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   headerSubtitle: {
-    fontSize: 16,
+    fontSize: 13,
     color: '#FEF3C7',
-    marginBottom: 16,
+    marginBottom: 10,
   },
   progressBar: {
-    height: 6,
+    height: 4,
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    borderRadius: 3,
+    borderRadius: 2,
     overflow: 'hidden',
   },
   progress: {
