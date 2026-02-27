@@ -437,10 +437,22 @@ export default function HomeScreen() {
               <Text style={styles.greeting}>Hola, {user?.name?.split(' ')[0]} 👋</Text>
               <Text style={styles.subtitle}>Tu progreso de hoy</Text>
             </View>
-            <TouchableOpacity onPress={handleSOS} style={styles.sosButton}>
-              <Ionicons name="heart" size={18} color="#FFFFFF" />
-              <Text style={styles.sosButtonText}>SOS</Text>
-            </TouchableOpacity>
+            <View style={styles.headerActions}>
+              <TouchableOpacity onPress={() => setShowNotifications(true)} style={styles.notificationButton}>
+                <Ionicons name="notifications" size={20} color="#FFFFFF" />
+                {unreadCount > 0 && (
+                  <View style={styles.notificationBadge}>
+                    <Text style={styles.notificationBadgeText}>
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleSOS} style={styles.sosButton}>
+                <Ionicons name="heart" size={18} color="#FFFFFF" />
+                <Text style={styles.sosButtonText}>SOS</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Contador de Sobriedad - Más compacto */}
