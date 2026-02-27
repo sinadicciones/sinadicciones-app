@@ -561,14 +561,14 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingTop: 10,
-    paddingBottom: 24,
-    paddingHorizontal: 24,
+    paddingBottom: 14,
+    paddingHorizontal: 20,
   },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   backButton: {
     padding: 4,
@@ -579,11 +579,11 @@ const styles = StyleSheet.create({
   headerTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    marginBottom: 4,
+    gap: 8,
+    marginBottom: 2,
   },
   headerTitle: {
-    fontSize: 26,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
@@ -591,18 +591,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    gap: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 10,
+    gap: 3,
   },
   smartBadgeText: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: 'bold',
     color: '#F59E0B',
   },
   headerSubtitle: {
-    fontSize: 16,
+    fontSize: 13,
     color: '#FEF3C7',
   },
   filterContainer: {
