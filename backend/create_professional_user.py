@@ -166,96 +166,96 @@ async def create_professional_demo():
     await db.therapist_tasks.insert_many(tasks)
     print(f"✅ {len(tasks)} tareas creadas para el paciente")
     
-    # 6. Crear notas clínicas del terapeuta sobre el paciente
-    clinical_notes = [
+    # 6. Crear notas clínicas del terapeuta sobre el paciente (en session_notes)
+    session_notes = [
         {
             "note_id": "note_" + uuid.uuid4().hex[:8],
             "therapist_id": professional_id,
             "patient_id": demo_patient_id,
-            "type": "session",
-            "title": "Sesión inicial - Evaluación",
-            "content": """
-            **Motivo de consulta:** Paciente de 35 años, busca apoyo para mantener sobriedad de alcohol. Lleva 95 días limpio.
-            
-            **Historia:** Consumo problemático desde los 22 años. Múltiples intentos de dejarlo. Esta vez motivado por su familia.
-            
-            **Fortalezas identificadas:**
-            - Alta motivación
-            - Apoyo familiar sólido
-            - Ya tiene experiencia en AA
-            
-            **Plan de tratamiento:**
-            1. Sesiones semanales de terapia individual
-            2. Identificación de gatillos
-            3. Desarrollo de estrategias de afrontamiento
-            4. Fortalecer red de apoyo
+            "session_date": (datetime.utcnow() - timedelta(days=30)).isoformat(),
+            "private_notes": """
+**Motivo de consulta:** Paciente de 35 años, busca apoyo para mantener sobriedad de alcohol. Lleva 95 días limpio.
+
+**Historia:** Consumo problemático desde los 22 años. Múltiples intentos de dejarlo. Esta vez motivado por su familia.
+
+**Fortalezas identificadas:**
+- Alta motivación
+- Apoyo familiar sólido
+- Ya tiene experiencia en AA
+
+**Plan de tratamiento:**
+1. Sesiones semanales de terapia individual
+2. Identificación de gatillos
+3. Desarrollo de estrategias de afrontamiento
+4. Fortalecer red de apoyo
             """,
-            "mood_assessment": 7,
-            "risk_level": "low",
-            "created_at": (datetime.utcnow() - timedelta(days=30)).isoformat(),
-            "is_private": True
+            "session_summary": "Sesión inicial de evaluación. Paciente muestra alta motivación y compromiso con su recuperación.",
+            "goals_discussed": ["Identificar gatillos principales", "Establecer rutina de hábitos saludables"],
+            "next_session_focus": "Revisar diario de emociones y situaciones de riesgo",
+            "mood_rating": 7,
+            "created_at": (datetime.utcnow() - timedelta(days=30))
         },
         {
             "note_id": "note_" + uuid.uuid4().hex[:8],
             "therapist_id": professional_id,
             "patient_id": demo_patient_id,
-            "type": "session",
-            "title": "Sesión 4 - Trabajo con gatillos",
-            "content": """
-            **Resumen:** Paciente reporta semana difícil. Tuvo evento social donde había alcohol.
-            
-            **Logros:**
-            - No consumió a pesar de la presión social
-            - Usó técnica de salida temprana
-            - Llamó a su padrino después del evento
-            
-            **Trabajo realizado:**
-            - Revisamos la situación con técnica ABC
-            - Identificamos pensamientos automáticos
-            - Practicamos reestructuración cognitiva
-            
-            **Próxima sesión:**
-            - Revisar tarea de carta al yo futuro
-            - Continuar con prevención de recaídas
+            "session_date": (datetime.utcnow() - timedelta(days=14)).isoformat(),
+            "private_notes": """
+**Resumen:** Paciente reporta semana difícil. Tuvo evento social donde había alcohol.
+
+**Logros:**
+- No consumió a pesar de la presión social
+- Usó técnica de salida temprana
+- Llamó a su padrino después del evento
+
+**Trabajo realizado:**
+- Revisamos la situación con técnica ABC
+- Identificamos pensamientos automáticos
+- Practicamos reestructuración cognitiva
+
+**Próxima sesión:**
+- Revisar tarea de carta al yo futuro
+- Continuar con prevención de recaídas
             """,
-            "mood_assessment": 6,
-            "risk_level": "medium",
-            "created_at": (datetime.utcnow() - timedelta(days=14)).isoformat(),
-            "is_private": True
+            "session_summary": "Paciente enfrentó situación de alto riesgo en evento social y manejó exitosamente sin consumir.",
+            "goals_discussed": ["Técnica ABC para manejo de ansiedad", "Estrategias de escape de situaciones de riesgo"],
+            "next_session_focus": "Carta al yo del futuro y técnicas de mindfulness",
+            "mood_rating": 6,
+            "created_at": (datetime.utcnow() - timedelta(days=14))
         },
         {
             "note_id": "note_" + uuid.uuid4().hex[:8],
             "therapist_id": professional_id,
             "patient_id": demo_patient_id,
-            "type": "progress",
-            "title": "Nota de progreso mensual",
-            "content": """
-            **Evaluación del mes:**
-            
-            Carlos ha mostrado un progreso significativo este mes. Ha mantenido su sobriedad a pesar de enfrentar situaciones de alto riesgo.
-            
-            **Indicadores positivos:**
-            - Cumplimiento de hábitos: 85%
-            - Asistencia a sesiones: 100%
-            - Uso consistente de la app
-            - Mejora en regulación emocional
-            
-            **Áreas de trabajo:**
-            - Manejo del estrés laboral
-            - Comunicación con la pareja
-            
-            **Recomendación:** Continuar con plan actual. Considerar reducir frecuencia de sesiones a quincenal en próximo mes si mantiene progreso.
+            "session_date": (datetime.utcnow() - timedelta(days=5)).isoformat(),
+            "private_notes": """
+**Evaluación del mes:**
+
+Carlos ha mostrado un progreso significativo este mes. Ha mantenido su sobriedad a pesar de enfrentar situaciones de alto riesgo.
+
+**Indicadores positivos:**
+- Cumplimiento de hábitos: 85%
+- Asistencia a sesiones: 100%
+- Uso consistente de la app
+- Mejora en regulación emocional
+
+**Áreas de trabajo:**
+- Manejo del estrés laboral
+- Comunicación con la pareja
+
+**Recomendación:** Continuar con plan actual. Considerar reducir frecuencia de sesiones a quincenal en próximo mes si mantiene progreso.
             """,
-            "mood_assessment": 8,
-            "risk_level": "low",
-            "created_at": (datetime.utcnow() - timedelta(days=5)).isoformat(),
-            "is_private": True
+            "session_summary": "Celebramos 90 días de sobriedad. Progreso excelente en todas las áreas. Paciente muy comprometido.",
+            "goals_discussed": ["Celebrar hito de 90 días", "Planificar siguiente fase del tratamiento"],
+            "next_session_focus": "Evaluar posibilidad de sesiones quincenales",
+            "mood_rating": 8,
+            "created_at": (datetime.utcnow() - timedelta(days=5))
         }
     ]
     
-    await db.clinical_notes.delete_many({"patient_id": demo_patient_id})
-    await db.clinical_notes.insert_many(clinical_notes)
-    print(f"✅ {len(clinical_notes)} notas clínicas creadas")
+    await db.session_notes.delete_many({"patient_id": demo_patient_id})
+    await db.session_notes.insert_many(session_notes)
+    print(f"✅ {len(session_notes)} notas de sesión creadas")
     
     # 7. Crear alertas del sistema para el profesional
     alerts = [
