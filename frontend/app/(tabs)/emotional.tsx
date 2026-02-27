@@ -123,9 +123,32 @@ export default function EmotionalScreen() {
         end={{ x: 1, y: 1 }}
         style={styles.header}
       >
-        <Text style={styles.headerTitle}>Estado Emocional</Text>
-        <Text style={styles.headerSubtitle}>Monitorea cómo te sientes</Text>
+        <View style={styles.headerTop}>
+          <View>
+            <Text style={styles.headerTitle}>Estado Emocional</Text>
+            <Text style={styles.headerSubtitle}>Monitorea cómo te sientes</Text>
+          </View>
+          <TouchableOpacity 
+            style={styles.insightsBtn}
+            onPress={() => setShowInsights(true)}
+          >
+            <Ionicons name="analytics" size={20} color="#EC4899" />
+          </TouchableOpacity>
+        </View>
       </LinearGradient>
+
+      {/* Insights Button Card */}
+      <TouchableOpacity 
+        style={styles.insightsCard}
+        onPress={() => setShowInsights(true)}
+      >
+        <Ionicons name="sparkles" size={20} color="#EC4899" />
+        <View style={styles.insightsCardContent}>
+          <Text style={styles.insightsCardTitle}>💭 Análisis Emocional</Text>
+          <Text style={styles.insightsCardSubtitle}>Patrones y bienestar con IA</Text>
+        </View>
+        <Ionicons name="chevron-forward" size={20} color="#EC4899" />
+      </TouchableOpacity>
 
       <ScrollView
         style={styles.content}
