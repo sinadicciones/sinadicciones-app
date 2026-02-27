@@ -294,12 +294,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9FAFB',
   },
   header: {
-    paddingTop: 60,
-    paddingBottom: 24,
-    paddingHorizontal: 24,
+    paddingTop: 50,
+    paddingBottom: 16,
+    paddingHorizontal: 20,
+  },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  insightsBtn: {
+    backgroundColor: '#FFFFFF',
+    padding: 10,
+    borderRadius: 12,
   },
   headerTitle: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
