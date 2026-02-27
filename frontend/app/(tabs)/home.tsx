@@ -760,7 +760,8 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        <View style={{ height: 100 }} />
+          <View style={{ height: 100 }} />
+        </View>
       </ScrollView>
 
       {/* Modal de Insights IA */}
