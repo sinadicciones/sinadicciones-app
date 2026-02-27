@@ -19,7 +19,7 @@ db = client.test_database
 
 # Datos del usuario de prueba
 TEST_USER = {
-    "email": "demo@sinadicciones.cl",
+    "email": "demo@sinadicciones.org",
     "password": "Demo123!",  # En producción esto sería hasheado
     "name": "Carlos Mendoza",
     "user_id": f"user_demo_{uuid.uuid4().hex[:8]}"
