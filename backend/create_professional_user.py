@@ -380,7 +380,7 @@ Carlos ha mostrado un progreso significativo este mes. Ha mantenido su sobriedad
     print(f"\n📋 Paciente vinculado: Carlos Mendoza (demo@sinadicciones.org)")
     print(f"\n📊 Datos de interacción creados:")
     print(f"   - {len(tasks)} tareas asignadas al paciente")
-    print(f"   - {len(clinical_notes)} notas clínicas")
+    print(f"   - {len(session_notes)} notas de sesión")
     print(f"   - {len(alerts)} alertas del sistema")
     print(f"   - {len(messages)} mensajes de comunicación")
     print("="*60)
