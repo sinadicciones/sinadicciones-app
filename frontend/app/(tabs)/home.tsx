@@ -797,6 +797,12 @@ export default function HomeScreen() {
           <WellnessInsights onClose={() => setShowInsights(false)} />
         </View>
       </Modal>
+
+      {/* Centro de Notificaciones */}
+      <NotificationCenter 
+        visible={showNotifications} 
+        onClose={() => setShowNotifications(false)} 
+      />
     </View>
   );
 }
