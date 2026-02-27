@@ -655,18 +655,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingTop: 10,
-    paddingBottom: 16,
+    paddingBottom: 12,
   },
   greeting: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
   subtitle: {
-    fontSize: 14,
-    color: '#3B82F6',
+    fontSize: 13,
+    color: '#93C5FD',
     marginTop: 2,
   },
   profileButton: {
