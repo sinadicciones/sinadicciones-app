@@ -52,6 +52,7 @@ export default function EmotionalScreen() {
   const [note, setNote] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [showInsights, setShowInsights] = useState(false);
 
   useEffect(() => {
     loadData();
