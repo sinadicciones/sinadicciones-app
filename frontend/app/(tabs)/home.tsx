@@ -762,9 +762,9 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   header: {
-    paddingTop: 50,
-    paddingBottom: 20,
-    paddingHorizontal: 20,
+    paddingTop: 44,
+    paddingBottom: 12,
+    paddingHorizontal: 16,
   },
   headerTop: {
     flexDirection: 'row',
