@@ -797,286 +797,397 @@ export default function ProfileScreen() {
           </>
         ) : (
           <>
-            {/* PATIENT/ACTIVE_USER PROFILE CONTENT */}
-            {/* Basic Info */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Información básica</Text>
-              
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Adicción principal</Text>
-                <TextInput
-                  style={styles.input}
-                  value={formData.addiction_type || ''}
-                  onChangeText={(text) =>
-                    setFormData({ ...formData, addiction_type: text })
-                  }
-                  placeholder="Ej: Alcohol, Drogas, Juego..."
-                  editable={editing}
-                />
-              </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Años de consumo</Text>
-                <TextInput
-                  style={styles.input}
-                  value={formData.years_using?.toString() || ''}
-                  onChangeText={(text) =>
-                    setFormData({ ...formData, years_using: parseInt(text) || 0 })
-                  }
-                  placeholder="Número de años"
-                  keyboardType="numeric"
-                  editable={editing}
-                />
-              </View>
-
-              {profile?.role !== 'active_user' && (
-                <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Limpio desde</Text>
-                  {Platform.OS === 'web' ? (
-                    <View style={styles.datePickerButton}>
-                      <Ionicons name="calendar" size={20} color="#10B981" />
-                      <input
-                        id="date-picker-input"
-                        type="date"
-                        value={formData.clean_since || ''}
-                        onChange={(e) => handleDateChange(e)}
-                        disabled={!editing}
-                        max={new Date().toISOString().split('T')[0]}
-                        style={{
-                          flex: 1,
-                          border: 'none',
-                          background: 'transparent',
-                          fontSize: 16,
-                          color: '#1F2937',
-                          marginLeft: 8,
-                          cursor: editing ? 'pointer' : 'not-allowed',
-                          opacity: editing ? 1 : 0.6,
-                        }}
-                      />
-                    </View>
-                  ) : (
-                    <>
-                      <TouchableOpacity
-                        style={styles.datePickerButton}
-                        onPress={openDatePicker}
-                        disabled={!editing}
-                      >
-                        <Ionicons name="calendar" size={20} color="#10B981" />
-                        <Text style={styles.datePickerText}>
-                          {formData.clean_since || 'Seleccionar fecha'}
-                        </Text>
-                      </TouchableOpacity>
-                      {showDatePicker && (
-                        <DateTimePicker
-                          value={selectedDate}
-                          mode="date"
-                          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                          onChange={handleDateChange}
-                          maximumDate={new Date()}
-                        />
-                      )}
-                    </>
-                  )}
+            {/* PATIENT/ACTIVE_USER PROFILE CONTENT - Nuevo diseño visual */}
+            
+            {/* Estadísticas Rápidas */}
+            <View style={styles.statsSection}>
+              <View style={styles.statCard}>
+                <View style={[styles.statIcon, { backgroundColor: '#ECFDF5' }]}>
+                  <Ionicons name="calendar" size={22} color="#10B981" />
                 </View>
-              )}
+                <Text style={styles.statNumber}>{profile?.days_clean || 0}</Text>
+                <Text style={styles.statLabel}>días limpio</Text>
+              </View>
+              <View style={styles.statCard}>
+                <View style={[styles.statIcon, { backgroundColor: '#FEF3C7' }]}>
+                  <Ionicons name="flame" size={22} color="#F59E0B" />
+                </View>
+                <Text style={styles.statNumber}>{profile?.longest_streak || 0}</Text>
+                <Text style={styles.statLabel}>mejor racha</Text>
+              </View>
+              <View style={styles.statCard}>
+                <View style={[styles.statIcon, { backgroundColor: '#EDE9FE' }]}>
+                  <Ionicons name="trophy" size={22} color="#8B5CF6" />
+                </View>
+                <Text style={styles.statNumber}>{profile?.total_habits_completed || 0}</Text>
+                <Text style={styles.statLabel}>hábitos</Text>
+              </View>
             </View>
 
-            {/* Linked Therapist Section */}
-            {profile?.linked_therapist_id ? (
-              <View style={styles.section}>
-                <View style={styles.sectionHeaderRow}>
-                  <Ionicons name="medical" size={22} color="#8B5CF6" />
-                  <Text style={[styles.sectionTitle, { marginLeft: 8 }]}>Mi Terapeuta</Text>
+            {/* Información Personal - Expandible */}
+            <TouchableOpacity 
+              style={styles.expandableSection}
+              onPress={() => setActiveSection(activeSection === 'personal' ? null : 'personal')}
+            >
+              <View style={styles.expandableHeader}>
+                <View style={styles.expandableIcon}>
+                  <Ionicons name="person" size={20} color="#3B82F6" />
                 </View>
-                <View style={styles.therapistLinkedCard}>
-                  <View style={styles.therapistLinkedAvatar}>
-                    <Ionicons name="person" size={28} color="#8B5CF6" />
-                  </View>
-                  <View style={styles.therapistLinkedInfo}>
-                    <Text style={styles.therapistLinkedName}>
-                      Terapeuta vinculado
-                    </Text>
-                    <Text style={styles.therapistLinkedStatus}>
-                      ✓ Tu progreso es monitoreado por tu profesional
-                    </Text>
-                  </View>
+                <View style={styles.expandableInfo}>
+                  <Text style={styles.expandableTitle}>Información Personal</Text>
+                  <Text style={styles.expandableSubtitle}>Nombre, teléfono, adicción</Text>
                 </View>
+                <Ionicons 
+                  name={activeSection === 'personal' ? 'chevron-up' : 'chevron-down'} 
+                  size={20} 
+                  color="#6B7280" 
+                />
               </View>
-            ) : (
-              <View style={styles.section}>
-                <View style={styles.sectionHeaderRow}>
-                  <Ionicons name="medical" size={22} color="#6B7280" />
-                  <Text style={[styles.sectionTitle, { marginLeft: 8 }]}>Mi Terapeuta</Text>
+            </TouchableOpacity>
+            
+            {activeSection === 'personal' && (
+              <View style={styles.expandableContent}>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Nombre completo</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={formData.name || user?.name || ''}
+                    onChangeText={(text) => setFormData({ ...formData, name: text })}
+                    placeholder="Tu nombre"
+                    editable={editing}
+                  />
                 </View>
-                <View style={styles.noTherapistCard}>
-                  <Ionicons name="information-circle" size={24} color="#6B7280" />
-                  <Text style={styles.noTherapistText}>
-                    No tienes un terapeuta vinculado aún. Tu terapeuta puede vincularte desde su panel profesional usando tu email de registro.
-                  </Text>
+
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Teléfono de contacto</Text>
+                  <View style={styles.phoneInputContainer}>
+                    <Ionicons name="call" size={18} color="#10B981" />
+                    <TextInput
+                      style={styles.phoneInput}
+                      value={formData.phone || ''}
+                      onChangeText={(text) => setFormData({ ...formData, phone: text })}
+                      placeholder="+56 9 1234 5678"
+                      keyboardType="phone-pad"
+                      editable={editing}
+                    />
+                  </View>
                 </View>
+
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Adicción principal</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={formData.addiction_type || ''}
+                    onChangeText={(text) => setFormData({ ...formData, addiction_type: text })}
+                    placeholder="Ej: Alcohol, Drogas, Juego..."
+                    editable={editing}
+                  />
+                </View>
+
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Años de consumo</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={formData.years_using?.toString() || ''}
+                    onChangeText={(text) => setFormData({ ...formData, years_using: parseInt(text) || 0 })}
+                    placeholder="Número de años"
+                    keyboardType="numeric"
+                    editable={editing}
+                  />
+                </View>
+
+                {profile?.role !== 'active_user' && (
+                  <View style={styles.inputGroup}>
+                    <Text style={styles.label}>Limpio desde</Text>
+                    {Platform.OS === 'web' ? (
+                      <View style={styles.datePickerButton}>
+                        <Ionicons name="calendar" size={20} color="#10B981" />
+                        <input
+                          id="date-picker-input"
+                          type="date"
+                          value={formData.clean_since || ''}
+                          onChange={(e) => handleDateChange(e)}
+                          disabled={!editing}
+                          max={new Date().toISOString().split('T')[0]}
+                          style={{
+                            flex: 1,
+                            border: 'none',
+                            background: 'transparent',
+                            fontSize: 16,
+                            color: '#1F2937',
+                            marginLeft: 8,
+                            cursor: editing ? 'pointer' : 'not-allowed',
+                            opacity: editing ? 1 : 0.6,
+                          }}
+                        />
+                      </View>
+                    ) : (
+                      <>
+                        <TouchableOpacity
+                          style={styles.datePickerButton}
+                          onPress={openDatePicker}
+                          disabled={!editing}
+                        >
+                          <Ionicons name="calendar" size={20} color="#10B981" />
+                          <Text style={styles.datePickerText}>
+                            {formData.clean_since || 'Seleccionar fecha'}
+                          </Text>
+                        </TouchableOpacity>
+                        {showDatePicker && (
+                          <DateTimePicker
+                            value={selectedDate}
+                            mode="date"
+                            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                            onChange={handleDateChange}
+                            maximumDate={new Date()}
+                          />
+                        )}
+                      </>
+                    )}
+                  </View>
+                )}
               </View>
             )}
 
-            {/* My Why */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Mi "Para Qué" 🎯</Text>
-              <Text style={styles.sectionDescription}>
-                Tu razón más profunda para mantenerte en recuperación
-              </Text>
-              <TextInput
-                style={[styles.input, styles.textArea]}
-                value={formData.my_why || ''}
-                onChangeText={(text) => setFormData({ ...formData, my_why: text })}
-                placeholder="Ej: Para estar presente para mis hijos, para recuperar mi salud..."
-                multiline
-                numberOfLines={4}
-                textAlignVertical="top"
-                editable={editing}
-              />
-            </View>
-
-            {/* Triggers */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Gatillos ⚠️</Text>
-              <Text style={styles.sectionDescription}>
-                Personas, lugares, emociones que activan el deseo de consumir
-              </Text>
-              {(formData.triggers || []).map((trigger: string, index: number) => (
-                <View key={index} style={styles.listItem}>
-                  <Text style={styles.listItemText}>{trigger}</Text>
-                  {editing && (
-                    <TouchableOpacity
-                      onPress={() => removeItemFromList('triggers', index)}
-                    >
-                      <Ionicons name="trash-outline" size={20} color="#EF4444" />
-                    </TouchableOpacity>
-                  )}
+            {/* Mi Para Qué - Expandible */}
+            <TouchableOpacity 
+              style={styles.expandableSection}
+              onPress={() => setActiveSection(activeSection === 'why' ? null : 'why')}
+            >
+              <View style={styles.expandableHeader}>
+                <View style={[styles.expandableIcon, { backgroundColor: '#FEF3C7' }]}>
+                  <Ionicons name="star" size={20} color="#F59E0B" />
                 </View>
-              ))}
-              {editing && (
-                <TextInput
-                  style={styles.input}
-                  placeholder="Agregar gatillo"
-                  onSubmitEditing={(e) => {
-                    addItemToList('triggers', e.nativeEvent.text);
-                    e.currentTarget.clear();
-                  }}
-                />
-              )}
-            </View>
-
-            {/* Protective Factors */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Factores Protectores 🛡️</Text>
-              <Text style={styles.sectionDescription}>
-                Lo que te ayuda a mantenerte limpio
-              </Text>
-              {(formData.protective_factors || []).map((factor: string, index: number) => (
-                <View key={index} style={styles.listItem}>
-                  <Text style={styles.listItemText}>{factor}</Text>
-                  {editing && (
-                    <TouchableOpacity
-                      onPress={() => removeItemFromList('protective_factors', index)}
-                    >
-                      <Ionicons name="trash-outline" size={20} color="#EF4444" />
-                    </TouchableOpacity>
-                  )}
+                <View style={styles.expandableInfo}>
+                  <Text style={styles.expandableTitle}>Mi "Para Qué"</Text>
+                  <Text style={styles.expandableSubtitle}>Tu razón para mantenerte limpio</Text>
                 </View>
-              ))}
-              {editing && (
-                <TextInput
-                  style={styles.input}
-                  placeholder="Agregar factor protector"
-                  onSubmitEditing={(e) => {
-                    addItemToList('protective_factors', e.nativeEvent.text);
-                    e.currentTarget.clear();
-                  }}
+                <Ionicons 
+                  name={activeSection === 'why' ? 'chevron-up' : 'chevron-down'} 
+                  size={20} 
+                  color="#6B7280" 
                 />
-              )}
-            </View>
+              </View>
+            </TouchableOpacity>
 
-            {/* Emergency Contacts */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Contactos de Emergencia 📞</Text>
-              <Text style={styles.sectionDescription}>
-                Personas a las que puedes llamar en momentos difíciles
-              </Text>
-              {(formData.emergency_contacts || []).map((contact: any, index: number) => (
-                <View key={index} style={styles.contactCard}>
+            {activeSection === 'why' && (
+              <View style={styles.expandableContent}>
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  value={formData.my_why || ''}
+                  onChangeText={(text) => setFormData({ ...formData, my_why: text })}
+                  placeholder="Ej: Para estar presente para mis hijos, para recuperar mi salud..."
+                  multiline
+                  numberOfLines={4}
+                  textAlignVertical="top"
+                  editable={editing}
+                />
+              </View>
+            )}
+
+            {/* Gatillos y Protectores - Expandible */}
+            <TouchableOpacity 
+              style={styles.expandableSection}
+              onPress={() => setActiveSection(activeSection === 'triggers' ? null : 'triggers')}
+            >
+              <View style={styles.expandableHeader}>
+                <View style={[styles.expandableIcon, { backgroundColor: '#FEE2E2' }]}>
+                  <Ionicons name="warning" size={20} color="#EF4444" />
+                </View>
+                <View style={styles.expandableInfo}>
+                  <Text style={styles.expandableTitle}>Gatillos y Protectores</Text>
+                  <Text style={styles.expandableSubtitle}>Lo que te afecta y lo que te ayuda</Text>
+                </View>
+                <Ionicons 
+                  name={activeSection === 'triggers' ? 'chevron-up' : 'chevron-down'} 
+                  size={20} 
+                  color="#6B7280" 
+                />
+              </View>
+            </TouchableOpacity>
+
+            {activeSection === 'triggers' && (
+              <View style={styles.expandableContent}>
+                <Text style={styles.subsectionTitle}>⚠️ Gatillos</Text>
+                <Text style={styles.subsectionDesc}>Personas, lugares, emociones que activan el deseo</Text>
+                {(formData.triggers || []).map((trigger: string, index: number) => (
+                  <View key={index} style={styles.tagItem}>
+                    <Text style={styles.tagText}>{trigger}</Text>
+                    {editing && (
+                      <TouchableOpacity onPress={() => removeItemFromList('triggers', index)}>
+                        <Ionicons name="close-circle" size={20} color="#EF4444" />
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                ))}
+                {editing && (
                   <TextInput
                     style={styles.input}
-                    value={contact.name}
-                    onChangeText={(text) =>
-                      updateEmergencyContact(index, 'name', text)
-                }
-                placeholder="Nombre"
-                editable={editing}
-              />
-              <TextInput
-                style={styles.input}
-                value={contact.phone}
-                onChangeText={(text) =>
-                  updateEmergencyContact(index, 'phone', text)
-                }
-                placeholder="Teléfono"
-                keyboardType="phone-pad"
-                editable={editing}
-              />
-              <TextInput
-                style={styles.input}
-                value={contact.relationship}
-                onChangeText={(text) =>
-                  updateEmergencyContact(index, 'relationship', text)
-                }
-                placeholder="Relación (ej: Padrino, Terapeuta)"
-                editable={editing}
-              />
-              {editing && (
-                <TouchableOpacity
-                  style={styles.removeButton}
-                  onPress={() => removeEmergencyContact(index)}
-                >
-                  <Text style={styles.removeButtonText}>Eliminar</Text>
-                </TouchableOpacity>
-              )}
-              {!editing && contact.phone && (
-                <TouchableOpacity style={styles.callButton}>
-                  <Ionicons name="call" size={20} color="#FFFFFF" />
-                  <Text style={styles.callButtonText}>Llamar</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          ))}
-          {editing && (
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={addEmergencyContact}
-            >
-              <Ionicons name="add-circle" size={24} color="#10B981" />
-              <Text style={styles.addButtonText}>Agregar contacto</Text>
-            </TouchableOpacity>
-          )}
-        </View>
+                    placeholder="Agregar gatillo y presionar Enter"
+                    onSubmitEditing={(e) => {
+                      addItemToList('triggers', e.nativeEvent.text);
+                      e.currentTarget.clear();
+                    }}
+                  />
+                )}
 
-        {/* Life Story */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Mi Historia 📖</Text>
-          <Text style={styles.sectionDescription}>
-            Hitos importantes, traumas, motivadores
-          </Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            value={formData.life_story || ''}
-            onChangeText={(text) =>
-              setFormData({ ...formData, life_story: text })
-            }
-            placeholder="Escribe tu historia..."
-            multiline
-            numberOfLines={6}
-            textAlignVertical="top"
-            editable={editing}
-          />
-        </View>
+                <Text style={[styles.subsectionTitle, { marginTop: 20 }]}>🛡️ Factores Protectores</Text>
+                <Text style={styles.subsectionDesc}>Lo que te ayuda a mantenerte limpio</Text>
+                {(formData.protective_factors || []).map((factor: string, index: number) => (
+                  <View key={index} style={[styles.tagItem, styles.tagItemProtect]}>
+                    <Text style={[styles.tagText, { color: '#047857' }]}>{factor}</Text>
+                    {editing && (
+                      <TouchableOpacity onPress={() => removeItemFromList('protective_factors', index)}>
+                        <Ionicons name="close-circle" size={20} color="#10B981" />
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                ))}
+                {editing && (
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Agregar factor protector y presionar Enter"
+                    onSubmitEditing={(e) => {
+                      addItemToList('protective_factors', e.nativeEvent.text);
+                      e.currentTarget.clear();
+                    }}
+                  />
+                )}
+              </View>
+            )}
+
+            {/* Contactos de Emergencia - Expandible */}
+            <TouchableOpacity 
+              style={styles.expandableSection}
+              onPress={() => setActiveSection(activeSection === 'emergency' ? null : 'emergency')}
+            >
+              <View style={styles.expandableHeader}>
+                <View style={[styles.expandableIcon, { backgroundColor: '#ECFDF5' }]}>
+                  <Ionicons name="call" size={20} color="#10B981" />
+                </View>
+                <View style={styles.expandableInfo}>
+                  <Text style={styles.expandableTitle}>Contactos de Emergencia</Text>
+                  <Text style={styles.expandableSubtitle}>
+                    {(formData.emergency_contacts || []).length} contacto(s) guardado(s)
+                  </Text>
+                </View>
+                <Ionicons 
+                  name={activeSection === 'emergency' ? 'chevron-up' : 'chevron-down'} 
+                  size={20} 
+                  color="#6B7280" 
+                />
+              </View>
+            </TouchableOpacity>
+
+            {activeSection === 'emergency' && (
+              <View style={styles.expandableContent}>
+                {(formData.emergency_contacts || []).map((contact: any, index: number) => (
+                  <View key={index} style={styles.contactCard}>
+                    <TextInput
+                      style={styles.input}
+                      value={contact.name}
+                      onChangeText={(text) => updateEmergencyContact(index, 'name', text)}
+                      placeholder="Nombre"
+                      editable={editing}
+                    />
+                    <TextInput
+                      style={styles.input}
+                      value={contact.phone}
+                      onChangeText={(text) => updateEmergencyContact(index, 'phone', text)}
+                      placeholder="Teléfono"
+                      keyboardType="phone-pad"
+                      editable={editing}
+                    />
+                    <TextInput
+                      style={styles.input}
+                      value={contact.relationship}
+                      onChangeText={(text) => updateEmergencyContact(index, 'relationship', text)}
+                      placeholder="Relación (ej: Padrino, Terapeuta)"
+                      editable={editing}
+                    />
+                    {editing && (
+                      <TouchableOpacity
+                        style={styles.removeButton}
+                        onPress={() => removeEmergencyContact(index)}
+                      >
+                        <Text style={styles.removeButtonText}>Eliminar</Text>
+                      </TouchableOpacity>
+                    )}
+                    {!editing && contact.phone && (
+                      <TouchableOpacity style={styles.callButton}>
+                        <Ionicons name="call" size={20} color="#FFFFFF" />
+                        <Text style={styles.callButtonText}>Llamar</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                ))}
+                {editing && (
+                  <TouchableOpacity style={styles.addButton} onPress={addEmergencyContact}>
+                    <Ionicons name="add-circle" size={24} color="#10B981" />
+                    <Text style={styles.addButtonText}>Agregar contacto</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
+
+            {/* Mi Historia - Expandible */}
+            <TouchableOpacity 
+              style={styles.expandableSection}
+              onPress={() => setActiveSection(activeSection === 'story' ? null : 'story')}
+            >
+              <View style={styles.expandableHeader}>
+                <View style={[styles.expandableIcon, { backgroundColor: '#EDE9FE' }]}>
+                  <Ionicons name="book" size={20} color="#8B5CF6" />
+                </View>
+                <View style={styles.expandableInfo}>
+                  <Text style={styles.expandableTitle}>Mi Historia</Text>
+                  <Text style={styles.expandableSubtitle}>Hitos importantes y motivadores</Text>
+                </View>
+                <Ionicons 
+                  name={activeSection === 'story' ? 'chevron-up' : 'chevron-down'} 
+                  size={20} 
+                  color="#6B7280" 
+                />
+              </View>
+            </TouchableOpacity>
+
+            {activeSection === 'story' && (
+              <View style={styles.expandableContent}>
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  value={formData.life_story || ''}
+                  onChangeText={(text) => setFormData({ ...formData, life_story: text })}
+                  placeholder="Escribe tu historia, hitos importantes, traumas, motivadores..."
+                  multiline
+                  numberOfLines={6}
+                  textAlignVertical="top"
+                  editable={editing}
+                />
+              </View>
+            )}
+
+            {/* Linked Therapist Section */}
+            {profile?.linked_therapist_id ? (
+              <View style={styles.therapistCard}>
+                <View style={styles.therapistLinkedAvatar}>
+                  <Ionicons name="medical" size={24} color="#8B5CF6" />
+                </View>
+                <View style={styles.therapistLinkedInfo}>
+                  <Text style={styles.therapistLinkedName}>Terapeuta vinculado</Text>
+                  <Text style={styles.therapistLinkedStatus}>
+                    Tu progreso es monitoreado
+                  </Text>
+                </View>
+                <Ionicons name="checkmark-circle" size={24} color="#10B981" />
+              </View>
+            ) : (
+              <View style={styles.noTherapistCard}>
+                <Ionicons name="information-circle" size={20} color="#6B7280" />
+                <Text style={styles.noTherapistText}>
+                  No tienes un terapeuta vinculado. Tu terapeuta puede vincularte usando tu email.
+                </Text>
+              </View>
+            )}
 
             <View style={{ height: 40 }} />
           </>
