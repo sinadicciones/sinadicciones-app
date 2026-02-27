@@ -1257,4 +1257,52 @@ const styles = StyleSheet.create({
     color: '#10B981',
     fontWeight: '500',
   },
+  // Insights Button Styles
+  insightsButton: {
+    marginHorizontal: 16,
+    marginBottom: 16,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  insightsButtonGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    gap: 12,
+  },
+  insightsButtonContent: {
+    flex: 1,
+  },
+  insightsButtonTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  insightsButtonSubtitle: {
+    fontSize: 12,
+    color: '#E9D5FF',
+    marginTop: 2,
+  },
+  // Modal Styles
+  insightsModal: {
+    flex: 1,
+    backgroundColor: '#F9FAFB',
+  },
+  insightsModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 12,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  insightsModalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1F2937',
+  },
 });
