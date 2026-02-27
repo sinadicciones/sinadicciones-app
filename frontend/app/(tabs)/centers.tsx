@@ -10,6 +10,8 @@ import {
   ActivityIndicator,
   TextInput,
   Alert,
+  Modal,
+  Pressable,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -19,20 +21,23 @@ import { authenticatedFetch, getBackendURL } from '../../utils/api';
 const BACKEND_URL = getBackendURL();
 const SINADICCIONES_API = 'https://sinadicciones.org/api';
 
-const QUICK_FILTERS = [
+const MODALITY_OPTIONS = [
   { label: 'Todos', value: 'all' },
   { label: 'Residencial', value: 'Residencial' },
   { label: 'Ambulatorio', value: 'Ambulatorio' },
   { label: 'Online', value: 'Online' },
 ];
 
-const CITY_FILTERS = [
-  { label: 'Todas', value: 'all' },
+const CITY_OPTIONS = [
+  { label: 'Todas las ciudades', value: 'all' },
   { label: 'Santiago', value: 'Santiago' },
   { label: 'Valparaíso', value: 'Valparaíso' },
   { label: 'Concepción', value: 'Concepción' },
   { label: 'Antofagasta', value: 'Antofagasta' },
   { label: 'Temuco', value: 'Temuco' },
+  { label: 'La Serena', value: 'La Serena' },
+  { label: 'Talca', value: 'Talca' },
+  { label: 'Viña del Mar', value: 'Viña del Mar' },
 ];
 
 const TABS = [
@@ -40,6 +45,84 @@ const TABS = [
   { label: 'Terapeutas', value: 'therapists', icon: 'people' },
   { label: 'Talleres', value: 'workshops', icon: 'calendar' },
 ];
+
+// Dropdown Component
+const FilterDropdown = ({ 
+  label, 
+  value, 
+  options, 
+  onSelect, 
+  icon,
+  color = '#10B981' 
+}: {
+  label: string;
+  value: string;
+  options: { label: string; value: string }[];
+  onSelect: (value: string) => void;
+  icon: string;
+  color?: string;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const selectedOption = options.find(o => o.value === value);
+
+  return (
+    <>
+      <TouchableOpacity 
+        style={[styles.dropdown, { borderColor: value !== 'all' ? color : '#E5E7EB' }]}
+        onPress={() => setIsOpen(true)}
+      >
+        <Ionicons name={icon as any} size={16} color={value !== 'all' ? color : '#6B7280'} />
+        <Text style={[styles.dropdownText, value !== 'all' && { color }]} numberOfLines={1}>
+          {selectedOption?.label || label}
+        </Text>
+        <Ionicons name="chevron-down" size={16} color={value !== 'all' ? color : '#6B7280'} />
+      </TouchableOpacity>
+
+      <Modal
+        visible={isOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setIsOpen(false)}
+      >
+        <Pressable style={styles.modalOverlay} onPress={() => setIsOpen(false)}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{label}</Text>
+              <TouchableOpacity onPress={() => setIsOpen(false)}>
+                <Ionicons name="close" size={24} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.optionsList}>
+              {options.map((option) => (
+                <TouchableOpacity
+                  key={option.value}
+                  style={[
+                    styles.optionItem,
+                    value === option.value && { backgroundColor: `${color}15` }
+                  ]}
+                  onPress={() => {
+                    onSelect(option.value);
+                    setIsOpen(false);
+                  }}
+                >
+                  <Text style={[
+                    styles.optionText,
+                    value === option.value && { color, fontWeight: '600' }
+                  ]}>
+                    {option.label}
+                  </Text>
+                  {value === option.value && (
+                    <Ionicons name="checkmark" size={20} color={color} />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </Pressable>
+      </Modal>
+    </>
+  );
+};
 
 export default function CentersScreen() {
   const [activeTab, setActiveTab] = useState('centers');
@@ -75,7 +158,6 @@ export default function CentersScreen() {
   const fetchCenters = async () => {
     try {
       setError(null);
-      // Build query params for sinadicciones.org API
       const params = new URLSearchParams();
       if (activeFilter !== 'all') {
         params.append('modality', activeFilter);
@@ -100,7 +182,6 @@ export default function CentersScreen() {
     } catch (err) {
       console.error('Error fetching centers:', err);
       setError('No se pudieron cargar los centros');
-      // Fallback to local backend
       try {
         const response = await fetch(`${BACKEND_URL}/api/centers`);
         if (response.ok) {
@@ -115,7 +196,6 @@ export default function CentersScreen() {
 
   const fetchTherapists = async () => {
     try {
-      // Fetch from sinadicciones.org API
       const params = new URLSearchParams();
       if (cityFilter !== 'all') {
         params.append('city', cityFilter);
@@ -131,7 +211,6 @@ export default function CentersScreen() {
       }
     } catch (err) {
       console.error('Error fetching therapists:', err);
-      // Fallback to local backend
       try {
         const response = await authenticatedFetch(`${BACKEND_URL}/api/therapists/search?query=`);
         if (response.ok) {
@@ -166,7 +245,7 @@ export default function CentersScreen() {
 
   const onRefresh = () => {
     setRefreshing(true);
-    fetchData();
+    fetchData().finally(() => setRefreshing(false));
   };
 
   const handleOpenCenter = (url: string) => {
@@ -178,10 +257,8 @@ export default function CentersScreen() {
   };
 
   const handleWhatsApp = (phone: string, name: string, isTherapist: boolean = false) => {
-    // Limpiar el número de teléfono
     let cleanPhone = phone.replace(/\s/g, '').replace(/[^0-9+]/g, '');
     
-    // Si el número empieza con +56, está bien. Si no, agregar código de Chile
     if (!cleanPhone.startsWith('+')) {
       if (cleanPhone.startsWith('56')) {
         cleanPhone = '+' + cleanPhone;
@@ -192,13 +269,11 @@ export default function CentersScreen() {
       }
     }
     
-    // Mensaje predefinido
     const message = isTherapist 
       ? `Hola ${name}, encontré tu perfil en la app SinAdicciones y me gustaría consultar sobre una sesión de terapia.`
       : `Hola estoy interesado, encontré tu servicio en Sinadicciones.cl, puedes darme más información del centro`;
     const encodedMessage = encodeURIComponent(message);
     
-    // Remover el + para la URL de WhatsApp
     const whatsappNumber = cleanPhone.replace('+', '');
     
     if (whatsappNumber) {
@@ -229,6 +304,14 @@ export default function CentersScreen() {
     );
   };
 
+  const clearFilters = () => {
+    setActiveFilter('all');
+    setCityFilter('all');
+    setSearchQuery('');
+  };
+
+  const hasActiveFilters = activeFilter !== 'all' || cityFilter !== 'all' || searchQuery.length > 0;
+
   // Filter centers based on search query
   const filteredCenters = centers.filter((center) => {
     if (!searchQuery) return true;
@@ -251,12 +334,6 @@ export default function CentersScreen() {
       t.city?.toLowerCase().includes(query)
     );
   });
-
-  const formatLastUpdated = () => {
-    if (!lastUpdated) return '';
-    const date = new Date(lastUpdated);
-    return date.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
-  };
 
   const getProfessionalTypeLabel = (type: string) => {
     const types: Record<string, string> = {
@@ -333,91 +410,58 @@ export default function CentersScreen() {
         ))}
       </View>
 
-      {activeTab === 'centers' ? (
-        <>
-          {/* Search Button for Centers */}
-          <TouchableOpacity style={styles.searchButton} onPress={handleOpenDirectory}>
-            <View style={styles.searchContent}>
-              <Ionicons name="search" size={20} color="#6B7280" />
-              <Text style={styles.searchText}>Buscar con filtros avanzados...</Text>
-            </View>
-            <Ionicons name="open-outline" size={18} color="#10B981" />
+      {/* Search Input - Visible for all tabs */}
+      <View style={styles.searchInputContainer}>
+        <Ionicons name="search" size={20} color="#6B7280" />
+        <TextInput
+          style={styles.searchInput}
+          placeholder={activeTab === 'centers' ? "Buscar centros..." : activeTab === 'therapists' ? "Buscar terapeutas..." : "Buscar talleres..."}
+          placeholderTextColor="#9CA3AF"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        {searchQuery.length > 0 && (
+          <TouchableOpacity onPress={() => setSearchQuery('')}>
+            <Ionicons name="close-circle" size={20} color="#6B7280" />
           </TouchableOpacity>
+        )}
+      </View>
 
-          {/* Quick Filters - Modalidad */}
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false}
-            style={styles.filtersContainer}
-            contentContainerStyle={styles.filtersContent}
-          >
-            {QUICK_FILTERS.map((filter) => (
-              <TouchableOpacity
-                key={filter.value}
-                style={[
-                  styles.filterChip,
-                  activeFilter === filter.value && styles.filterChipActive,
-                ]}
-                onPress={() => setActiveFilter(filter.value)}
-              >
-                <Text
-                  style={[
-                    styles.filterText,
-                    activeFilter === filter.value && styles.filterTextActive,
-                  ]}
-                >
-                  {filter.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+      {/* Compact Filters Row */}
+      <View style={styles.filtersRow}>
+        <FilterDropdown
+          label="Modalidad"
+          value={activeFilter}
+          options={MODALITY_OPTIONS}
+          onSelect={setActiveFilter}
+          icon="options"
+          color="#10B981"
+        />
+        <FilterDropdown
+          label="Ciudad"
+          value={cityFilter}
+          options={CITY_OPTIONS}
+          onSelect={setCityFilter}
+          icon="location"
+          color="#8B5CF6"
+        />
+        {hasActiveFilters && (
+          <TouchableOpacity style={styles.clearButton} onPress={clearFilters}>
+            <Ionicons name="close-circle" size={18} color="#EF4444" />
+          </TouchableOpacity>
+        )}
+      </View>
 
-          {/* City Filters */}
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false}
-            style={styles.filtersContainer}
-            contentContainerStyle={styles.filtersContent}
-          >
-            <Text style={styles.filterLabel}>Ciudad:</Text>
-            {CITY_FILTERS.map((filter) => (
-              <TouchableOpacity
-                key={filter.value}
-                style={[
-                  styles.filterChip,
-                  { borderColor: '#8B5CF6' },
-                  cityFilter === filter.value && [styles.filterChipActive, { backgroundColor: '#8B5CF6' }],
-                ]}
-                onPress={() => setCityFilter(filter.value)}
-              >
-                <Text
-                  style={[
-                    styles.filterText,
-                    { color: cityFilter === filter.value ? '#FFFFFF' : '#8B5CF6' },
-                  ]}
-                >
-                  {filter.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </>
-      ) : (
-        /* Search Input for Therapists */
-        <View style={styles.searchInputContainer}>
-          <Ionicons name="search" size={20} color="#6B7280" />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Buscar por nombre, especialización..."
-            placeholderTextColor="#9CA3AF"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Ionicons name="close-circle" size={20} color="#6B7280" />
-            </TouchableOpacity>
-          )}
+      {/* Active Filters Summary */}
+      {hasActiveFilters && (
+        <View style={styles.activeFiltersBar}>
+          <Ionicons name="filter" size={14} color="#6B7280" />
+          <Text style={styles.activeFiltersText}>
+            Filtros: {activeFilter !== 'all' ? MODALITY_OPTIONS.find(o => o.value === activeFilter)?.label : ''} 
+            {activeFilter !== 'all' && cityFilter !== 'all' ? ' • ' : ''}
+            {cityFilter !== 'all' ? CITY_OPTIONS.find(o => o.value === cityFilter)?.label : ''}
+            {searchQuery ? ` • "${searchQuery}"` : ''}
+          </Text>
         </View>
       )}
 
@@ -583,7 +627,7 @@ export default function CentersScreen() {
               </TouchableOpacity>
             </>
           )
-        ) : (
+        ) : activeTab === 'therapists' ? (
           /* Therapists List */
           filteredTherapists.length === 0 ? (
             <View style={styles.emptyState}>
@@ -613,11 +657,7 @@ export default function CentersScreen() {
                 <View key={therapist.id || index} style={styles.therapistCard}>
                   <View style={styles.therapistHeader}>
                     <View style={styles.therapistAvatar}>
-                      {therapist.photo ? (
-                        <Ionicons name="person" size={28} color="#8B5CF6" />
-                      ) : (
-                        <Ionicons name="person" size={28} color="#8B5CF6" />
-                      )}
+                      <Ionicons name="person" size={28} color="#8B5CF6" />
                     </View>
                     <View style={styles.therapistInfo}>
                       <Text style={styles.therapistName}>{therapist.name}</Text>
@@ -653,7 +693,6 @@ export default function CentersScreen() {
                     </View>
                   )}
 
-                  {/* Old fields for backwards compatibility */}
                   {therapist.specialization && !therapist.subspecialties && (
                     <View style={styles.therapistDetail}>
                       <Ionicons name="medical" size={16} color="#6B7280" />
@@ -729,10 +768,8 @@ export default function CentersScreen() {
               ))}
             </>
           )
-        )}
-
-        {/* Workshops List */}
-        {activeTab === 'workshops' && (
+        ) : (
+          /* Workshops List */
           workshops.length === 0 ? (
             <View style={styles.emptyState}>
               <Ionicons name="calendar" size={48} color="#D1D5DB" />
@@ -754,7 +791,7 @@ export default function CentersScreen() {
               <View style={[styles.infoBanner, { backgroundColor: '#FEF3C7' }]}>
                 <Ionicons name="sparkles" size={20} color="#D97706" />
                 <Text style={[styles.infoBannerText, { color: '#92400E' }]}>
-                  Talleres de bienestar y apoyo: yoga, meditación, arte terapia y más actividades para tu recuperación.
+                  Talleres de bienestar y apoyo: yoga, meditación, arte terapia y más.
                 </Text>
               </View>
 
@@ -903,7 +940,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
+    paddingVertical: 10,
     borderRadius: 10,
     gap: 6,
   },
@@ -911,7 +948,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#D1FAE5',
   },
   tabText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
     color: '#6B7280',
   },
@@ -928,34 +965,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#6B7280',
   },
-  searchButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    margin: 16,
-    marginBottom: 8,
-    padding: 14,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    gap: 8,
-  },
-  searchContent: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  searchText: {
-    fontSize: 14,
-    color: '#6B7280',
-  },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
     marginHorizontal: 16,
-    marginVertical: 8,
+    marginTop: 12,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 12,
@@ -968,40 +983,86 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#1F2937',
   },
-  filtersContainer: {
-    maxHeight: 50,
-  },
-  filtersContent: {
+  // Compact Filters
+  filtersRow: {
+    flexDirection: 'row',
     paddingHorizontal: 16,
-    gap: 8,
+    paddingVertical: 10,
+    gap: 10,
+    alignItems: 'center',
   },
-  filterChip: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
+  dropdown: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#FFFFFF',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: '#E5E7EB',
-    marginRight: 8,
+    gap: 6,
   },
-  filterChipActive: {
-    backgroundColor: '#10B981',
-    borderColor: '#10B981',
-  },
-  filterText: {
-    fontSize: 14,
+  dropdownText: {
+    flex: 1,
+    fontSize: 13,
     color: '#6B7280',
-    fontWeight: '500',
   },
-  filterTextActive: {
-    color: '#FFFFFF',
+  clearButton: {
+    padding: 6,
   },
-  filterLabel: {
-    fontSize: 14,
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '60%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1F2937',
+  },
+  optionsList: {
+    paddingBottom: 20,
+  },
+  optionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+  },
+  optionText: {
+    fontSize: 16,
     color: '#4B5563',
-    fontWeight: '600',
-    marginRight: 8,
-    alignSelf: 'center',
+  },
+  // Active Filters Summary
+  activeFiltersBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+    gap: 6,
+  },
+  activeFiltersText: {
+    fontSize: 12,
+    color: '#6B7280',
+    flex: 1,
   },
   errorBanner: {
     flexDirection: 'row',
@@ -1075,8 +1136,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#6B7280',
     paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 12,
+    paddingTop: 12,
+    paddingBottom: 10,
   },
   centerCard: {
     backgroundColor: '#FFFFFF',
@@ -1264,10 +1325,13 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   availableBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#D1FAE5',
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
+    gap: 4,
   },
   availableBadgeText: {
     fontSize: 11,
