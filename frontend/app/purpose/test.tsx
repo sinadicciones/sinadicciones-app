@@ -139,14 +139,16 @@ export default function PurposeTestScreen() {
       >
         <View style={styles.headerTop}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+            <Ionicons name="arrow-back" size={20} color="#FFFFFF" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => router.push('/(tabs)/home')} style={styles.homeButton}>
-            <Ionicons name="home" size={24} color="#FFFFFF" />
+          <View style={styles.headerTitleContainer}>
+            <Text style={styles.headerTitle}>Test de Descubrimiento</Text>
+            <Text style={styles.headerSubtitle}>Paso {step} de {totalSteps}</Text>
+          </View>
+          <TouchableOpacity onPress={() => router.push('/(tabs)/home')} style={styles.backButton}>
+            <Ionicons name="home" size={20} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
-        <Text style={styles.headerTitle}>Test de Descubrimiento</Text>
-        <Text style={styles.headerSubtitle}>Paso {step} de {totalSteps}</Text>
         <View style={styles.progressBar}>
           <View style={[styles.progress, { width: `${(step / totalSteps) * 100}%` }]} />
         </View>
