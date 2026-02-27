@@ -14,6 +14,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BarChart } from 'react-native-gifted-charts';
 import { format } from 'date-fns';
 import { authenticatedFetch, getBackendURL } from '../../utils/api';
+import EmotionalInsights from '../../components/EmotionalInsights';
 
 const BACKEND_URL = getBackendURL();
 
