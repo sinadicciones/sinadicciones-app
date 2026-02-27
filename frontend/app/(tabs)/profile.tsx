@@ -1281,19 +1281,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   header: {
-    paddingTop: 60,
-    paddingBottom: 24,
-    paddingHorizontal: 24,
+    paddingTop: 50,
+    paddingBottom: 16,
+    paddingHorizontal: 20,
   },
   headerTitle: {
-    fontSize: 32,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
   headerSubtitle: {
-    fontSize: 16,
+    fontSize: 13,
     color: '#FEF3C7',
-    marginTop: 4,
+    marginTop: 2,
   },
   content: {
     flex: 1,
