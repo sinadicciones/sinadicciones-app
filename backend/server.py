@@ -710,7 +710,7 @@ async def get_professional_patients(current_user: User = Depends(get_current_use
                 "profile": patient
             })
     
-    return results
+    return {"patients": results}
 
 @app.get("/api/professional/patient/{patient_id}")
 async def get_patient_detail(patient_id: str, current_user: User = Depends(get_current_user)):
