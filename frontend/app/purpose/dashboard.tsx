@@ -926,14 +926,14 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingTop: 10,
-    paddingBottom: 24,
-    paddingHorizontal: 24,
+    paddingBottom: 14,
+    paddingHorizontal: 20,
   },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   backButton: {
     padding: 4,
@@ -942,13 +942,13 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#FFFFFF',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   headerSubtitle: {
-    fontSize: 16,
+    fontSize: 13,
     color: '#FEF3C7',
   },
   content: {
