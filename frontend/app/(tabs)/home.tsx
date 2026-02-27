@@ -797,9 +797,9 @@ const styles = StyleSheet.create({
   },
   sobrietyCard: {
     backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: 16,
-    padding: 16,
-    marginTop: 16,
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 10,
     alignItems: 'center',
   },
   sobrietyMain: {
