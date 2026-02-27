@@ -1345,7 +1345,7 @@ async def get_professional_alerts(current_user: User = Depends(get_current_user)
     severity_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
     alerts.sort(key=lambda x: (severity_order.get(x["severity"], 4), x["created_at"]), reverse=False)
     
-    return alerts
+    return {"alerts": alerts}
 
 @app.get("/api/professional/alerts/summary")
 async def get_alerts_summary(current_user: User = Depends(get_current_user)):
