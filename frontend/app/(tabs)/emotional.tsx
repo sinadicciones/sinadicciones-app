@@ -306,6 +306,24 @@ export default function EmotionalScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Modal de Insights */}
+      <Modal
+        visible={showInsights}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowInsights(false)}
+      >
+        <View style={styles.insightsModal}>
+          <View style={styles.insightsModalHeader}>
+            <Text style={styles.insightsModalTitle}>💭 Análisis Emocional</Text>
+            <TouchableOpacity onPress={() => setShowInsights(false)}>
+              <Ionicons name="close" size={28} color="#6B7280" />
+            </TouchableOpacity>
+          </View>
+          <EmotionalInsights onClose={() => setShowInsights(false)} />
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -316,19 +334,76 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9FAFB',
   },
   header: {
-    paddingTop: 60,
-    paddingBottom: 24,
-    paddingHorizontal: 24,
+    paddingTop: 50,
+    paddingBottom: 16,
+    paddingHorizontal: 20,
+  },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  insightsBtn: {
+    backgroundColor: '#FFFFFF',
+    padding: 10,
+    borderRadius: 12,
   },
   headerTitle: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
   headerSubtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#FAE8FF',
     marginTop: 4,
+  },
+  // Insights Card Styles
+  insightsCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FCE7F3',
+    marginHorizontal: 16,
+    marginTop: 12,
+    marginBottom: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    gap: 12,
+  },
+  insightsCardContent: {
+    flex: 1,
+  },
+  insightsCardTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#BE185D',
+  },
+  insightsCardSubtitle: {
+    fontSize: 12,
+    color: '#EC4899',
+    marginTop: 2,
+  },
+  // Modal Styles
+  insightsModal: {
+    flex: 1,
+    backgroundColor: '#F9FAFB',
+  },
+  insightsModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 12,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  insightsModalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1F2937',
   },
   content: {
     flex: 1,
