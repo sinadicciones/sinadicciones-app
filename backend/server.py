@@ -1406,7 +1406,7 @@ async def get_patient_relapses(current_user: User = Depends(get_current_user)):
 
 # ============== ADMIN ENDPOINTS ==============
 
-ADMIN_EMAIL = "contacto@sinadicciones.cl"
+ADMIN_EMAIL = "contacto@sinadicciones.org"
 
 async def is_admin(user: User) -> bool:
     """Check if user is admin"""
@@ -2487,87 +2487,87 @@ centers_cache = {
     "cache_duration": 300  # 5 minutes cache
 }
 
-# Hardcoded centers data as fallback (from sinadicciones.cl)
+# Hardcoded centers data as fallback (from sinadicciones.org)
 FALLBACK_CENTERS = [
     {
         "name": "Centro rehabilitación de Drogas Mixto - Existencia Plena",
-        "url": "https://sinadicciones.cl/listing/centro-rehabilitacion-existencia-plena/",
+        "url": "https://sinadicciones.org/listing/centro-rehabilitacion-existencia-plena/",
         "description": "Se puede, pero no solo!",
         "phone": "+56 9 5402 0968",
         "address": "El Copihue 3238, Calera de Tango",
         "price": "Desde $1M a $1.2M",
         "modalities": ["Online", "Residencial", "Ambulatorio"],
-        "image": "https://sinadicciones.cl/wp-content/uploads/2025/10/9a0e1ef6782c77-1-768x512.jpg"
+        "image": "https://sinadicciones.org/wp-content/uploads/2025/10/9a0e1ef6782c77-1-768x512.jpg"
     },
     {
         "name": "Tratamiento Adicciones Los Olivos - Arica",
-        "url": "https://sinadicciones.cl/listing/tratamiento-adicciones-los-olivos-arica/",
+        "url": "https://sinadicciones.org/listing/tratamiento-adicciones-los-olivos-arica/",
         "description": "Programa de Tratamiento Los Olivos – Ambulatorio y Residencial",
         "phone": "58 2 24 6387",
         "address": "Arica",
         "price": "Consultar",
         "modalities": ["Residencial", "Ambulatorio"],
-        "image": "https://sinadicciones.cl/wp-content/uploads/2025/10/e08471078e9a00-1-768x512.jpg"
+        "image": "https://sinadicciones.org/wp-content/uploads/2025/10/e08471078e9a00-1-768x512.jpg"
     },
     {
         "name": "Centro Clínico Comunitario de Drogas - Puerto Montt",
-        "url": "https://sinadicciones.cl/listing/centro-clinico-comunitario-de-drogas-puerto-montt/",
+        "url": "https://sinadicciones.org/listing/centro-clinico-comunitario-de-drogas-puerto-montt/",
         "description": "Universidad Austral De Chile",
         "phone": "+56 9 4163 8395",
         "address": "Puerto Montt",
         "price": "Gratis",
         "modalities": ["Ambulatorio"],
-        "image": "https://sinadicciones.cl/wp-content/uploads/2025/10/e08471078e9a00-1-768x512.jpg"
+        "image": "https://sinadicciones.org/wp-content/uploads/2025/10/e08471078e9a00-1-768x512.jpg"
     },
     {
         "name": "Centro de Rehabilitación de Drogas - Nawel Chile",
-        "url": "https://sinadicciones.cl/listing/centro-de-rehabilitacion-de-drogas-nawel-chile/",
+        "url": "https://sinadicciones.org/listing/centro-de-rehabilitacion-de-drogas-nawel-chile/",
         "description": "El Rumbo a Seguir",
         "phone": "+56 9 35450840",
         "address": "San Joaquin de los Mayos, Machalí",
         "price": "Desde $500.000 a $700.000",
         "modalities": ["Residencial"],
-        "image": "https://sinadicciones.cl/wp-content/uploads/2025/10/e08471078e9a00-1-768x512.jpg"
+        "image": "https://sinadicciones.org/wp-content/uploads/2025/10/e08471078e9a00-1-768x512.jpg"
     },
     {
         "name": "Comunidad Terapéutica de Mujeres - Suyaí",
-        "url": "https://sinadicciones.cl/listing/comunidad-terapeutica-de-mujeres-suyai/",
+        "url": "https://sinadicciones.org/listing/comunidad-terapeutica-de-mujeres-suyai/",
         "description": "Comunidad terapéutica de adicciones para mujeres",
         "phone": "+569 2230 8440",
         "address": "Mirador del Valle 68, Lampa",
         "price": "Desde $250.000 a $500.000",
         "modalities": ["Residencial"],
-        "image": "https://sinadicciones.cl/wp-content/uploads/2025/10/e08471078e9a00-1-768x512.jpg"
+        "image": "https://sinadicciones.org/wp-content/uploads/2025/10/e08471078e9a00-1-768x512.jpg"
     },
     {
         "name": "Fundación Paréntesis - Santiago",
-        "url": "https://sinadicciones.cl/listing/fundacion-parentesis-santiago/",
+        "url": "https://sinadicciones.org/listing/fundacion-parentesis-santiago/",
         "description": "Atención especializada en adicciones",
         "phone": "+56 2 2634 4760",
         "address": "Santiago Centro",
         "price": "Consultar",
         "modalities": ["Ambulatorio", "Online"],
-        "image": "https://sinadicciones.cl/wp-content/uploads/2025/10/e08471078e9a00-1-768x512.jpg"
+        "image": "https://sinadicciones.org/wp-content/uploads/2025/10/e08471078e9a00-1-768x512.jpg"
     },
     {
         "name": "Centro de Tratamiento Renacer",
-        "url": "https://sinadicciones.cl/listing/centro-tratamiento-renacer/",
+        "url": "https://sinadicciones.org/listing/centro-tratamiento-renacer/",
         "description": "Recuperación integral para personas con adicciones",
         "phone": "+56 9 8765 4321",
         "address": "Viña del Mar",
         "price": "Desde $500.000 a $700.000",
         "modalities": ["Residencial"],
-        "image": "https://sinadicciones.cl/wp-content/uploads/2025/10/e08471078e9a00-1-768x512.jpg"
+        "image": "https://sinadicciones.org/wp-content/uploads/2025/10/e08471078e9a00-1-768x512.jpg"
     },
     {
         "name": "Comunidad Terapéutica Nueva Vida",
-        "url": "https://sinadicciones.cl/listing/comunidad-terapeutica-nueva-vida/",
+        "url": "https://sinadicciones.org/listing/comunidad-terapeutica-nueva-vida/",
         "description": "Tratamiento residencial especializado",
         "phone": "+56 9 1234 5678",
         "address": "Concepción",
         "price": "Desde $250.000 a $500.000",
         "modalities": ["Residencial", "Ambulatorio"],
-        "image": "https://sinadicciones.cl/wp-content/uploads/2025/10/e08471078e9a00-1-768x512.jpg"
+        "image": "https://sinadicciones.org/wp-content/uploads/2025/10/e08471078e9a00-1-768x512.jpg"
     }
 ]
 
@@ -2672,7 +2672,7 @@ def parse_centers_from_html(html: str) -> list:
 
 @app.get("/api/centers")
 async def get_centers():
-    """Fetch rehabilitation centers from sinadicciones.cl"""
+    """Fetch rehabilitation centers from sinadicciones.org"""
     
     # Check cache first
     now = datetime.now(timezone.utc)
@@ -2690,7 +2690,7 @@ async def get_centers():
         # Use a proper browser-like request
         async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
             response = await client.get(
-                "https://sinadicciones.cl/explore-no-map/?type=place&sort=latest",
+                "https://sinadicciones.org/explore-no-map/?type=place&sort=latest",
                 headers={
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
