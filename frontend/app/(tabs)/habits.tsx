@@ -266,6 +266,24 @@ export default function HabitsScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Modal de Insights */}
+      <Modal
+        visible={showInsights}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowInsights(false)}
+      >
+        <View style={styles.insightsModal}>
+          <View style={styles.insightsModalHeader}>
+            <Text style={styles.insightsModalTitle}>📊 Análisis de Hábitos</Text>
+            <TouchableOpacity onPress={() => setShowInsights(false)}>
+              <Ionicons name="close" size={28} color="#6B7280" />
+            </TouchableOpacity>
+          </View>
+          <HabitsInsights onClose={() => setShowInsights(false)} />
+        </View>
+      </Modal>
     </View>
   );
 }
