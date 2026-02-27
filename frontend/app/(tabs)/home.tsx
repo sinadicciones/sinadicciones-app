@@ -183,6 +183,7 @@ const AlertCard = ({ alert, onPress }: { alert: any; onPress: () => void }) => {
 
 export default function HomeScreen() {
   const { user, logout } = useAuth();
+  const { unreadCount } = useNotifications();
   const router = useRouter();
   const [dashboard, setDashboard] = useState<any>(null);
   const [habits, setHabits] = useState<any[]>([]);
@@ -191,6 +192,7 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [profile, setProfile] = useState<any>(null);
   const [showInsights, setShowInsights] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(() => {
     loadData();
