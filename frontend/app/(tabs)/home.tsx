@@ -764,6 +764,24 @@ export default function HomeScreen() {
 
         <View style={{ height: 100 }} />
       </ScrollView>
+
+      {/* Modal de Insights IA */}
+      <Modal
+        visible={showInsights}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowInsights(false)}
+      >
+        <View style={styles.insightsModal}>
+          <View style={styles.insightsModalHeader}>
+            <Text style={styles.insightsModalTitle}>📊 Mi Análisis</Text>
+            <TouchableOpacity onPress={() => setShowInsights(false)}>
+              <Ionicons name="close" size={28} color="#6B7280" />
+            </TouchableOpacity>
+          </View>
+          <WellnessInsights onClose={() => setShowInsights(false)} />
+        </View>
+      </Modal>
     </View>
   );
 }
