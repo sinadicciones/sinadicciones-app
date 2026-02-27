@@ -484,4 +484,51 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  // Insights Card Styles
+  insightsCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ECFDF5',
+    marginHorizontal: 16,
+    marginTop: 12,
+    marginBottom: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    gap: 12,
+  },
+  insightsCardContent: {
+    flex: 1,
+  },
+  insightsCardTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#059669',
+  },
+  insightsCardSubtitle: {
+    fontSize: 12,
+    color: '#10B981',
+    marginTop: 2,
+  },
+  // Modal Styles
+  insightsModal: {
+    flex: 1,
+    backgroundColor: '#F9FAFB',
+  },
+  insightsModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 12,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  insightsModalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1F2937',
+  },
 });
