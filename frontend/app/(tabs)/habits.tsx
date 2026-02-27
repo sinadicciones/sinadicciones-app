@@ -13,6 +13,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { authenticatedFetch, getBackendURL } from '../../utils/api';
+import HabitsInsights from '../../components/HabitsInsights';
 
 const BACKEND_URL = getBackendURL();
 
@@ -24,6 +25,7 @@ export default function HabitsScreen() {
   const [habitName, setHabitName] = useState('');
   const [selectedColor, setSelectedColor] = useState(COLORS[0]);
   const [refreshing, setRefreshing] = useState(false);
+  const [showInsights, setShowInsights] = useState(false);
 
   useEffect(() => {
     loadHabits();
