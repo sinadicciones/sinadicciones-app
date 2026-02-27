@@ -4041,10 +4041,11 @@ def calculate_clean_days(clean_since: str) -> int:
 @app.get("/api/wellness/stats/{period}")
 async def get_wellness_stats(
     period: AnalysisPeriod,
-    user_id: str = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """Get detailed wellness statistics without AI analysis"""
     try:
+        user_id = current_user.user_id
         now = datetime.now(timezone.utc)
         
         if period == AnalysisPeriod.week:
