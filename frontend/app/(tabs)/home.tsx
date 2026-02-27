@@ -478,6 +478,26 @@ export default function HomeScreen() {
           </View>
         )}
 
+        {/* Botón de Insights IA */}
+        <TouchableOpacity 
+          style={styles.insightsButton}
+          onPress={() => setShowInsights(true)}
+        >
+          <LinearGradient
+            colors={['#8B5CF6', '#6366F1']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.insightsButtonGradient}
+          >
+            <Ionicons name="sparkles" size={20} color="#FFFFFF" />
+            <View style={styles.insightsButtonContent}>
+              <Text style={styles.insightsButtonTitle}>📊 Mi Análisis Semanal</Text>
+              <Text style={styles.insightsButtonSubtitle}>IA analiza tus patrones y progreso</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="#FFFFFF" />
+          </LinearGradient>
+        </TouchableOpacity>
+
         {/* Alertas */}
         {alerts.length > 0 && (
           <View style={styles.section}>
