@@ -19,7 +19,7 @@ app = FastAPI()
 # CORS Configuration - Allow specific origins with credentials
 origins = [
     "http://localhost:3000",
-    "https://sinadicciones-app.preview.emergentagent.com",
+    "https://wellness-insights-3.preview.emergentagent.com",
     "https://preview.emergentagent.com",
     "exp://",  # For Expo Go
 ]
