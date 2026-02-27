@@ -1350,7 +1350,8 @@ async def get_professional_alerts(current_user: User = Depends(get_current_user)
 @app.get("/api/professional/alerts/summary")
 async def get_alerts_summary(current_user: User = Depends(get_current_user)):
     """Get a summary count of alerts by type"""
-    alerts = await get_professional_alerts(current_user)
+    alerts_response = await get_professional_alerts(current_user)
+    alerts = alerts_response.get("alerts", [])
     
     summary = {
         "total": len(alerts),
