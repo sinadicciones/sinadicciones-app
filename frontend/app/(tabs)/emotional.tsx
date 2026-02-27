@@ -335,28 +335,28 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingTop: 50,
-    paddingBottom: 16,
-    paddingHorizontal: 20,
+    paddingBottom: 12,
+    paddingHorizontal: 16,
   },
   headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
   insightsBtn: {
     backgroundColor: '#FFFFFF',
-    padding: 10,
-    borderRadius: 12,
+    padding: 8,
+    borderRadius: 10,
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
   headerSubtitle: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#FAE8FF',
-    marginTop: 4,
+    marginTop: 2,
   },
   // Insights Card Styles
   insightsCard: {
