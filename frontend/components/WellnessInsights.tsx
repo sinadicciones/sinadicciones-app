@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { authenticatedFetch, getBackendURL } from '../../utils/api';
+import { authenticatedFetch, getBackendURL } from '../utils/api';
 
 const BACKEND_URL = getBackendURL();
 const { width } = Dimensions.get('window');
