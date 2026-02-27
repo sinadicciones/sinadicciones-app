@@ -4587,6 +4587,465 @@ Genera un análisis JSON con esta estructura exacta (responde SOLO el JSON, sin 
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
 
+# ============== PUSH NOTIFICATIONS ==============
+
+class RegisterPushTokenRequest(BaseModel):
+    user_id: str
+    push_token: str
+    platform: str = "ios"
+
+class NotificationData(BaseModel):
+    title: str
+    body: str
+    data: Optional[dict] = None
+
+# Función para enviar notificación push via Expo
+async def send_push_notification(push_token: str, title: str, body: str, data: dict = None):
+    """Envía una notificación push usando Expo Push API"""
+    if not push_token or not push_token.startswith('ExponentPushToken'):
+        print(f"Token inválido: {push_token}")
+        return False
+    
+    message = {
+        "to": push_token,
+        "sound": "default",
+        "title": title,
+        "body": body,
+        "data": data or {},
+        "badge": 1,
+    }
+    
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "https://exp.host/--/api/v2/push/send",
+                json=message,
+                headers={
+                    "Accept": "application/json",
+                    "Accept-Encoding": "gzip, deflate",
+                    "Content-Type": "application/json",
+                }
+            )
+            result = response.json()
+            print(f"Push notification result: {result}")
+            return response.status_code == 200
+    except Exception as e:
+        print(f"Error enviando push notification: {e}")
+        return False
+
+# Función helper para enviar notificación a un usuario
+async def notify_user(user_id: str, title: str, body: str, notification_type: str, data: dict = None):
+    """Envía notificación push y guarda en base de datos"""
+    # Buscar token del usuario
+    token_doc = await db.push_tokens.find_one({"user_id": user_id})
+    
+    # Guardar notificación en la base de datos
+    notification = {
+        "notification_id": f"notif_{uuid.uuid4().hex[:12]}",
+        "user_id": user_id,
+        "title": title,
+        "body": body,
+        "type": notification_type,
+        "data": data or {},
+        "read": False,
+        "created_at": datetime.now(timezone.utc)
+    }
+    await db.notifications.insert_one(notification)
+    
+    # Enviar push si tiene token
+    if token_doc and token_doc.get("push_token"):
+        await send_push_notification(
+            token_doc["push_token"],
+            title,
+            body,
+            {**data, "notification_id": notification["notification_id"]} if data else {"notification_id": notification["notification_id"]}
+        )
+    
+    return notification["notification_id"]
+
+@app.post("/api/notifications/register-token")
+async def register_push_token(data: RegisterPushTokenRequest, current_user: User = Depends(get_current_user)):
+    """Registrar token de push notification para un usuario"""
+    await db.push_tokens.update_one(
+        {"user_id": data.user_id},
+        {
+            "$set": {
+                "user_id": data.user_id,
+                "push_token": data.push_token,
+                "platform": data.platform,
+                "updated_at": datetime.now(timezone.utc)
+            }
+        },
+        upsert=True
+    )
+    return {"success": True, "message": "Token registrado"}
+
+@app.post("/api/notifications/unregister-token")
+async def unregister_push_token(current_user: User = Depends(get_current_user)):
+    """Eliminar token de push notification (logout)"""
+    await db.push_tokens.delete_one({"user_id": current_user.user_id})
+    return {"success": True, "message": "Token eliminado"}
+
+@app.get("/api/notifications/unread")
+async def get_unread_notifications(current_user: User = Depends(get_current_user)):
+    """Obtener notificaciones no leídas del usuario"""
+    notifications = await db.notifications.find(
+        {"user_id": current_user.user_id, "read": False},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(50)
+    
+    return {"notifications": notifications, "count": len(notifications)}
+
+@app.get("/api/notifications/all")
+async def get_all_notifications(current_user: User = Depends(get_current_user), limit: int = 50):
+    """Obtener todas las notificaciones del usuario"""
+    notifications = await db.notifications.find(
+        {"user_id": current_user.user_id},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(limit)
+    
+    unread_count = await db.notifications.count_documents(
+        {"user_id": current_user.user_id, "read": False}
+    )
+    
+    return {"notifications": notifications, "unread_count": unread_count}
+
+@app.post("/api/notifications/{notification_id}/read")
+async def mark_notification_read(notification_id: str, current_user: User = Depends(get_current_user)):
+    """Marcar una notificación como leída"""
+    result = await db.notifications.update_one(
+        {"notification_id": notification_id, "user_id": current_user.user_id},
+        {"$set": {"read": True, "read_at": datetime.now(timezone.utc)}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Notificación no encontrada")
+    
+    return {"success": True}
+
+@app.post("/api/notifications/mark-all-read")
+async def mark_all_notifications_read(current_user: User = Depends(get_current_user)):
+    """Marcar todas las notificaciones como leídas"""
+    await db.notifications.update_many(
+        {"user_id": current_user.user_id, "read": False},
+        {"$set": {"read": True, "read_at": datetime.now(timezone.utc)}}
+    )
+    return {"success": True}
+
+
+# ============== TAREAS CON NOTIFICACIONES ==============
+
+class CreateTaskWithNotificationRequest(BaseModel):
+    patient_id: str
+    title: str
+    description: str
+    category: str = "general"
+    priority: str = "medium"
+    due_date: Optional[str] = None
+
+@app.post("/api/professional/tasks/create")
+async def create_task_with_notification(data: CreateTaskWithNotificationRequest, current_user: User = Depends(get_current_user)):
+    """Crear tarea y notificar al paciente"""
+    # Verificar que es profesional
+    profile = await db.user_profiles.find_one({"user_id": current_user.user_id})
+    if not profile or profile.get("role") != "professional":
+        raise HTTPException(status_code=403, detail="Solo profesionales pueden crear tareas")
+    
+    # Verificar que el paciente está vinculado
+    patient_profile = await db.user_profiles.find_one({
+        "user_id": data.patient_id,
+        "linked_therapist_id": current_user.user_id
+    })
+    if not patient_profile:
+        raise HTTPException(status_code=404, detail="Paciente no vinculado")
+    
+    # Obtener info del paciente
+    patient = await db.users.find_one({"user_id": data.patient_id})
+    
+    # Crear la tarea
+    task_id = f"task_{uuid.uuid4().hex[:12]}"
+    task = {
+        "task_id": task_id,
+        "therapist_id": current_user.user_id,
+        "therapist_name": current_user.name,
+        "patient_id": data.patient_id,
+        "title": data.title,
+        "description": data.description,
+        "category": data.category,
+        "priority": data.priority,
+        "status": "pending",
+        "due_date": data.due_date,
+        "created_at": datetime.now(timezone.utc),
+        "patient_notes": None
+    }
+    
+    await db.therapist_tasks.insert_one(task)
+    
+    # Notificar al paciente
+    await notify_user(
+        user_id=data.patient_id,
+        title="📋 Nueva tarea de tu terapeuta",
+        body=f"{current_user.name} te asignó: {data.title}",
+        notification_type="new_task",
+        data={
+            "task_id": task_id,
+            "therapist_name": current_user.name,
+            "action": "view_task"
+        }
+    )
+    
+    return {"success": True, "task_id": task_id, "message": "Tarea creada y paciente notificado"}
+
+class CompleteTaskRequest(BaseModel):
+    task_id: str
+    notes: Optional[str] = None
+
+@app.post("/api/patient/tasks/complete")
+async def complete_task_with_notification(data: CompleteTaskRequest, current_user: User = Depends(get_current_user)):
+    """Paciente completa tarea y notifica al profesional"""
+    # Buscar la tarea
+    task = await db.therapist_tasks.find_one({
+        "task_id": data.task_id,
+        "patient_id": current_user.user_id
+    })
+    
+    if not task:
+        raise HTTPException(status_code=404, detail="Tarea no encontrada")
+    
+    # Actualizar la tarea
+    await db.therapist_tasks.update_one(
+        {"task_id": data.task_id},
+        {
+            "$set": {
+                "status": "completed",
+                "completed_at": datetime.now(timezone.utc),
+                "patient_notes": data.notes
+            }
+        }
+    )
+    
+    # Notificar al profesional
+    await notify_user(
+        user_id=task["therapist_id"],
+        title="✅ Tarea completada",
+        body=f"{current_user.name} completó: {task['title']}",
+        notification_type="task_completed",
+        data={
+            "task_id": data.task_id,
+            "patient_id": current_user.user_id,
+            "patient_name": current_user.name,
+            "action": "view_task"
+        }
+    )
+    
+    return {"success": True, "message": "Tarea completada y terapeuta notificado"}
+
+@app.post("/api/patient/tasks/{task_id}/progress")
+async def update_task_progress(task_id: str, notes: str = "", current_user: User = Depends(get_current_user)):
+    """Paciente actualiza progreso de tarea"""
+    task = await db.therapist_tasks.find_one({
+        "task_id": task_id,
+        "patient_id": current_user.user_id
+    })
+    
+    if not task:
+        raise HTTPException(status_code=404, detail="Tarea no encontrada")
+    
+    # Actualizar la tarea
+    await db.therapist_tasks.update_one(
+        {"task_id": task_id},
+        {
+            "$set": {
+                "status": "in_progress",
+                "patient_notes": notes,
+                "updated_at": datetime.now(timezone.utc)
+            }
+        }
+    )
+    
+    # Notificar al profesional
+    await notify_user(
+        user_id=task["therapist_id"],
+        title="📝 Progreso en tarea",
+        body=f"{current_user.name} actualizó: {task['title']}",
+        notification_type="task_progress",
+        data={
+            "task_id": task_id,
+            "patient_id": current_user.user_id,
+            "patient_name": current_user.name,
+            "action": "view_task"
+        }
+    )
+    
+    return {"success": True, "message": "Progreso actualizado"}
+
+
+# ============== NOTAS CON NOTIFICACIONES ==============
+
+@app.post("/api/professional/notes/create")
+async def create_note_with_notification(data: CreateSessionNoteRequest, current_user: User = Depends(get_current_user)):
+    """Crear nota de sesión y notificar al paciente"""
+    profile = await db.user_profiles.find_one({"user_id": current_user.user_id})
+    if not profile or profile.get("role") != "professional":
+        raise HTTPException(status_code=403, detail="Solo profesionales pueden crear notas")
+    
+    # Verificar paciente vinculado
+    patient_profile = await db.user_profiles.find_one({
+        "user_id": data.patient_id,
+        "linked_therapist_id": current_user.user_id
+    })
+    if not patient_profile:
+        raise HTTPException(status_code=404, detail="Paciente no vinculado")
+    
+    note_id = f"note_{uuid.uuid4().hex[:12]}"
+    note = {
+        "note_id": note_id,
+        "therapist_id": current_user.user_id,
+        "patient_id": data.patient_id,
+        "session_date": data.session_date,
+        "private_notes": data.private_notes,
+        "session_summary": data.session_summary,
+        "goals_discussed": data.goals_discussed,
+        "next_session_focus": data.next_session_focus,
+        "mood_rating": data.mood_rating,
+        "created_at": datetime.now(timezone.utc)
+    }
+    
+    await db.session_notes.insert_one(note)
+    
+    # Notificar al paciente (solo si hay resumen visible)
+    if data.session_summary:
+        await notify_user(
+            user_id=data.patient_id,
+            title="📝 Nueva nota de sesión",
+            body=f"{current_user.name} agregó notas de tu última sesión",
+            notification_type="new_note",
+            data={
+                "note_id": note_id,
+                "therapist_name": current_user.name,
+                "action": "view_notes"
+            }
+        )
+    
+    return {"success": True, "note_id": note_id, "message": "Nota creada"}
+
+
+# ============== MENSAJES CON NOTIFICACIONES ==============
+
+class SendMessageRequest(BaseModel):
+    to_user_id: str
+    content: str
+
+@app.post("/api/messages/send")
+async def send_message_with_notification(data: SendMessageRequest, current_user: User = Depends(get_current_user)):
+    """Enviar mensaje y notificar al destinatario"""
+    # Obtener info del destinatario
+    recipient = await db.users.find_one({"user_id": data.to_user_id})
+    if not recipient:
+        raise HTTPException(status_code=404, detail="Destinatario no encontrado")
+    
+    # Crear el mensaje
+    message_id = f"msg_{uuid.uuid4().hex[:12]}"
+    message = {
+        "message_id": message_id,
+        "from_user_id": current_user.user_id,
+        "to_user_id": data.to_user_id,
+        "from_name": current_user.name,
+        "to_name": recipient.get("name"),
+        "content": data.content,
+        "created_at": datetime.now(timezone.utc),
+        "read": False
+    }
+    
+    await db.messages.insert_one(message)
+    
+    # Notificar al destinatario
+    preview = data.content[:50] + "..." if len(data.content) > 50 else data.content
+    await notify_user(
+        user_id=data.to_user_id,
+        title=f"💬 Mensaje de {current_user.name}",
+        body=preview,
+        notification_type="new_message",
+        data={
+            "message_id": message_id,
+            "from_user_id": current_user.user_id,
+            "from_name": current_user.name,
+            "action": "view_messages"
+        }
+    )
+    
+    return {"success": True, "message_id": message_id}
+
+@app.get("/api/messages/conversation/{other_user_id}")
+async def get_conversation(other_user_id: str, current_user: User = Depends(get_current_user)):
+    """Obtener conversación entre dos usuarios"""
+    messages = await db.messages.find({
+        "$or": [
+            {"from_user_id": current_user.user_id, "to_user_id": other_user_id},
+            {"from_user_id": other_user_id, "to_user_id": current_user.user_id}
+        ]
+    }, {"_id": 0}).sort("created_at", 1).to_list(100)
+    
+    # Marcar como leídos los mensajes recibidos
+    await db.messages.update_many(
+        {"from_user_id": other_user_id, "to_user_id": current_user.user_id, "read": False},
+        {"$set": {"read": True, "read_at": datetime.now(timezone.utc)}}
+    )
+    
+    return {"messages": messages}
+
+@app.get("/api/messages/unread-count")
+async def get_unread_messages_count(current_user: User = Depends(get_current_user)):
+    """Obtener cantidad de mensajes no leídos"""
+    count = await db.messages.count_documents({
+        "to_user_id": current_user.user_id,
+        "read": False
+    })
+    return {"unread_count": count}
+
+
+# ============== RECAÍDAS CON NOTIFICACIONES ==============
+
+@app.post("/api/patient/report-relapse-notify")
+async def report_relapse_with_notification(current_user: User = Depends(get_current_user), notes: str = ""):
+    """Reportar recaída y notificar al terapeuta"""
+    # Obtener perfil del paciente
+    profile = await db.user_profiles.find_one({"user_id": current_user.user_id})
+    
+    # Registrar la recaída
+    relapse = {
+        "relapse_id": f"relapse_{uuid.uuid4().hex[:12]}",
+        "user_id": current_user.user_id,
+        "reported_at": datetime.now(timezone.utc),
+        "notes": notes
+    }
+    await db.relapses.insert_one(relapse)
+    
+    # Resetear contador de días
+    await db.user_profiles.update_one(
+        {"user_id": current_user.user_id},
+        {"$set": {"clean_since": datetime.now(timezone.utc).date().isoformat()}}
+    )
+    
+    # Notificar al terapeuta si está vinculado
+    if profile and profile.get("linked_therapist_id"):
+        await notify_user(
+            user_id=profile["linked_therapist_id"],
+            title="⚠️ Alerta: Recaída reportada",
+            body=f"{current_user.name} ha reportado una recaída",
+            notification_type="relapse_alert",
+            data={
+                "patient_id": current_user.user_id,
+                "patient_name": current_user.name,
+                "relapse_id": relapse["relapse_id"],
+                "action": "view_patient",
+                "severity": "high"
+            }
+        )
+    
+    return {"success": True, "message": "Recaída registrada. Tu terapeuta ha sido notificado."}
+
+
 
 if __name__ == "__main__":
     import uvicorn
