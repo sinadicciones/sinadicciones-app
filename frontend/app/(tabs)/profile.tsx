@@ -425,7 +425,7 @@ export default function ProfileScreen() {
           
           <View style={styles.accountActions}>
             {/* Botón para Dashboard Admin (solo admins) */}
-            {(profile?.role === 'admin' || user?.email === 'contacto@sinadicciones.cl') && (
+            {(profile?.role === 'admin' || user?.email === 'contacto@sinadicciones.org') && (
               <TouchableOpacity 
                 style={[styles.accountButton, styles.adminButton]}
                 onPress={() => router.push('/admin-dashboard')}

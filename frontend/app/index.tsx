@@ -17,7 +17,7 @@ import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 
-// Logo de sinadicciones.cl
+// Logo de sinadicciones.org
 const LOGO_URL = 'https://customer-assets.emergentagent.com/job_b1701075-ef08-4c17-96e4-9e005036f1a8/artifacts/ftksetul_IMG_0917.jpeg';
 
 export default function WelcomeScreen() {
@@ -169,7 +169,7 @@ export default function WelcomeScreen() {
           <View style={styles.content}>
             {/* Header */}
             <View style={styles.header}>
-              <Text style={styles.title}>Sinadicciones.cl</Text>
+              <Text style={styles.title}>Sinadicciones.org</Text>
               <Text style={styles.subtitle}>Tu primer paso en tu recuperación</Text>
             </View>
 

@@ -209,7 +209,7 @@ export default function RecommendationsScreen() {
   };
 
   const openSinAdicciones = () => {
-    Linking.openURL('https://sinadicciones.cl');
+    Linking.openURL('https://sinadicciones.org');
   };
 
   if (loading) {

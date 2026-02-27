@@ -271,7 +271,7 @@ export default function CentersScreen() {
     
     const message = isTherapist 
       ? `Hola ${name}, encontré tu perfil en la app SinAdicciones y me gustaría consultar sobre una sesión de terapia.`
-      : `Hola estoy interesado, encontré tu servicio en Sinadicciones.cl, puedes darme más información del centro`;
+      : `Hola estoy interesado, encontré tu servicio en Sinadicciones.org, puedes darme más información del centro`;
     const encodedMessage = encodeURIComponent(message);
     
     const whatsappNumber = cleanPhone.replace('+', '');
@@ -493,7 +493,7 @@ export default function CentersScreen() {
                 Prueba con otro filtro o busca en el sitio web
               </Text>
               <TouchableOpacity style={styles.emptyButton} onPress={handleOpenDirectory}>
-                <Text style={styles.emptyButtonText}>Ir a sinadicciones.cl</Text>
+                <Text style={styles.emptyButtonText}>Ir a sinadicciones.org</Text>
               </TouchableOpacity>
             </View>
           ) : (
@@ -617,7 +617,7 @@ export default function CentersScreen() {
                   <Ionicons name="globe" size={32} color="#FFFFFF" />
                   <Text style={styles.viewMoreTitle}>Ver directorio completo</Text>
                   <Text style={styles.viewMoreText}>
-                    Explora más centros con filtros avanzados en sinadicciones.cl
+                    Explora más centros con filtros avanzados en sinadicciones.org
                   </Text>
                   <View style={styles.viewMoreButton}>
                     <Text style={styles.viewMoreButtonText}>Abrir sitio web</Text>
