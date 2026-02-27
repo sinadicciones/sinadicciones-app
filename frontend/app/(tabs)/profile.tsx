@@ -32,6 +32,7 @@ export default function ProfileScreen() {
   const [formData, setFormData] = useState<any>({});
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [activeSection, setActiveSection] = useState<string | null>(null);
   
   // Estados para cambio de contraseña
   const [showPasswordModal, setShowPasswordModal] = useState(false);
