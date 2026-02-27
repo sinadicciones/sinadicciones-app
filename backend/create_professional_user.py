@@ -15,7 +15,7 @@ MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017")
 
 async def create_professional_demo():
     client = AsyncIOMotorClient(MONGO_URL)
-    db = client.sinadicciones
+    db = client.test_database
     
     # IDs
     professional_id = "user_pro_demo_" + uuid.uuid4().hex[:8]
