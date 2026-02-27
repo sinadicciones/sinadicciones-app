@@ -3807,10 +3807,11 @@ class AnalysisPeriod(str, Enum):
 @app.get("/api/wellness/analysis/{period}")
 async def get_wellness_analysis(
     period: AnalysisPeriod,
-    user_id: str = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """Generate AI-powered wellness analysis for the user"""
     try:
+        user_id = current_user.user_id
         now = datetime.now(timezone.utc)
         
         if period == AnalysisPeriod.week:
