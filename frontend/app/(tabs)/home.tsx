@@ -416,57 +416,55 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header con Sobriedad */}
-      <LinearGradient
-        colors={['#10B981', '#059669']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.header}
-      >
-        <View style={styles.headerTop}>
-          <View>
-            <Text style={styles.greeting}>Hola, {user?.name?.split(' ')[0]} 👋</Text>
-            <Text style={styles.subtitle}>Tu progreso de hoy</Text>
-          </View>
-          <TouchableOpacity onPress={handleSOS} style={styles.sosButton}>
-            <Ionicons name="heart" size={20} color="#FFFFFF" />
-            <Text style={styles.sosButtonText}>SOS</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Contador de Sobriedad */}
-        <View style={styles.sobrietyCard}>
-          <View style={styles.sobrietyMain}>
-            <Text style={styles.sobrietyNumber}>{sobriety.days_clean || 0}</Text>
-            <Text style={styles.sobrietyLabel}>días limpio</Text>
-          </View>
-          {sobriety.next_milestone && (
-            <View style={styles.milestoneContainer}>
-              <View style={styles.milestoneBadge}>
-                <Ionicons name="flag" size={14} color="#10B981" />
-                <Text style={styles.milestoneText}>
-                  ¡{sobriety.days_to_milestone} días para {formatMilestone(sobriety.next_milestone)}!
-                </Text>
-              </View>
-            </View>
-          )}
-          {/* Flamitas de racha */}
-          {habitsData.longest_streak > 0 && (
-            <View style={styles.streakContainer}>
-              <Text style={styles.streakFire}>
-                {'🔥'.repeat(Math.min(habitsData.longest_streak, 7))}
-              </Text>
-              <Text style={styles.streakText}>{habitsData.longest_streak} días de racha</Text>
-            </View>
-          )}
-        </View>
-      </LinearGradient>
-
       <ScrollView
-        style={styles.content}
+        style={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
+        {/* Header con Sobriedad - Ahora dentro del ScrollView */}
+        <LinearGradient
+          colors={['#10B981', '#059669']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.header}
+        >
+          <View style={styles.headerTop}>
+            <View style={styles.greetingContainer}>
+              <Text style={styles.greeting}>Hola, {user?.name?.split(' ')[0]} 👋</Text>
+              <Text style={styles.subtitle}>Tu progreso de hoy</Text>
+            </View>
+            <TouchableOpacity onPress={handleSOS} style={styles.sosButton}>
+              <Ionicons name="heart" size={18} color="#FFFFFF" />
+              <Text style={styles.sosButtonText}>SOS</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Contador de Sobriedad - Más compacto */}
+          <View style={styles.sobrietyRow}>
+            <View style={styles.sobrietyMain}>
+              <Text style={styles.sobrietyNumber}>{sobriety.days_clean || 0}</Text>
+              <Text style={styles.sobrietyLabel}>días</Text>
+            </View>
+            <View style={styles.sobrietyInfo}>
+              {sobriety.next_milestone && (
+                <View style={styles.milestoneBadge}>
+                  <Ionicons name="flag" size={12} color="#10B981" />
+                  <Text style={styles.milestoneText}>
+                    {sobriety.days_to_milestone}d → {formatMilestone(sobriety.next_milestone)}
+                  </Text>
+                </View>
+              )}
+              {habitsData.longest_streak > 0 && (
+                <View style={styles.streakBadge}>
+                  <Text style={styles.streakFire}>🔥</Text>
+                  <Text style={styles.streakText}>{habitsData.longest_streak} días racha</Text>
+                </View>
+              )}
+            </View>
+          </View>
+        </LinearGradient>
+
+        <View style={styles.content}>
         {/* Frase Motivacional */}
         {quote.quote && (
           <View style={styles.quoteCard}>
