@@ -4127,6 +4127,465 @@ async def get_wellness_stats(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# ============== HABITS SPECIFIC ANALYSIS ==============
+
+@app.get("/api/habits/analysis/{period}")
+async def get_habits_analysis(
+    period: AnalysisPeriod,
+    current_user: User = Depends(get_current_user)
+):
+    """Generate AI-powered habits analysis"""
+    try:
+        user_id = current_user.user_id
+        now = datetime.now(timezone.utc)
+        
+        if period == AnalysisPeriod.week:
+            start_date = now - timedelta(days=7)
+            period_name = "esta semana"
+            days_count = 7
+        else:
+            start_date = now - timedelta(days=30)
+            period_name = "este mes"
+            days_count = 30
+        
+        start_str = start_date.strftime("%Y-%m-%d")
+        end_str = now.strftime("%Y-%m-%d")
+        
+        # Fetch habits and logs
+        habits = await db.habits.find({"user_id": user_id, "is_active": True}).to_list(100)
+        habit_logs = await db.habit_logs.find({
+            "user_id": user_id,
+            "date": {"$gte": start_str, "$lte": end_str}
+        }).to_list(2000)
+        
+        # Calculate per-habit stats
+        habit_stats = []
+        for habit in habits:
+            logs = [l for l in habit_logs if l.get("habit_id") == habit["habit_id"]]
+            completed = sum(1 for l in logs if l.get("completed"))
+            total = len(logs) if logs else days_count
+            
+            # Daily breakdown for this habit
+            daily_completion = {}
+            for i in range(7):
+                day_logs = [l for l in logs if datetime.strptime(l["date"], "%Y-%m-%d").weekday() == i]
+                day_completed = sum(1 for l in day_logs if l.get("completed"))
+                daily_completion[i] = {
+                    "completed": day_completed,
+                    "total": len(day_logs) if day_logs else 0
+                }
+            
+            habit_stats.append({
+                "habit_id": habit["habit_id"],
+                "name": habit["name"],
+                "icon": habit.get("icon", "checkmark"),
+                "color": habit.get("color", "#10B981"),
+                "completed": completed,
+                "total": total,
+                "rate": round(completed / total * 100, 1) if total > 0 else 0,
+                "daily_completion": daily_completion
+            })
+        
+        # Sort by completion rate
+        habit_stats.sort(key=lambda x: x["rate"], reverse=True)
+        
+        # Day of week analysis
+        day_names = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+        day_completions = {i: {"total": 0, "completed": 0} for i in range(7)}
+        for log in habit_logs:
+            try:
+                log_date = datetime.strptime(log["date"], "%Y-%m-%d")
+                day = log_date.weekday()
+                day_completions[day]["total"] += 1
+                if log.get("completed"):
+                    day_completions[day]["completed"] += 1
+            except:
+                pass
+        
+        best_day = max(day_completions.items(), key=lambda x: x[1]["completed"] / x[1]["total"] if x[1]["total"] > 0 else 0)
+        worst_day = min(day_completions.items(), key=lambda x: x[1]["completed"] / x[1]["total"] if x[1]["total"] > 0 else 1)
+        
+        # Overall stats
+        total_entries = len(habit_logs)
+        completed_entries = sum(1 for l in habit_logs if l.get("completed"))
+        completion_rate = (completed_entries / total_entries * 100) if total_entries > 0 else 0
+        
+        # Streaks calculation
+        current_streak = 0
+        max_streak = 0
+        streak = 0
+        dates_with_all_completed = set()
+        
+        for i in range(days_count):
+            check_date = (start_date + timedelta(days=i)).strftime("%Y-%m-%d")
+            day_logs = [l for l in habit_logs if l.get("date") == check_date]
+            day_completed = sum(1 for l in day_logs if l.get("completed"))
+            day_total = len(habits)
+            
+            if day_total > 0 and day_completed >= day_total * 0.8:  # 80% threshold
+                streak += 1
+                max_streak = max(max_streak, streak)
+                dates_with_all_completed.add(check_date)
+            else:
+                streak = 0
+        
+        current_streak = streak
+        
+        # Prepare AI prompt
+        data_summary = f"""
+ANÁLISIS DE HÁBITOS ({period_name}):
+
+RESUMEN GENERAL:
+- Hábitos activos: {len(habits)}
+- Total de registros: {total_entries}
+- Completados: {completed_entries} ({completion_rate:.1f}%)
+- Racha actual: {current_streak} días
+- Racha máxima: {max_streak} días
+
+RENDIMIENTO POR HÁBITO:
+{chr(10).join([f"- {h['name']}: {h['rate']:.1f}% ({h['completed']}/{h['total']})" for h in habit_stats])}
+
+RENDIMIENTO POR DÍA:
+- Mejor día: {day_names[best_day[0]]} ({best_day[1]['completed']}/{best_day[1]['total']} = {(best_day[1]['completed']/best_day[1]['total']*100) if best_day[1]['total'] > 0 else 0:.0f}%)
+- Día más difícil: {day_names[worst_day[0]]} ({worst_day[1]['completed']}/{worst_day[1]['total']} = {(worst_day[1]['completed']/worst_day[1]['total']*100) if worst_day[1]['total'] > 0 else 0:.0f}%)
+
+HÁBITOS MÁS CONSISTENTES: {', '.join([h['name'] for h in habit_stats[:3]]) if habit_stats else 'N/A'}
+HÁBITOS A MEJORAR: {', '.join([h['name'] for h in habit_stats[-3:]]) if len(habit_stats) >= 3 else 'N/A'}
+"""
+
+        # Generate AI analysis
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"habits_{user_id}_{period}",
+            system_message="""Eres un coach de hábitos experto y motivador. Analiza los datos de hábitos del usuario y proporciona insights específicos y accionables.
+Responde SIEMPRE en español de manera positiva y constructiva.
+Usa emojis para hacer el mensaje más amigable.
+Enfócate en patrones, consistencia y mejoras prácticas."""
+        ).with_model("openai", "gpt-4o")
+        
+        prompt = f"""Analiza estos datos de hábitos y genera un análisis personalizado:
+
+{data_summary}
+
+Genera un análisis JSON con esta estructura exacta (responde SOLO el JSON, sin markdown):
+{{
+    "resumen": "Un párrafo de 2-3 oraciones sobre el rendimiento de hábitos",
+    "logros": ["logro específico 1", "logro específico 2", "logro específico 3"],
+    "patrones": [
+        {{"patron": "descripción del patrón detectado", "tipo": "positivo|negativo|neutro"}},
+        {{"patron": "otro patrón", "tipo": "positivo|negativo|neutro"}}
+    ],
+    "habito_estrella": {{"nombre": "nombre del hábito más consistente", "razon": "por qué destaca"}},
+    "habito_a_mejorar": {{"nombre": "nombre del hábito a mejorar", "estrategia": "estrategia específica para mejorarlo"}},
+    "tips": [
+        {{"tip": "consejo específico para mejorar hábitos", "prioridad": "alta|media|baja"}},
+        {{"tip": "otro consejo", "prioridad": "alta|media|baja"}}
+    ],
+    "frase_motivacional": "Una frase motivacional sobre hábitos y disciplina",
+    "meta_proxima_semana": "Una meta específica y alcanzable para la próxima semana"
+}}"""
+
+        user_message = UserMessage(text=prompt)
+        ai_response = await chat.send_message(user_message)
+        
+        # Parse AI response
+        try:
+            clean_response = ai_response.strip()
+            if clean_response.startswith("```"):
+                clean_response = clean_response.split("```")[1]
+                if clean_response.startswith("json"):
+                    clean_response = clean_response[4:]
+            analysis = json.loads(clean_response)
+        except:
+            analysis = {
+                "resumen": f"Durante {period_name}, has completado {completion_rate:.0f}% de tus hábitos. Tu mejor rendimiento fue los {day_names[best_day[0]]}.",
+                "logros": [
+                    f"Completaste {completed_entries} hábitos",
+                    f"Racha máxima de {max_streak} días",
+                    f"Mantuviste {len(habits)} hábitos activos"
+                ],
+                "patrones": [
+                    {"patron": f"Tu rendimiento es mejor los {day_names[best_day[0]]}", "tipo": "positivo"},
+                    {"patron": f"Los {day_names[worst_day[0]]} son más difíciles", "tipo": "neutro"}
+                ],
+                "habito_estrella": {"nombre": habit_stats[0]["name"] if habit_stats else "N/A", "razon": "Mayor consistencia"},
+                "habito_a_mejorar": {"nombre": habit_stats[-1]["name"] if habit_stats else "N/A", "estrategia": "Vincularlo a un hábito existente"},
+                "tips": [
+                    {"tip": f"Prepara tus hábitos del {day_names[worst_day[0]]} la noche anterior", "prioridad": "alta"},
+                    {"tip": "Celebra cada día completado", "prioridad": "media"}
+                ],
+                "frase_motivacional": "Los pequeños hábitos de hoy construyen la persona que serás mañana.",
+                "meta_proxima_semana": f"Completar al menos 80% de hábitos los {day_names[worst_day[0]]}"
+            }
+        
+        return {
+            "period": period,
+            "period_name": period_name,
+            "stats": {
+                "total_habits": len(habits),
+                "completion_rate": round(completion_rate, 1),
+                "completed_entries": completed_entries,
+                "total_entries": total_entries,
+                "current_streak": current_streak,
+                "max_streak": max_streak,
+                "best_day": day_names[best_day[0]],
+                "worst_day": day_names[worst_day[0]],
+                "daily_completion": {
+                    day_names[i]: {
+                        "completed": day_completions[i]["completed"],
+                        "total": day_completions[i]["total"],
+                        "rate": round(day_completions[i]["completed"] / day_completions[i]["total"] * 100, 1) if day_completions[i]["total"] > 0 else 0
+                    } for i in range(7)
+                }
+            },
+            "habit_stats": habit_stats,
+            "analysis": analysis,
+            "generated_at": now.isoformat()
+        }
+        
+    except Exception as e:
+        print(f"Error generating habits analysis: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+
+
+# ============== EMOTIONAL SPECIFIC ANALYSIS ==============
+
+@app.get("/api/emotional/analysis/{period}")
+async def get_emotional_analysis(
+    period: AnalysisPeriod,
+    current_user: User = Depends(get_current_user)
+):
+    """Generate AI-powered emotional analysis"""
+    try:
+        user_id = current_user.user_id
+        now = datetime.now(timezone.utc)
+        
+        if period == AnalysisPeriod.week:
+            start_date = now - timedelta(days=7)
+            period_name = "esta semana"
+            days_count = 7
+        else:
+            start_date = now - timedelta(days=30)
+            period_name = "este mes"
+            days_count = 30
+        
+        start_str = start_date.strftime("%Y-%m-%d")
+        end_str = now.strftime("%Y-%m-%d")
+        
+        # Fetch emotional logs
+        emotional_logs = await db.emotional_logs.find({
+            "user_id": user_id,
+            "date": {"$gte": start_str, "$lte": end_str}
+        }).to_list(500)
+        
+        # Fetch profile for context
+        profile = await db.user_profiles.find_one({"user_id": user_id})
+        
+        if not emotional_logs:
+            return {
+                "period": period,
+                "period_name": period_name,
+                "stats": {"entries": 0},
+                "analysis": {
+                    "resumen": f"No hay registros emocionales para {period_name}. ¡Comienza a registrar tu estado de ánimo!",
+                    "tips": [{"tip": "Registra tu ánimo al menos una vez al día", "prioridad": "alta"}]
+                }
+            }
+        
+        # Calculate mood statistics
+        moods = [log.get("mood_scale", 5) for log in emotional_logs if log.get("mood_scale")]
+        avg_mood = sum(moods) / len(moods) if moods else 0
+        min_mood = min(moods) if moods else 0
+        max_mood = max(moods) if moods else 0
+        
+        # Mood trend
+        mood_trend = "estable"
+        if len(moods) >= 3:
+            first_half = sum(moods[:len(moods)//2]) / (len(moods)//2)
+            second_half = sum(moods[len(moods)//2:]) / (len(moods) - len(moods)//2)
+            if second_half > first_half + 0.5:
+                mood_trend = "mejorando"
+            elif second_half < first_half - 0.5:
+                mood_trend = "bajando"
+        
+        # Day of week analysis
+        day_names = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+        day_moods = {i: [] for i in range(7)}
+        for log in emotional_logs:
+            try:
+                log_date = datetime.strptime(log["date"], "%Y-%m-%d")
+                day = log_date.weekday()
+                if log.get("mood_scale"):
+                    day_moods[day].append(log["mood_scale"])
+            except:
+                pass
+        
+        day_avg = {i: sum(day_moods[i])/len(day_moods[i]) if day_moods[i] else 0 for i in range(7)}
+        best_day = max(day_avg.items(), key=lambda x: x[1])
+        worst_day = min(day_avg.items(), key=lambda x: x[1] if x[1] > 0 else 999)
+        
+        # Tag frequency
+        tag_freq = {}
+        for log in emotional_logs:
+            for tag in log.get("tags", []):
+                tag_freq[tag] = tag_freq.get(tag, 0) + 1
+        top_tags = sorted(tag_freq.items(), key=lambda x: x[1], reverse=True)[:10]
+        
+        # Positive vs negative tags
+        positive_tags = ["paz", "motivación", "orgullo", "gratitud", "esperanza", "tranquilidad", "alegría"]
+        negative_tags = ["ansiedad", "ira", "vacío", "tristeza", "miedo", "frustración", "craving"]
+        
+        positive_count = sum(tag_freq.get(t, 0) for t in positive_tags)
+        negative_count = sum(tag_freq.get(t, 0) for t in negative_tags)
+        total_tags = positive_count + negative_count
+        
+        emotional_balance = "equilibrado"
+        if total_tags > 0:
+            positive_ratio = positive_count / total_tags
+            if positive_ratio > 0.6:
+                emotional_balance = "positivo"
+            elif positive_ratio < 0.4:
+                emotional_balance = "desafiante"
+        
+        # Daily mood data
+        daily_moods = {}
+        for log in emotional_logs:
+            date = log.get("date")
+            if date and log.get("mood_scale"):
+                daily_moods[date] = {
+                    "mood": log["mood_scale"],
+                    "tags": log.get("tags", []),
+                    "note": log.get("note", "")
+                }
+        
+        # Prepare AI prompt
+        data_summary = f"""
+ANÁLISIS EMOCIONAL ({period_name}):
+
+ESTADÍSTICAS GENERALES:
+- Total de registros: {len(emotional_logs)}
+- Ánimo promedio: {avg_mood:.1f}/10
+- Ánimo más bajo: {min_mood}/10
+- Ánimo más alto: {max_mood}/10
+- Tendencia: {mood_trend}
+- Balance emocional: {emotional_balance}
+
+POR DÍA DE LA SEMANA:
+{chr(10).join([f"- {day_names[i]}: {day_avg[i]:.1f}/10 promedio" for i in range(7) if day_avg[i] > 0])}
+- Mejor día: {day_names[best_day[0]]} ({best_day[1]:.1f}/10)
+- Día más difícil: {day_names[worst_day[0]]} ({worst_day[1]:.1f}/10)
+
+EMOCIONES MÁS FRECUENTES:
+{chr(10).join([f"- {tag}: {count} veces" for tag, count in top_tags[:5]])}
+
+BALANCE EMOCIONAL:
+- Emociones positivas: {positive_count} registros
+- Emociones desafiantes: {negative_count} registros
+
+CONTEXTO DEL USUARIO:
+- En recuperación de: {profile.get('addiction_type', 'No especificado') if profile else 'No especificado'}
+- Triggers conocidos: {', '.join(profile.get('triggers', [])[:3]) if profile and profile.get('triggers') else 'No especificados'}
+"""
+
+        # Generate AI analysis
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"emotional_{user_id}_{period}",
+            system_message="""Eres un psicólogo especializado en bienestar emocional y recuperación de adicciones. 
+Analiza los datos emocionales del usuario con empatía y proporciona insights útiles.
+Responde SIEMPRE en español de manera cálida y comprensiva.
+Usa emojis para hacer el mensaje más amigable.
+Enfócate en validar las emociones y ofrecer estrategias de regulación emocional."""
+        ).with_model("openai", "gpt-4o")
+        
+        prompt = f"""Analiza estos datos emocionales y genera un análisis personalizado:
+
+{data_summary}
+
+Genera un análisis JSON con esta estructura exacta (responde SOLO el JSON, sin markdown):
+{{
+    "resumen": "Un párrafo de 2-3 oraciones sobre el estado emocional del período",
+    "fortalezas_emocionales": ["fortaleza 1", "fortaleza 2"],
+    "areas_atencion": ["área que necesita atención 1", "área 2"],
+    "patrones": [
+        {{"patron": "descripción del patrón emocional detectado", "tipo": "positivo|negativo|neutro"}},
+        {{"patron": "otro patrón", "tipo": "positivo|negativo|neutro"}}
+    ],
+    "correlaciones": ["correlación entre emociones y días/situaciones"],
+    "estrategias": [
+        {{"estrategia": "técnica de regulación emocional recomendada", "cuando_usar": "situación específica"}},
+        {{"estrategia": "otra técnica", "cuando_usar": "situación"}}
+    ],
+    "tips": [
+        {{"tip": "consejo específico para el bienestar emocional", "prioridad": "alta|media|baja"}}
+    ],
+    "mensaje_apoyo": "Un mensaje de apoyo y validación emocional personalizado",
+    "enfoque_proxima_semana": "Un área emocional específica para trabajar"
+}}"""
+
+        user_message = UserMessage(text=prompt)
+        ai_response = await chat.send_message(user_message)
+        
+        # Parse AI response
+        try:
+            clean_response = ai_response.strip()
+            if clean_response.startswith("```"):
+                clean_response = clean_response.split("```")[1]
+                if clean_response.startswith("json"):
+                    clean_response = clean_response[4:]
+            analysis = json.loads(clean_response)
+        except:
+            analysis = {
+                "resumen": f"Durante {period_name}, tu ánimo promedio fue {avg_mood:.1f}/10 con una tendencia {mood_trend}.",
+                "fortalezas_emocionales": ["Consistencia en el registro emocional", "Autoconciencia"],
+                "areas_atencion": [f"Los {day_names[worst_day[0]]} tienden a ser más difíciles"],
+                "patrones": [
+                    {"patron": f"Tu mejor día emocionalmente es el {day_names[best_day[0]]}", "tipo": "positivo"},
+                    {"patron": f"Tendencia emocional {mood_trend}", "tipo": "positivo" if mood_trend == "mejorando" else "neutro"}
+                ],
+                "correlaciones": [f"Tu ánimo tiende a ser mejor los {day_names[best_day[0]]}"],
+                "estrategias": [
+                    {"estrategia": "Respiración profunda", "cuando_usar": "Cuando sientas ansiedad"},
+                    {"estrategia": "Caminar al aire libre", "cuando_usar": "En días difíciles"}
+                ],
+                "tips": [
+                    {"tip": "Registra tus emociones en el mismo momento del día", "prioridad": "media"}
+                ],
+                "mensaje_apoyo": "Reconocer y registrar tus emociones es un gran paso. Cada día es una oportunidad para conocerte mejor.",
+                "enfoque_proxima_semana": f"Prestar atención especial a los {day_names[worst_day[0]]}"
+            }
+        
+        return {
+            "period": period,
+            "period_name": period_name,
+            "stats": {
+                "entries": len(emotional_logs),
+                "avg_mood": round(avg_mood, 1),
+                "min_mood": min_mood,
+                "max_mood": max_mood,
+                "mood_trend": mood_trend,
+                "emotional_balance": emotional_balance,
+                "best_day": day_names[best_day[0]],
+                "worst_day": day_names[worst_day[0]],
+                "positive_count": positive_count,
+                "negative_count": negative_count,
+                "top_emotions": [{"tag": t[0], "count": t[1]} for t in top_tags],
+                "daily_avg": {day_names[i]: round(day_avg[i], 1) for i in range(7)}
+            },
+            "daily_moods": daily_moods,
+            "analysis": analysis,
+            "generated_at": now.isoformat()
+        }
+        
+    except Exception as e:
+        print(f"Error generating emotional analysis: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+
+
 
 if __name__ == "__main__":
     import uvicorn
