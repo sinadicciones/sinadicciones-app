@@ -121,9 +121,32 @@ export default function HabitsScreen() {
         end={{ x: 1, y: 1 }}
         style={styles.header}
       >
-        <Text style={styles.headerTitle}>Mis Hábitos</Text>
-        <Text style={styles.headerSubtitle}>Construye tu rutina diaria</Text>
+        <View style={styles.headerTop}>
+          <View>
+            <Text style={styles.headerTitle}>Mis Hábitos</Text>
+            <Text style={styles.headerSubtitle}>Construye tu rutina diaria</Text>
+          </View>
+          <TouchableOpacity 
+            style={styles.insightsBtn}
+            onPress={() => setShowInsights(true)}
+          >
+            <Ionicons name="stats-chart" size={20} color="#10B981" />
+          </TouchableOpacity>
+        </View>
       </LinearGradient>
+
+      {/* Insights Button Card */}
+      <TouchableOpacity 
+        style={styles.insightsCard}
+        onPress={() => setShowInsights(true)}
+      >
+        <Ionicons name="sparkles" size={20} color="#10B981" />
+        <View style={styles.insightsCardContent}>
+          <Text style={styles.insightsCardTitle}>📊 Análisis de Hábitos</Text>
+          <Text style={styles.insightsCardSubtitle}>Patrones y estadísticas con IA</Text>
+        </View>
+        <Ionicons name="chevron-forward" size={20} color="#10B981" />
+      </TouchableOpacity>
 
       <ScrollView
         style={styles.content}
