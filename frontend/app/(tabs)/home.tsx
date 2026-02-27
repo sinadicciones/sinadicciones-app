@@ -806,7 +806,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   sobrietyNumber: {
-    fontSize: 56,
+    fontSize: 42,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
