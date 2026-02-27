@@ -558,17 +558,17 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   header: {
-    marginBottom: 24,
+    marginBottom: 16,
   },
   greeting: {
-    fontSize: 28,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 13,
     color: '#9CA3AF',
-    marginTop: 4,
+    marginTop: 2,
   },
   challengeCard: {
     backgroundColor: 'rgba(245, 158, 11, 0.1)',
