@@ -188,6 +188,7 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [profile, setProfile] = useState<any>(null);
+  const [showInsights, setShowInsights] = useState(false);
 
   useEffect(() => {
     loadData();
