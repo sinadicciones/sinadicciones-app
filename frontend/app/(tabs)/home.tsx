@@ -13,12 +13,14 @@ import {
   Modal,
 } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
+import { useNotifications } from '../../contexts/NotificationContext';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { authenticatedFetch, getBackendURL } from '../../utils/api';
 import Svg, { Circle, G, Text as SvgText } from 'react-native-svg';
 import WellnessInsights from '../../components/WellnessInsights';
+import NotificationCenter from '../../components/NotificationCenter';
 
 const BACKEND_URL = getBackendURL();
 const { width } = Dimensions.get('window');
