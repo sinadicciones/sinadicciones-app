@@ -266,7 +266,7 @@ export default function PatientDetailScreen() {
 
       {/* Task Modal */}
       <Modal visible={showTaskModal} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}><Text style={styles.modalTitle}>Nueva Tarea</Text><TouchableOpacity onPress={() => setShowTaskModal(false)}><Ionicons name="close" size={24} color="#6B7280" /></TouchableOpacity></View>
             <ScrollView style={styles.modalBody}>
