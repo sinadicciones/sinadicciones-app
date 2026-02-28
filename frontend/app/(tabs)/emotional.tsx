@@ -204,7 +204,6 @@ export default function EmotionalScreen() {
           ) : (
             logs.slice(0, 10).map((log) => {
               const moodValue = log.mood_scale || log.mood || 0;
-              console.log('Rendering log:', log.log_id, 'mood:', moodValue, 'emoji:', MOOD_EMOJIS[moodValue - 1]?.emoji);
               return (
               <View key={log.log_id} style={styles.logCard}>
                 <View style={styles.logHeader}>
