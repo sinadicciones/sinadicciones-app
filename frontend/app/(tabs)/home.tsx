@@ -789,6 +789,193 @@ export default function HomeScreen() {
           </View>
         </View>
 
+        {/* Sección Educativa - Estilo Oscuro */}
+        {education && (
+          <View style={styles.educationSection}>
+            <Text style={styles.educationSectionTitle}>📚 Educación y Recursos</Text>
+            
+            {/* Entender la Adicción */}
+            {education.understanding_addiction && (
+              <View style={styles.eduSection}>
+                <TouchableOpacity 
+                  style={styles.eduSectionHeader}
+                  onPress={() => setExpandedEducation(expandedEducation === 'understanding' ? null : 'understanding')}
+                >
+                  <View style={styles.eduSectionTitleRow}>
+                    <Ionicons name="book" size={22} color="#3B82F6" />
+                    <Text style={styles.eduSectionTitle}>Entender la Adicción</Text>
+                  </View>
+                  <Ionicons 
+                    name={expandedEducation === 'understanding' ? 'chevron-up' : 'chevron-down'} 
+                    size={20} 
+                    color="#9CA3AF" 
+                  />
+                </TouchableOpacity>
+                
+                {expandedEducation === 'understanding' && (
+                  <View style={styles.eduActionsList}>
+                    {education.understanding_addiction.topics.map((topic: any) => (
+                      <View key={topic.id} style={styles.eduActionItem}>
+                        <View style={[styles.eduActionIcon, { backgroundColor: 'rgba(59, 130, 246, 0.2)' }]}>
+                          <Ionicons name={topic.icon as any} size={20} color="#3B82F6" />
+                        </View>
+                        <View style={styles.eduActionContent}>
+                          <Text style={styles.eduActionTitle}>{topic.title}</Text>
+                          <Text style={styles.eduActionDescription}>{topic.description}</Text>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
+            )}
+
+            {/* Qué Esperar */}
+            {education.what_to_expect && (
+              <View style={styles.eduSection}>
+                <TouchableOpacity 
+                  style={styles.eduSectionHeader}
+                  onPress={() => setExpandedEducation(expandedEducation === 'expect' ? null : 'expect')}
+                >
+                  <View style={styles.eduSectionTitleRow}>
+                    <Ionicons name="time" size={22} color="#8B5CF6" />
+                    <Text style={styles.eduSectionTitle}>Qué Esperar</Text>
+                  </View>
+                  <Ionicons 
+                    name={expandedEducation === 'expect' ? 'chevron-up' : 'chevron-down'} 
+                    size={20} 
+                    color="#9CA3AF" 
+                  />
+                </TouchableOpacity>
+                
+                {expandedEducation === 'expect' && (
+                  <View style={styles.eduActionsList}>
+                    {education.what_to_expect.phases.map((phase: any) => (
+                      <View key={phase.id} style={styles.eduActionItem}>
+                        <View style={[styles.eduActionIcon, { backgroundColor: 'rgba(139, 92, 246, 0.2)' }]}>
+                          <Ionicons name={phase.icon as any} size={20} color="#8B5CF6" />
+                        </View>
+                        <View style={styles.eduActionContent}>
+                          <Text style={styles.eduActionTitle}>{phase.title}</Text>
+                          <Text style={styles.eduActionDescription}>{phase.description}</Text>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
+            )}
+
+            {/* Manejo del Craving */}
+            {education.craving_management && (
+              <View style={styles.eduSection}>
+                <TouchableOpacity 
+                  style={styles.eduSectionHeader}
+                  onPress={() => setExpandedEducation(expandedEducation === 'craving' ? null : 'craving')}
+                >
+                  <View style={styles.eduSectionTitleRow}>
+                    <Ionicons name="flame" size={22} color="#EF4444" />
+                    <Text style={styles.eduSectionTitle}>Manejo del Craving</Text>
+                  </View>
+                  <Ionicons 
+                    name={expandedEducation === 'craving' ? 'chevron-up' : 'chevron-down'} 
+                    size={20} 
+                    color="#9CA3AF" 
+                  />
+                </TouchableOpacity>
+                
+                {expandedEducation === 'craving' && (
+                  <View style={styles.eduActionsList}>
+                    {education.craving_management.techniques.map((technique: any) => (
+                      <View key={technique.id} style={styles.eduActionItem}>
+                        <View style={[styles.eduActionIcon, { backgroundColor: 'rgba(239, 68, 68, 0.2)' }]}>
+                          <Ionicons name={technique.icon as any} size={20} color="#EF4444" />
+                        </View>
+                        <View style={styles.eduActionContent}>
+                          <Text style={styles.eduActionTitle}>{technique.title}</Text>
+                          <Text style={styles.eduActionDescription}>{technique.description}</Text>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
+            )}
+
+            {/* Acciones de Protección */}
+            {education.primary_actions && (
+              <View style={styles.eduSection}>
+                <TouchableOpacity 
+                  style={styles.eduSectionHeader}
+                  onPress={() => setExpandedEducation(expandedEducation === 'actions' ? null : 'actions')}
+                >
+                  <View style={styles.eduSectionTitleRow}>
+                    <Ionicons name="shield-checkmark" size={22} color="#10B981" />
+                    <Text style={styles.eduSectionTitle}>Acciones de Protección</Text>
+                  </View>
+                  <Ionicons 
+                    name={expandedEducation === 'actions' ? 'chevron-up' : 'chevron-down'} 
+                    size={20} 
+                    color="#9CA3AF" 
+                  />
+                </TouchableOpacity>
+                
+                {expandedEducation === 'actions' && (
+                  <View style={styles.eduActionsList}>
+                    {education.primary_actions.actions.map((action: any) => (
+                      <View key={action.id} style={styles.eduActionItem}>
+                        <View style={[styles.eduActionIcon, { backgroundColor: 'rgba(16, 185, 129, 0.2)' }]}>
+                          <Ionicons name={action.icon as any} size={20} color="#10B981" />
+                        </View>
+                        <View style={styles.eduActionContent}>
+                          <Text style={styles.eduActionTitle}>{action.title}</Text>
+                          <Text style={styles.eduActionDescription}>{action.description}</Text>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
+            )}
+
+            {/* Hábitos Positivos */}
+            {education.positive_habits && (
+              <View style={styles.eduSection}>
+                <TouchableOpacity 
+                  style={styles.eduSectionHeader}
+                  onPress={() => setExpandedEducation(expandedEducation === 'habits' ? null : 'habits')}
+                >
+                  <View style={styles.eduSectionTitleRow}>
+                    <Ionicons name="heart" size={22} color="#F59E0B" />
+                    <Text style={styles.eduSectionTitle}>Hábitos Positivos</Text>
+                  </View>
+                  <Ionicons 
+                    name={expandedEducation === 'habits' ? 'chevron-up' : 'chevron-down'} 
+                    size={20} 
+                    color="#9CA3AF" 
+                  />
+                </TouchableOpacity>
+                
+                {expandedEducation === 'habits' && (
+                  <View style={styles.eduActionsList}>
+                    {education.positive_habits.habits.map((habit: any) => (
+                      <View key={habit.id} style={styles.eduActionItem}>
+                        <View style={[styles.eduActionIcon, { backgroundColor: 'rgba(245, 158, 11, 0.2)' }]}>
+                          <Ionicons name={habit.icon as any} size={20} color="#F59E0B" />
+                        </View>
+                        <View style={styles.eduActionContent}>
+                          <Text style={styles.eduActionTitle}>{habit.title}</Text>
+                          <Text style={styles.eduActionDescription}>{habit.description}</Text>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
+            )}
+          </View>
+        )}
+
           <View style={{ height: 100 }} />
         </View>
       </ScrollView>
