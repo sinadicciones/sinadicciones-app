@@ -688,4 +688,19 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: theme.text.primary,
   },
+  insightsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.background.secondary,
+    padding: 16,
+    borderRadius: theme.radius.md,
+    marginTop: 16,
+    gap: 12,
+  },
+  insightsButtonText: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '600',
+    color: theme.accent.warning,
+  },
 });
