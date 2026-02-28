@@ -565,6 +565,14 @@ export default function PurposeDashboard() {
         {labels}
       </Svg>
     );
+    } catch (error) {
+      console.error('Error rendering WheelOfLife:', error);
+      return (
+        <View style={{ padding: 20, alignItems: 'center' }}>
+          <Text>Error al cargar el gráfico</Text>
+        </View>
+      );
+    }
   };
 
   if (loading) {
