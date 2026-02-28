@@ -1,12 +1,15 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
+import { Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { authenticatedFetch, getBackendURL } from '../../utils/api';
 
 const BACKEND_URL = getBackendURL();
 
 export default function TabsLayout() {
   const [userRole, setUserRole] = useState<string | null>(null);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     // Load user profile to determine role
