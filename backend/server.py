@@ -29,13 +29,11 @@ app.add_middleware(
 MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017")
 print(f"Connecting to MongoDB: {MONGO_URL[:50]}...")  # Log connection (truncated for security)
 
-try:
-    client = AsyncIOMotorClient(MONGO_URL, serverSelectionTimeoutMS=5000)
-    db = client.get_default_database() if "?" in MONGO_URL or "/" in MONGO_URL.split("@")[-1] else client.sinadicciones
-except Exception as e:
-    print(f"MongoDB connection error: {e}")
-    client = AsyncIOMotorClient(MONGO_URL, serverSelectionTimeoutMS=5000)
-    db = client.sinadicciones
+# Connect to MongoDB
+client = AsyncIOMotorClient(MONGO_URL, serverSelectionTimeoutMS=5000)
+
+# Use 'sinadicciones' as database name
+db = client.sinadicciones
 
 # Emergent Auth URL
 EMERGENT_AUTH_URL = "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data"
