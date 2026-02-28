@@ -1151,24 +1151,19 @@ const styles = StyleSheet.create({
   },
   quoteCard: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     marginHorizontal: 16,
     marginTop: 16,
     padding: 16,
     borderRadius: 12,
     gap: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
   },
   quoteContent: {
     flex: 1,
   },
   quoteText: {
     fontSize: 14,
-    color: '#374151',
+    color: '#E5E5E5',
     fontStyle: 'italic',
     lineHeight: 20,
   },
@@ -1190,7 +1185,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
     marginBottom: 12,
   },
   seeAllText: {
