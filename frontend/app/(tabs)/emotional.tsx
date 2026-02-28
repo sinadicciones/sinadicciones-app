@@ -314,8 +314,24 @@ export default function EmotionalScreen() {
           )}
         </View>
 
+        {/* AI Insights Button */}
+        <TouchableOpacity 
+          style={styles.insightsButton}
+          onPress={() => setShowInsights(true)}
+        >
+          <Ionicons name="analytics" size={20} color={theme.accent.purple} />
+          <Text style={styles.insightsButtonText}>Ver Análisis IA</Text>
+          <Ionicons name="chevron-forward" size={20} color={theme.text.muted} />
+        </TouchableOpacity>
+
         <View style={{ height: 100 }} />
       </ScrollView>
+
+      {/* AI Insights Modal */}
+      <EmotionalInsights 
+        visible={showInsights} 
+        onClose={() => setShowInsights(false)} 
+      />
 
       {/* Add Log Modal */}
       <Modal
