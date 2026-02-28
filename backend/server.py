@@ -1830,16 +1830,16 @@ async def get_emotional_stats(current_user: User = Depends(get_current_user)):
         {"_id": 0}
     ).sort("date", 1).to_list(30)
     
-    # Calculate average mood
+    # Calculate average mood - support both mood and mood_scale field names
     if logs:
-        avg_mood = sum(log["mood_scale"] for log in logs) / len(logs)
+        avg_mood = sum(log.get("mood_scale") or log.get("mood", 5) for log in logs) / len(logs)
     else:
         avg_mood = 0
     
-    # Get most common tags
+    # Get most common tags - support both tags and emotions field names
     tag_counts = {}
     for log in logs:
-        for tag in log.get("tags", []):
+        for tag in log.get("tags", []) or log.get("emotions", []):
             tag_counts[tag] = tag_counts.get(tag, 0) + 1
     
     return {
