@@ -51,9 +51,9 @@ export default function BottomNavigation() {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: '#2D2D2D',
     paddingBottom: 20,
     paddingTop: 8,
   },
@@ -65,11 +65,11 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 10,
-    color: '#6B7280',
+    color: '#A1A1AA',
     marginTop: 2,
   },
   labelActive: {
-    color: '#10B981',
+    color: '#F59E0B',
     fontWeight: '600',
   },
 });
