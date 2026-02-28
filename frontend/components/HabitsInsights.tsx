@@ -210,6 +210,27 @@ export default function HabitsInsights({ onClose }: Props) {
   const aiAnalysis = analysis?.analysis;
   const habitStats = analysis?.habit_stats || [];
 
+  // Generate calendar data from daily_completion
+  const getCalendarData = () => {
+    if (!stats?.daily_completion) return [];
+    // This is a placeholder - in real implementation, you would get this from the API
+    const today = new Date();
+    const data = [];
+    for (let i = 30; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      const dateKey = date.toISOString().split('T')[0];
+      // Simulating completion rate based on day of week
+      const dayName = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][date.getDay()];
+      const dayData = stats.daily_completion[dayName];
+      data.push({
+        date: dateKey,
+        completionRate: dayData?.rate || 0,
+      });
+    }
+    return data;
+  };
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Period Selector */}
@@ -230,6 +251,39 @@ export default function HabitsInsights({ onClose }: Props) {
             Este Mes
           </Text>
         </TouchableOpacity>
+      </View>
+
+      {/* Calendar View */}
+      <CalendarView 
+        data={getCalendarData()}
+        type="habits"
+        accentColor="#10B981"
+      />
+
+      {/* Progress Ring and Stats */}
+      <View style={styles.ringStatsContainer}>
+        <ProgressRing 
+          percentage={stats?.completion_rate || 0} 
+          size={140} 
+          strokeWidth={12}
+          color="#10B981"
+        />
+        <View style={styles.ringStatsRight}>
+          <View style={styles.ringStatItem}>
+            <Ionicons name="flame" size={28} color="#F59E0B" />
+            <View>
+              <Text style={styles.ringStatValue}>{stats?.current_streak || 0}</Text>
+              <Text style={styles.ringStatLabel}>Mejores Rachas</Text>
+            </View>
+          </View>
+          <View style={styles.ringStatItem}>
+            <Ionicons name="calendar" size={28} color="#8B5CF6" />
+            <View>
+              <Text style={styles.ringStatValue}>{stats?.max_streak || 0}</Text>
+              <Text style={styles.ringStatLabel}>Días Perfectos</Text>
+            </View>
+          </View>
+        </View>
       </View>
 
       {/* AI Summary Card */}
