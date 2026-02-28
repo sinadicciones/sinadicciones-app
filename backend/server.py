@@ -4513,15 +4513,12 @@ CONTEXTO DEL USUARIO:
 """
 
         # Generate AI analysis
-        chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=f"emotional_{user_id}_{period}",
-            system_message="""Eres un psicólogo especializado en bienestar emocional y recuperación de adicciones. 
+        # Generate AI analysis using OpenAI
+        system_message_emotional = """Eres un psicólogo especializado en bienestar emocional y recuperación de adicciones. 
 Analiza los datos emocionales del usuario con empatía y proporciona insights útiles.
 Responde SIEMPRE en español de manera cálida y comprensiva.
 Usa emojis para hacer el mensaje más amigable.
 Enfócate en validar las emociones y ofrecer estrategias de regulación emocional."""
-        ).with_model("openai", "gpt-4o")
         
         prompt = f"""Analiza estos datos emocionales y genera un análisis personalizado:
 
@@ -4548,12 +4545,11 @@ Genera un análisis JSON con esta estructura exacta (responde SOLO el JSON, sin 
     "enfoque_proxima_semana": "Un área emocional específica para trabajar"
 }}"""
 
-        user_message = UserMessage(text=prompt)
-        ai_response = await chat.send_message(user_message)
+        ai_response_text = await generate_ai_response(system_message_emotional, prompt)
         
         # Parse AI response
         try:
-            clean_response = ai_response.strip()
+            clean_response = ai_response_text.strip()
             if clean_response.startswith("```"):
                 clean_response = clean_response.split("```")[1]
                 if clean_response.startswith("json"):
