@@ -162,9 +162,11 @@ const MoodChart = ({ data }: { data: any[] }) => {
 
 // Componente de Alerta
 const AlertCard = ({ alert, onPress }: { alert: any; onPress: () => void }) => {
-  const bgColor = alert.severity === 'warning' ? '#FEF3C7' : '#EFF6FF';
+  const bgColor = alert.severity === 'warning' ? '#1A1A1A' : '#1A1A1A';
   const borderColor = alert.severity === 'warning' ? '#F59E0B' : '#3B82F6';
   const iconColor = alert.severity === 'warning' ? '#F59E0B' : '#3B82F6';
+  const textColor = '#FFFFFF';
+  const subTextColor = '#A1A1AA';
 
   return (
     <TouchableOpacity 
@@ -173,10 +175,10 @@ const AlertCard = ({ alert, onPress }: { alert: any; onPress: () => void }) => {
     >
       <Ionicons name={alert.icon as any} size={24} color={iconColor} />
       <View style={styles.alertContent}>
-        <Text style={styles.alertTitle}>{alert.title}</Text>
-        <Text style={styles.alertMessage}>{alert.message}</Text>
+        <Text style={[styles.alertTitle, { color: textColor }]}>{alert.title}</Text>
+        <Text style={[styles.alertMessage, { color: subTextColor }]}>{alert.message}</Text>
       </View>
-      <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+      <Ionicons name="chevron-forward" size={20} color="#6B7280" />
     </TouchableOpacity>
   );
 };
