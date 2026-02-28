@@ -269,7 +269,7 @@ index 5525e64..e69de29 100644
 -------+from datetime import datetime, timezone
 -------+
 -------+# Configuration
--------+BACKEND_URL = "https://wellness-insights-3.preview.emergentagent.com/api"
+-------+BACKEND_URL = "https://version-code-fix.preview.emergentagent.com/api"
 -------+
 -------+class EdgeCaseTester:
 -------+    def __init__(self):

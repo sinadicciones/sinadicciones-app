@@ -5,7 +5,7 @@ import * as Linking from 'expo-linking';
 import { Platform } from 'react-native';
 
 // Get backend URL - use environment variable or fallback
-const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'https://wellness-insights-3.preview.emergentagent.com';
+const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'https://version-code-fix.preview.emergentagent.com';
 
 // Helper for storing token (works on both web and mobile)
 const storeToken = async (token: string) => {
@@ -199,7 +199,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const currentOrigin = window.location.origin;
         if (currentOrigin.includes('localhost') || currentOrigin.includes('127.0.0.1')) {
           // Use the public preview URL instead of localhost
-          redirectUrl = 'https://wellness-insights-3.preview.emergentagent.com/';
+          redirectUrl = 'https://version-code-fix.preview.emergentagent.com/';
         } else {
           redirectUrl = currentOrigin + window.location.pathname;
         }
