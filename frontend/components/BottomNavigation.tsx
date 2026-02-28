@@ -36,7 +36,7 @@ export default function BottomNavigation() {
             <Ionicons
               name={active ? tab.icon as any : `${tab.icon}-outline` as any}
               size={24}
-              color={active ? '#10B981' : '#6B7280'}
+              color={active ? '#F59E0B' : '#A1A1AA'}
             />
             <Text style={[styles.label, active && styles.labelActive]}>
               {tab.label}
