@@ -322,8 +322,24 @@ export default function HabitsScreen() {
           )}
         </View>
 
+        {/* AI Insights Button */}
+        <TouchableOpacity 
+          style={styles.insightsButton}
+          onPress={() => setShowInsights(true)}
+        >
+          <Ionicons name="analytics" size={20} color={theme.accent.warning} />
+          <Text style={styles.insightsButtonText}>Ver Análisis IA</Text>
+          <Ionicons name="chevron-forward" size={20} color={theme.text.muted} />
+        </TouchableOpacity>
+
         <View style={{ height: 100 }} />
       </ScrollView>
+
+      {/* AI Insights Modal */}
+      <HabitsInsights 
+        visible={showInsights} 
+        onClose={() => setShowInsights(false)} 
+      />
 
       {/* Add Habit Modal */}
       <Modal
