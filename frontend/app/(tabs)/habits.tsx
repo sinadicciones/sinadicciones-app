@@ -297,7 +297,7 @@ export default function HabitsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#0D0D0D',
   },
   header: {
     paddingTop: 50,
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   insightsBtn: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     padding: 8,
     borderRadius: 10,
   },
@@ -336,12 +336,12 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
     marginTop: 16,
   },
   emptyText: {
     fontSize: 16,
-    color: '#6B7280',
+    color: '#A1A1AA',
     marginTop: 8,
     textAlign: 'center',
   },
@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     padding: 16,
     borderRadius: 16,
     marginBottom: 12,
@@ -378,7 +378,7 @@ const styles = StyleSheet.create({
   habitName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   habitMeta: {
     flexDirection: 'row',
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
   },
   habitFrequency: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#A1A1AA',
     marginLeft: 4,
   },
   habitRight: {
@@ -432,7 +432,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
@@ -448,7 +448,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   input: {
     backgroundColor: '#F3F4F6',
@@ -460,7 +460,7 @@ const styles = StyleSheet.create({
   colorLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: '#FFFFFF',
     marginBottom: 12,
   },
   colorPicker: {
@@ -520,7 +520,7 @@ const styles = StyleSheet.create({
   // Modal Styles
   insightsModal: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#0D0D0D',
   },
   insightsModalHeader: {
     flexDirection: 'row',
@@ -529,13 +529,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 12,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: '#2D2D2D',
   },
   insightsModalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
 });
