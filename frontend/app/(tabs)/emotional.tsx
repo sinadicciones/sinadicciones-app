@@ -202,11 +202,14 @@ export default function EmotionalScreen() {
               <Text style={styles.emptyText}>Aún no has registrado tus emociones</Text>
             </View>
           ) : (
-            logs.slice(0, 10).map((log) => (
+            logs.slice(0, 10).map((log) => {
+              const moodValue = log.mood_scale || log.mood || 0;
+              console.log('Rendering log:', log.log_id, 'mood:', moodValue, 'emoji:', MOOD_EMOJIS[moodValue - 1]?.emoji);
+              return (
               <View key={log.log_id} style={styles.logCard}>
                 <View style={styles.logHeader}>
                   <Text style={styles.logMood}>
-                    {MOOD_EMOJIS[(log.mood_scale || log.mood) - 1]?.emoji} {log.mood_scale || log.mood}/10
+                    {MOOD_EMOJIS[moodValue - 1]?.emoji} {moodValue}/10
                   </Text>
                   <Text style={styles.logDate}>{log.date}</Text>
                 </View>
@@ -221,7 +224,7 @@ export default function EmotionalScreen() {
                   </View>
                 )}
               </View>
-            ))
+            )})
           )}
         </View>
       </ScrollView>
