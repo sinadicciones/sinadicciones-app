@@ -928,7 +928,7 @@ export default function PurposeDashboard() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#0D0D0D',
   },
   loadingContainer: {
     flex: 1,
@@ -974,13 +974,13 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
     marginTop: 24,
     marginBottom: 12,
   },
   emptyText: {
     fontSize: 16,
-    color: '#6B7280',
+    color: '#A1A1AA',
     textAlign: 'center',
     marginBottom: 32,
     lineHeight: 24,
@@ -1026,7 +1026,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   purposeCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     margin: 16,
     marginTop: 0,
     padding: 20,
@@ -1045,7 +1045,7 @@ const styles = StyleSheet.create({
   },
   purposeLabel: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#A1A1AA',
     marginBottom: 4,
   },
   purposeType: {
@@ -1084,7 +1084,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   wheelCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     margin: 16,
     marginTop: 0,
     padding: 20,
@@ -1098,12 +1098,12 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
     marginBottom: 4,
   },
   cardSubtitle: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#A1A1AA',
     marginBottom: 20,
   },
   wheelContainer: {
@@ -1127,7 +1127,7 @@ const styles = StyleSheet.create({
   },
   areaCard: {
     width: (width - 56) / 2,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     padding: 16,
     borderRadius: 12,
     shadowColor: '#000',
@@ -1147,12 +1147,12 @@ const styles = StyleSheet.create({
   areaLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1F2937',
+    color: '#FFFFFF',
     marginBottom: 8,
   },
   areaProgress: {
     height: 6,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#0D0D0D',
     borderRadius: 3,
     overflow: 'hidden',
     marginBottom: 8,
@@ -1163,7 +1163,7 @@ const styles = StyleSheet.create({
   },
   areaRating: {
     fontSize: 12,
-    color: '#6B7280',
+    color: '#A1A1AA',
     fontWeight: '600',
   },
   actionsSection: {
@@ -1172,13 +1172,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
     marginBottom: 16,
   },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
@@ -1194,7 +1194,7 @@ const styles = StyleSheet.create({
   },
   actionButtonText: {
     fontSize: 16,
-    color: '#1F2937',
+    color: '#FFFFFF',
     fontWeight: '600',
   },
   actionButtonSubtext: {
@@ -1210,14 +1210,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#2D2D2D',
     borderStyle: 'dashed',
     marginTop: 8,
     gap: 8,
   },
   restartButtonText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#A1A1AA',
   },
   // Modal styles
   modalOverlay: {
@@ -1226,7 +1226,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
@@ -1241,7 +1241,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   modalDescription: {
     fontSize: 16,
@@ -1272,7 +1272,7 @@ const styles = StyleSheet.create({
   modalSectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
     marginBottom: 12,
     marginTop: 8,
   },
@@ -1350,7 +1350,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#0D0D0D',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
@@ -1358,13 +1358,13 @@ const styles = StyleSheet.create({
   guideTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
     marginBottom: 8,
     textAlign: 'center',
   },
   guideText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#A1A1AA',
     textAlign: 'center',
     lineHeight: 22,
   },
