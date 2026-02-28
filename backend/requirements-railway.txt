@@ -20,5 +20,8 @@ aiohttp==3.13.3
 python-dotenv==1.2.1
 pydantic==2.12.5
 
+# Web scraping
+beautifulsoup4==4.12.3
+
 # AI Integration - Using OpenAI directly
 openai==1.99.9
