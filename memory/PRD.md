@@ -43,6 +43,11 @@ SinAdicciones es una aplicación móvil de apoyo a personas en recuperación de 
 - [x] Secciones expandibles en perfil
 - [x] KeyboardAvoidingView en modales
 - [x] Placeholders visibles en inputs
+- [x] Contrastes de color corregidos en toda la app
+- [x] Widget "Tu Bienestar" con gráfico circular
+- [x] Tarjetas de resumen (Hábitos hoy, Último ánimo, Metas)
+- [x] Componente CalendarView con vista Semana/Mes
+- [x] Integración de calendario en HabitsInsights y EmotionalInsights
 
 ### Backend
 - [x] Endpoints de autenticación (email/password, Google OAuth)
@@ -67,16 +72,21 @@ SinAdicciones es una aplicación móvil de apoyo a personas en recuperación de 
 - [x] Emojis no mostrándose en historial emocional
 - [x] Error 500 en endpoint /api/emotional-logs/stats
 - [x] placeholderTextColor duplicado en profile.tsx
+- [x] Contraste de colores en tarjetas de alertas (AlertCard)
+- [x] Texto del gráfico de bienestar no visible
+- [x] Tarjetas de estadísticas con colores invertidos
+
+## New Components Added (Feb 28, 2026)
+- [x] CalendarView.tsx - Componente de calendario reutilizable con vista semana/mes
+- [x] ProgressRing mejorado con SVG en HabitsInsights
+- [x] Mood stats ring en EmotionalInsights
 
 ## Upcoming Tasks (P1)
-- [ ] Rediseño estilo "Daily Planner" para Hábitos y Emociones
-  - Selector de semana
-  - Calendario mensual
-  - Filtros
 - [ ] Notificaciones push en frontend
+- [ ] Refinar visualización del calendario con datos reales del backend
 
 ## Future Tasks (P2-P3)
-- [ ] Usuarios de prueba permanentes en producción
+- [ ] Usuarios de prueba permanentes en producción (Railway)
 - [ ] Dominio personalizado
 - [ ] Más contenido educativo
 
@@ -94,13 +104,15 @@ SinAdicciones es una aplicación móvil de apoyo a personas en recuperación de 
 │   ├── app/
 │   │   ├── (tabs)/
 │   │   │   ├── _layout.tsx    # Tab bar config
+│   │   │   ├── home.tsx       # Dashboard con widgets
 │   │   │   ├── profile.tsx    # Perfil con secciones
 │   │   │   ├── habits.tsx     # Tracking de hábitos
 │   │   │   └── emotional.tsx  # Tracking emocional
 │   │   └── index.tsx          # Landing/Login
 │   ├── components/
-│   │   ├── HabitsInsights.tsx
-│   │   └── EmotionalInsights.tsx
+│   │   ├── CalendarView.tsx   # NUEVO: Calendario semana/mes
+│   │   ├── HabitsInsights.tsx # Con calendario y ring
+│   │   └── EmotionalInsights.tsx # Con calendario y stats
 │   └── utils/
 │       └── api.ts             # authenticatedFetch
 └── memory/
