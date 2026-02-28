@@ -602,19 +602,23 @@ export default function HomeScreen() {
         {/* Estadísticas Rápidas */}
         <View style={styles.statsRow}>
           <TouchableOpacity 
-            style={[styles.statMini, { backgroundColor: '#ECFDF5' }]}
+            style={styles.statMini}
             onPress={() => router.push('/(tabs)/habits')}
           >
-            <Ionicons name="checkmark-circle" size={24} color="#10B981" />
+            <View style={[styles.statMiniIconBg, { backgroundColor: 'rgba(16, 185, 129, 0.15)' }]}>
+              <Ionicons name="checkmark-circle" size={24} color="#10B981" />
+            </View>
             <Text style={styles.statMiniNumber}>{habitsData.completed_today || 0}/{habitsData.total || 0}</Text>
             <Text style={styles.statMiniLabel}>Hábitos hoy</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
-            style={[styles.statMini, { backgroundColor: '#FEF2F2' }]}
+            style={styles.statMini}
             onPress={() => router.push('/(tabs)/emotional')}
           >
-            <Ionicons name="heart" size={24} color="#EF4444" />
+            <View style={[styles.statMiniIconBg, { backgroundColor: 'rgba(239, 68, 68, 0.15)' }]}>
+              <Ionicons name="heart" size={24} color="#EF4444" />
+            </View>
             <Text style={styles.statMiniNumber}>
               {emotional.last_mood ? `${emotional.last_mood}/10` : '—'}
             </Text>
@@ -624,10 +628,12 @@ export default function HomeScreen() {
           </TouchableOpacity>
           
           <TouchableOpacity 
-            style={[styles.statMini, { backgroundColor: '#F5F3FF' }]}
+            style={styles.statMini}
             onPress={() => router.push('/(tabs)/purpose')}
           >
-            <Ionicons name="compass" size={24} color="#8B5CF6" />
+            <View style={[styles.statMiniIconBg, { backgroundColor: 'rgba(139, 92, 246, 0.15)' }]}>
+              <Ionicons name="compass" size={24} color="#8B5CF6" />
+            </View>
             <Text style={styles.statMiniNumber}>{dashboard?.purpose?.total_goals || 0}</Text>
             <Text style={styles.statMiniLabel}>Metas</Text>
           </TouchableOpacity>
