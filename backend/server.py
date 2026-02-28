@@ -4281,15 +4281,11 @@ HÁBITOS MÁS CONSISTENTES: {', '.join([h['name'] for h in habit_stats[:3]]) if 
 HÁBITOS A MEJORAR: {', '.join([h['name'] for h in habit_stats[-3:]]) if len(habit_stats) >= 3 else 'N/A'}
 """
 
-        # Generate AI analysis
-        chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=f"habits_{user_id}_{period}",
-            system_message="""Eres un coach de hábitos experto y motivador. Analiza los datos de hábitos del usuario y proporciona insights específicos y accionables.
+        # Generate AI analysis using OpenAI
+        system_message_habits = """Eres un coach de hábitos experto y motivador. Analiza los datos de hábitos del usuario y proporciona insights específicos y accionables.
 Responde SIEMPRE en español de manera positiva y constructiva.
 Usa emojis para hacer el mensaje más amigable.
 Enfócate en patrones, consistencia y mejoras prácticas."""
-        ).with_model("openai", "gpt-4o")
         
         prompt = f"""Analiza estos datos de hábitos y genera un análisis personalizado:
 
@@ -4313,12 +4309,11 @@ Genera un análisis JSON con esta estructura exacta (responde SOLO el JSON, sin 
     "meta_proxima_semana": "Una meta específica y alcanzable para la próxima semana"
 }}"""
 
-        user_message = UserMessage(text=prompt)
-        ai_response = await chat.send_message(user_message)
+        ai_response_text = await generate_ai_response(system_message_habits, prompt)
         
         # Parse AI response
         try:
-            clean_response = ai_response.strip()
+            clean_response = ai_response_text.strip()
             if clean_response.startswith("```"):
                 clean_response = clean_response.split("```")[1]
                 if clean_response.startswith("json"):
