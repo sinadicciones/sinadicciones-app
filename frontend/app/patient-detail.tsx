@@ -322,7 +322,7 @@ export default function PatientDetailScreen() {
               <TouchableOpacity style={styles.submitBtn} onPress={handleCreateNote}><Text style={styles.submitBtnText}>Guardar Nota</Text></TouchableOpacity>
             </ScrollView>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );
