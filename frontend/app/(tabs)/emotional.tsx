@@ -206,14 +206,14 @@ export default function EmotionalScreen() {
               <View key={log.log_id} style={styles.logCard}>
                 <View style={styles.logHeader}>
                   <Text style={styles.logMood}>
-                    {MOOD_EMOJIS[log.mood_scale - 1]?.emoji} {log.mood_scale}/10
+                    {MOOD_EMOJIS[(log.mood_scale || log.mood) - 1]?.emoji} {log.mood_scale || log.mood}/10
                   </Text>
                   <Text style={styles.logDate}>{log.date}</Text>
                 </View>
                 {log.note && <Text style={styles.logNote}>{log.note}</Text>}
-                {log.tags && log.tags.length > 0 && (
+                {(log.tags || log.emotions) && (log.tags || log.emotions).length > 0 && (
                   <View style={styles.logTags}>
-                    {log.tags.map((tag: string) => (
+                    {(log.tags || log.emotions).map((tag: string) => (
                       <View key={tag} style={styles.tag}>
                         <Text style={styles.tagText}>{tag}</Text>
                       </View>
