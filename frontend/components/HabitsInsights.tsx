@@ -837,4 +837,32 @@ const styles = StyleSheet.create({
     color: '#065F46',
     lineHeight: 22,
   },
+  ringStatsContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#1A1A1A',
+    borderRadius: 16,
+    padding: 20,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  ringStatsRight: {
+    flex: 1,
+    marginLeft: 20,
+    gap: 20,
+  },
+  ringStatItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  ringStatValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  ringStatLabel: {
+    fontSize: 12,
+    color: '#A1A1AA',
+  },
 });
