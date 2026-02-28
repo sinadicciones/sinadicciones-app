@@ -175,8 +175,8 @@ export default function EmotionalScreen() {
                 <Text style={styles.chartTitle}>Últimos 7 días</Text>
                 <BarChart
                   data={stats.recent_logs.map((log: any) => ({
-                    value: log.mood_scale,
-                    frontColor: getMoodColor(log.mood_scale),
+                    value: log.mood_scale || log.mood || 0,
+                    frontColor: getMoodColor(log.mood_scale || log.mood || 5),
                   }))}
                   barWidth={32}
                   spacing={20}
