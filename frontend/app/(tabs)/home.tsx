@@ -892,7 +892,7 @@ export default function HomeScreen() {
                   />
                 </TouchableOpacity>
                 
-                {expandedEducation === 'craving' && (
+                {expandedEducation === 'craving' && education.craving_management?.techniques && (
                   <View style={styles.eduActionsList}>
                     {education.craving_management.techniques.map((technique: any) => (
                       <View key={technique.id} style={styles.eduActionItem}>
