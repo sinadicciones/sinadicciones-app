@@ -32,22 +32,17 @@ export default function TabsLayout() {
   const isFamily = userRole === 'family';
   const isProfessional = userRole === 'professional';
 
-  // Get theme colors based on role
+  // Get theme colors based on role - Yellow accent for all
   const getThemeColor = () => {
-    if (isActiveUser) return '#F59E0B';
-    if (isFamily) return '#8B5CF6';
-    if (isProfessional) return '#3B82F6';
-    return '#10B981';
+    return '#F59E0B'; // Yellow for all profiles
   };
 
   const getBgColor = () => {
-    if (isActiveUser) return '#1A1A1A';
-    return '#FFFFFF';
+    return '#0D0D0D'; // Dark for all profiles
   };
 
   const getBorderColor = () => {
-    if (isActiveUser) return '#333333';
-    return '#E5E7EB';
+    return '#2D2D2D'; // Dark border for all
   };
 
   return (
