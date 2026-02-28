@@ -347,6 +347,7 @@ export default function OnboardingScreen() {
               style={styles.input}
               placeholder="Ej: Alcohol, Cocaína, Juego, etc."
               placeholderTextColor="#9CA3AF"
+              placeholderTextColor="#9CA3AF"
               value={addictionType}
               onChangeText={setAddictionType}
               autoFocus
@@ -354,6 +355,7 @@ export default function OnboardingScreen() {
             <TextInput
               style={styles.input}
               placeholder="¿Cuántos años aproximadamente?"
+              placeholderTextColor="#9CA3AF"
               placeholderTextColor="#9CA3AF"
               value={yearsUsing}
               onChangeText={setYearsUsing}
@@ -375,6 +377,7 @@ export default function OnboardingScreen() {
             <TextInput
               style={styles.input}
               placeholder="2024-01-15"
+              placeholderTextColor="#9CA3AF"
               value={cleanSince}
               onChangeText={setCleanSince}
               autoFocus
@@ -429,6 +432,7 @@ export default function OnboardingScreen() {
                 <TextInput
                   style={styles.input}
                   placeholder="O escribe otro diagnóstico"
+              placeholderTextColor="#9CA3AF"
                   value={newDiagnosis}
                   onChangeText={setNewDiagnosis}
                   onSubmitEditing={() => addItem(diagnoses, setDiagnoses, newDiagnosis, setNewDiagnosis)}
@@ -473,6 +477,7 @@ export default function OnboardingScreen() {
             <TextInput
               style={styles.input}
               placeholder="Agregar otro gatillo"
+              placeholderTextColor="#9CA3AF"
               value={newTrigger}
               onChangeText={setNewTrigger}
               onSubmitEditing={() => addItem(triggers, setTriggers, newTrigger, setNewTrigger)}
@@ -515,6 +520,7 @@ export default function OnboardingScreen() {
             <TextInput
               style={styles.input}
               placeholder="Agregar otro factor protector"
+              placeholderTextColor="#9CA3AF"
               value={newFactor}
               onChangeText={setNewFactor}
               onSubmitEditing={() => addItem(protectiveFactors, setProtectiveFactors, newFactor, setNewFactor)}
@@ -537,6 +543,7 @@ export default function OnboardingScreen() {
             <TextInput
               style={[styles.input, styles.textArea]}
               placeholder="Ejemplo: Para estar presente para mis hijos, recuperar mi salud, volver a ser quien era antes..."
+              placeholderTextColor="#9CA3AF"
               value={myWhy}
               onChangeText={setMyWhy}
               multiline
@@ -708,12 +715,14 @@ export default function OnboardingScreen() {
             <TextInput
               style={styles.input}
               placeholder="Nombre del contacto"
+              placeholderTextColor="#9CA3AF"
               value={emergencyContact.name}
               onChangeText={(text) => setEmergencyContact({ ...emergencyContact, name: text })}
             />
             <TextInput
               style={styles.input}
               placeholder="Teléfono (con código de país)"
+              placeholderTextColor="#9CA3AF"
               value={emergencyContact.phone}
               onChangeText={(text) => setEmergencyContact({ ...emergencyContact, phone: text })}
               keyboardType="phone-pad"
@@ -721,6 +730,7 @@ export default function OnboardingScreen() {
             <TextInput
               style={styles.input}
               placeholder="Relación (padrino, familiar, amigo)"
+              placeholderTextColor="#9CA3AF"
               value={emergencyContact.relationship}
               onChangeText={(text) => setEmergencyContact({ ...emergencyContact, relationship: text })}
             />
