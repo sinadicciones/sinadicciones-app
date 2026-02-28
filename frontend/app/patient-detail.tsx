@@ -269,9 +269,11 @@ export default function PatientDetailScreen() {
             <View style={styles.modalHeader}><Text style={styles.modalTitle}>Nueva Tarea</Text><TouchableOpacity onPress={() => setShowTaskModal(false)}><Ionicons name="close" size={24} color="#6B7280" /></TouchableOpacity></View>
             <ScrollView style={styles.modalBody}>
               <Text style={styles.inputLabel}>Título *</Text>
-              <TextInput style={styles.input} value={newTask.title} onChangeText={(t) => setNewTask({ ...newTask, title: t })} placeholder="Ej: Ejercicio de respiración" />
+              <TextInput style={styles.input} value={newTask.title} onChangeText={(t) => setNewTask({ ...newTask, title: t })} placeholder="Ej: Ejercicio de respiración"
+              placeholderTextColor="#9CA3AF" />
               <Text style={styles.inputLabel}>Descripción</Text>
-              <TextInput style={[styles.input, styles.textArea]} value={newTask.description} onChangeText={(t) => setNewTask({ ...newTask, description: t })} placeholder="Instrucciones..." multiline />
+              <TextInput style={[styles.input, styles.textArea]} value={newTask.description} onChangeText={(t) => setNewTask({ ...newTask, description: t })} placeholder="Instrucciones..."
+              placeholderTextColor="#9CA3AF" multiline />
               <Text style={styles.inputLabel}>Categoría</Text>
               <View style={styles.catGrid}>
                 {TASK_CATEGORIES.map((c) => (
@@ -301,13 +303,17 @@ export default function PatientDetailScreen() {
             <View style={styles.modalHeader}><Text style={styles.modalTitle}>Nota de Sesión</Text><TouchableOpacity onPress={() => setShowNoteModal(false)}><Ionicons name="close" size={24} color="#6B7280" /></TouchableOpacity></View>
             <ScrollView style={styles.modalBody}>
               <Text style={styles.inputLabel}>Fecha</Text>
-              <TextInput style={styles.input} value={newNote.session_date} onChangeText={(t) => setNewNote({ ...newNote, session_date: t })} placeholder="YYYY-MM-DD" />
+              <TextInput style={styles.input} value={newNote.session_date} onChangeText={(t) => setNewNote({ ...newNote, session_date: t })} placeholder="YYYY-MM-DD"
+              placeholderTextColor="#9CA3AF" />
               <Text style={styles.inputLabel}>Notas privadas *</Text>
-              <TextInput style={[styles.input, styles.textArea]} value={newNote.private_notes} onChangeText={(t) => setNewNote({ ...newNote, private_notes: t })} placeholder="Observaciones clínicas..." multiline />
+              <TextInput style={[styles.input, styles.textArea]} value={newNote.private_notes} onChangeText={(t) => setNewNote({ ...newNote, private_notes: t })} placeholder="Observaciones clínicas..."
+              placeholderTextColor="#9CA3AF" multiline />
               <Text style={styles.inputLabel}>Resumen para paciente</Text>
-              <TextInput style={[styles.input, styles.textArea]} value={newNote.session_summary} onChangeText={(t) => setNewNote({ ...newNote, session_summary: t })} placeholder="Lo que el paciente verá..." multiline />
+              <TextInput style={[styles.input, styles.textArea]} value={newNote.session_summary} onChangeText={(t) => setNewNote({ ...newNote, session_summary: t })} placeholder="Lo que el paciente verá..."
+              placeholderTextColor="#9CA3AF" multiline />
               <Text style={styles.inputLabel}>Objetivos</Text>
-              <View style={styles.goalInputRow}><TextInput style={[styles.input, { flex: 1 }]} value={goalInput} onChangeText={setGoalInput} placeholder="Agregar objetivo..." /><TouchableOpacity style={styles.addGoalBtn} onPress={addGoal}><Ionicons name="add" size={20} color="#FFF" /></TouchableOpacity></View>
+              <View style={styles.goalInputRow}><TextInput style={[styles.input, { flex: 1 }]} value={goalInput} onChangeText={setGoalInput} placeholder="Agregar objetivo..."
+              placeholderTextColor="#9CA3AF" /><TouchableOpacity style={styles.addGoalBtn} onPress={addGoal}><Ionicons name="add" size={20} color="#FFF" /></TouchableOpacity></View>
               {newNote.goals_discussed.map((g, i) => <View key={i} style={styles.goalChip}><Text style={styles.goalChipText}>{g}</Text><TouchableOpacity onPress={() => setNewNote({ ...newNote, goals_discussed: newNote.goals_discussed.filter((_, idx) => idx !== i) })}><Ionicons name="close-circle" size={18} color="#6B7280" /></TouchableOpacity></View>)}
               <Text style={styles.inputLabel}>Ánimo observado: {newNote.mood_rating}/10</Text>
               <View style={styles.moodRow}>{[1,2,3,4,5,6,7,8,9,10].map((n) => <TouchableOpacity key={n} style={[styles.moodDot, newNote.mood_rating === n && styles.moodDotActive]} onPress={() => setNewNote({ ...newNote, mood_rating: n })}><Text style={styles.moodDotText}>{n}</Text></TouchableOpacity>)}</View>
