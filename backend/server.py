@@ -3957,17 +3957,13 @@ TRIGGERS CONOCIDOS: {', '.join(profile.get('triggers', [])[:3]) if profile and p
 FACTORES PROTECTORES: {', '.join(profile.get('protective_factors', [])[:3]) if profile and profile.get('protective_factors') else 'No especificados'}
 """
 
-        # Generate AI analysis
-        chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=f"wellness_{user_id}_{period}",
-            system_message="""Eres un coach de bienestar y recuperación de adicciones compasivo y experto. 
+        # Generate AI analysis using OpenAI directly
+        system_message = """Eres un coach de bienestar y recuperación de adicciones compasivo y experto. 
 Tu rol es analizar los datos del usuario y proporcionar insights personalizados, motivadores y prácticos.
 Responde SIEMPRE en español de manera cálida y empática.
 Usa emojis para hacer el mensaje más amigable.
 Sé específico con los datos pero nunca crítico ni negativo.
 Enfócate en el progreso y las oportunidades de mejora."""
-        ).with_model("openai", "gpt-4o")
         
         prompt = f"""Analiza estos datos de bienestar y genera un reporte personalizado:
 
@@ -3990,8 +3986,7 @@ Genera un análisis JSON con esta estructura exacta (responde SOLO el JSON, sin 
     "enfoque_semana": "Un área específica para enfocarse la próxima semana"
 }}"""
 
-        user_message = UserMessage(text=prompt)
-        ai_response = await chat.send_message(user_message)
+        ai_response_text = await generate_ai_response(system_message, prompt)
         
         # Parse AI response
         try:
