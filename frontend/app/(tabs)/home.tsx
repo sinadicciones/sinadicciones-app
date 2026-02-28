@@ -259,6 +259,17 @@ export default function HomeScreen() {
       } catch (err) {
         console.log('No therapist tasks available');
       }
+
+      // Load educational content
+      try {
+        const eduRes = await fetch(`${BACKEND_URL}/api/education/content`);
+        if (eduRes.ok) {
+          const eduData = await eduRes.json();
+          setEducation(eduData);
+        }
+      } catch (error) {
+        console.log('Education content not available');
+      }
     } catch (error) {
       console.error('Failed to load data:', error);
     } finally {
