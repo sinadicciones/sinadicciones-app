@@ -3,9 +3,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 
-// Get backend URL - use environment variable or fallback
-const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'https://version-code-fix.preview.emergentagent.com';
+// Get backend URL - use expo config extra or environment variable
+const BACKEND_URL = Constants.expoConfig?.extra?.backendUrl || process.env.EXPO_PUBLIC_BACKEND_URL || 'https://sinadicciones-app-production.up.railway.app';
 
 // Helper for storing token (works on both web and mobile)
 const storeToken = async (token: string) => {
