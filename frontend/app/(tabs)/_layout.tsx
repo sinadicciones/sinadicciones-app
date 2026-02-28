@@ -60,8 +60,8 @@ export default function TabsLayout() {
           backgroundColor: getBgColor(),
           borderTopWidth: 1,
           borderTopColor: getBorderColor(),
-          height: 60,
-          paddingBottom: 6,
+          height: 60 + (Platform.OS === 'android' ? insets.bottom : 0),
+          paddingBottom: Platform.OS === 'android' ? Math.max(insets.bottom, 10) : 6,
           paddingTop: 6,
         },
         tabBarLabelStyle: {
