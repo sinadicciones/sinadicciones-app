@@ -540,11 +540,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
   },
+  modalScrollContent: {
+    flexGrow: 1,
+    justifyContent: 'flex-end',
+  },
   modalContent: {
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
+    paddingBottom: Platform.OS === 'android' ? 40 : 24,
     maxHeight: '90%',
   },
   modalHeader: {
