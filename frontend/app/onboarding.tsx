@@ -347,7 +347,6 @@ export default function OnboardingScreen() {
               style={styles.input}
               placeholder="Ej: Alcohol, Cocaína, Juego, etc."
               placeholderTextColor="#9CA3AF"
-              placeholderTextColor="#9CA3AF"
               value={addictionType}
               onChangeText={setAddictionType}
               autoFocus
@@ -355,7 +354,6 @@ export default function OnboardingScreen() {
             <TextInput
               style={styles.input}
               placeholder="¿Cuántos años aproximadamente?"
-              placeholderTextColor="#9CA3AF"
               placeholderTextColor="#9CA3AF"
               value={yearsUsing}
               onChangeText={setYearsUsing}
