@@ -19,6 +19,7 @@ const getToken = async (): Promise<string | null> => {
 /**
  * Helper function to make authenticated API requests
  * Uses Authorization header with token from storage
+ * Automatically prepends BACKEND_URL if the url starts with /api
  */
 export async function authenticatedFetch(url: string, options: FetchOptions = {}): Promise<Response> {
   const headers: Record<string, string> = {
@@ -32,8 +33,11 @@ export async function authenticatedFetch(url: string, options: FetchOptions = {}
     headers['Authorization'] = `Bearer ${token}`;
   }
 
+  // Prepend BACKEND_URL if url starts with /api (relative URL)
+  const fullUrl = url.startsWith('/api') ? `${BACKEND_URL}${url}` : url;
+
   // Make the request
-  return fetch(url, {
+  return fetch(fullUrl, {
     ...options,
     headers,
     credentials: 'include',
