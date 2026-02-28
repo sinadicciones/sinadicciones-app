@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -13,46 +13,30 @@ import {
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { authenticatedFetch, getBackendURL } from '../../utils/api';
-import { theme, STATUS_FILTERS, TIME_FILTERS, DAYS_SHORT } from '../../utils/theme';
-import { WeekSelector, MonthCalendar, FilterChips } from '../../components/Calendar';
 import HabitsInsights from '../../components/HabitsInsights';
 
 const BACKEND_URL = getBackendURL();
 
 const COLORS = ['#10B981', '#3B82F6', '#8B5CF6', '#F59E0B', '#EF4444', '#EC4899'];
 
-const TIME_OPTIONS = [
-  { key: 'anytime', label: 'Cualquier momento', icon: 'time-outline' },
-  { key: 'morning', label: 'Mañana', icon: 'sunny-outline' },
-  { key: 'afternoon', label: 'Tarde', icon: 'partly-sunny-outline' },
-  { key: 'evening', label: 'Noche', icon: 'moon-outline' },
-];
-
 export default function HabitsScreen() {
   const [habits, setHabits] = useState<any[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [habitName, setHabitName] = useState('');
   const [selectedColor, setSelectedColor] = useState(COLORS[0]);
-  const [selectedTime, setSelectedTime] = useState('anytime');
   const [refreshing, setRefreshing] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [timeFilter, setTimeFilter] = useState('all');
-  const [showCalendar, setShowCalendar] = useState(false);
-  const [habitHistory, setHabitHistory] = useState<any>({});
   const [showInsights, setShowInsights] = useState(false);
 
   useEffect(() => {
     loadHabits();
-    loadHistory();
-  }, [selectedDate]);
+  }, []);
 
   const loadHabits = async () => {
     try {
-      const dateStr = selectedDate.toISOString().split('T')[0];
-      const response = await authenticatedFetch(`${BACKEND_URL}/api/habits?date=${dateStr}`);
+      const response = await authenticatedFetch(`${BACKEND_URL}/api/habits`);
+
       if (response.ok) {
         const data = await response.json();
         setHabits(data);
@@ -61,22 +45,6 @@ export default function HabitsScreen() {
       console.error('Failed to load habits:', error);
     } finally {
       setRefreshing(false);
-    }
-  };
-
-  const loadHistory = async () => {
-    try {
-      const response = await authenticatedFetch(`${BACKEND_URL}/api/habits/history`);
-      if (response.ok) {
-        const data = await response.json();
-        const historyMap: any = {};
-        data.forEach((entry: any) => {
-          historyMap[entry.date] = { completed: entry.completed_count > 0, color: theme.accent.primary };
-        });
-        setHabitHistory(historyMap);
-      }
-    } catch (error) {
-      console.error('Failed to load history:', error);
     }
   };
 
@@ -93,14 +61,12 @@ export default function HabitsScreen() {
           name: habitName,
           color: selectedColor,
           frequency: 'daily',
-          time_of_day: selectedTime,
         }),
       });
 
       if (response.ok) {
         setHabitName('');
         setSelectedColor(COLORS[0]);
-        setSelectedTime('anytime');
         setModalVisible(false);
         loadHabits();
       }
@@ -112,13 +78,12 @@ export default function HabitsScreen() {
 
   const toggleHabit = async (habitId: string, currentStatus: boolean) => {
     try {
-      const dateStr = selectedDate.toISOString().split('T')[0];
       await authenticatedFetch(`${BACKEND_URL}/api/habits/${habitId}/log`, {
         method: 'POST',
-        body: JSON.stringify({ completed: !currentStatus, date: dateStr }),
+        body: JSON.stringify({ completed: !currentStatus }),
       });
+
       loadHabits();
-      loadHistory();
     } catch (error) {
       console.error('Failed to toggle habit:', error);
     }
@@ -138,6 +103,7 @@ export default function HabitsScreen() {
               await authenticatedFetch(`${BACKEND_URL}/api/habits/${habitId}`, {
                 method: 'DELETE',
               });
+
               loadHabits();
             } catch (error) {
               console.error('Failed to delete habit:', error);
@@ -148,198 +114,110 @@ export default function HabitsScreen() {
     );
   };
 
-  const filteredHabits = habits.filter(habit => {
-    if (statusFilter === 'completed' && !habit.completed_today) return false;
-    if (statusFilter === 'pending' && habit.completed_today) return false;
-    if (timeFilter !== 'all' && habit.time_of_day !== timeFilter) return false;
-    return true;
-  });
-
-  const completedCount = habits.filter(h => h.completed_today).length;
-  const totalCount = habits.length;
-  const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
-
-  const formatDate = (date: Date) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const compareDate = new Date(date);
-    compareDate.setHours(0, 0, 0, 0);
-    
-    if (compareDate.getTime() === today.getTime()) return 'Hoy';
-    
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    if (compareDate.getTime() === yesterday.getTime()) return 'Ayer';
-    
-    return `${date.getDate()} ${['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'][date.getMonth()]}`;
-  };
-
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.headerTitle}>Mis Hábitos</Text>
-          <Text style={styles.headerSubtitle}>{formatDate(selectedDate)}</Text>
-        </View>
-        <View style={styles.headerActions}>
+      <LinearGradient
+        colors={['#10B981', '#3B82F6']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.header}
+      >
+        <View style={styles.headerTop}>
+          <View>
+            <Text style={styles.headerTitle}>Mis Hábitos</Text>
+            <Text style={styles.headerSubtitle}>Construye tu rutina diaria</Text>
+          </View>
           <TouchableOpacity 
-            style={styles.calendarButton}
-            onPress={() => setShowCalendar(!showCalendar)}
+            style={styles.insightsBtn}
+            onPress={() => setShowInsights(true)}
           >
-            <Ionicons name="calendar-outline" size={22} color={theme.text.primary} />
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.addButton}
-            onPress={() => setModalVisible(true)}
-          >
-            <Ionicons name="add" size={24} color={theme.text.primary} />
+            <Ionicons name="stats-chart" size={20} color="#10B981" />
           </TouchableOpacity>
         </View>
-      </View>
+      </LinearGradient>
+
+      {/* Insights Button Card */}
+      <TouchableOpacity 
+        style={styles.insightsCard}
+        onPress={() => setShowInsights(true)}
+      >
+        <Ionicons name="sparkles" size={20} color="#10B981" />
+        <View style={styles.insightsCardContent}>
+          <Text style={styles.insightsCardTitle}>📊 Análisis de Hábitos</Text>
+          <Text style={styles.insightsCardSubtitle}>Patrones y estadísticas con IA</Text>
+        </View>
+        <Ionicons name="chevron-forward" size={20} color="#10B981" />
+      </TouchableOpacity>
 
       <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl 
-            refreshing={refreshing} 
-            onRefresh={() => { setRefreshing(true); loadHabits(); }}
-            tintColor={theme.accent.primary}
-          />
-        }
+        style={styles.content}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loadHabits} />}
       >
-        {/* Week Selector */}
-        <WeekSelector
-          selectedDate={selectedDate}
-          onDateSelect={setSelectedDate}
-          markedDates={habitHistory}
-        />
-
-        {/* Calendar (expandable) */}
-        {showCalendar && (
-          <MonthCalendar
-            selectedDate={selectedDate}
-            onDateSelect={(date) => {
-              setSelectedDate(date);
-              setShowCalendar(false);
-            }}
-            markedDates={habitHistory}
-          />
-        )}
-
-        {/* Progress Card */}
-        <View style={styles.progressCard}>
-          <View style={styles.progressHeader}>
-            <Text style={styles.progressTitle}>Progreso del día</Text>
-            <Text style={styles.progressPercent}>{Math.round(progressPercent)}%</Text>
+        {habits.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Ionicons name="checkmark-circle-outline" size={64} color="#D1D5DB" />
+            <Text style={styles.emptyTitle}>No tienes hábitos aún</Text>
+            <Text style={styles.emptyText}>
+              Comienza agregando tu primer hábito positivo
+            </Text>
           </View>
-          <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
-          </View>
-          <Text style={styles.progressText}>
-            {completedCount} de {totalCount} completados
-          </Text>
-        </View>
-
-        {/* Filters */}
-        <View style={styles.filtersSection}>
-          <Text style={styles.filterLabel}>Estado</Text>
-          <FilterChips
-            filters={STATUS_FILTERS}
-            selected={statusFilter}
-            onSelect={setStatusFilter}
-            accentColor={theme.accent.primary}
-          />
-          
-          <Text style={styles.filterLabel}>Momento del día</Text>
-          <FilterChips
-            filters={TIME_FILTERS}
-            selected={timeFilter}
-            onSelect={setTimeFilter}
-            accentColor={theme.accent.secondary}
-          />
-        </View>
-
-        {/* Habits List */}
-        <View style={styles.habitsList}>
-          {filteredHabits.length === 0 ? (
-            <View style={styles.emptyState}>
-              <View style={styles.emptyIcon}>
-                <Ionicons name="leaf-outline" size={48} color={theme.accent.primary} />
-              </View>
-              <Text style={styles.emptyTitle}>No hay hábitos</Text>
-              <Text style={styles.emptyText}>
-                Toca "+" para agregar tu primer hábito
-              </Text>
-            </View>
-          ) : (
-            filteredHabits.map((habit) => (
-              <TouchableOpacity
-                key={habit.habit_id}
-                style={styles.habitCard}
-                onPress={() => toggleHabit(habit.habit_id, habit.completed_today)}
-                onLongPress={() => deleteHabit(habit.habit_id, habit.name)}
-              >
-                <View style={styles.habitLeft}>
-                  <View style={[
-                    styles.habitCheck,
-                    habit.completed_today && { backgroundColor: habit.color || theme.accent.primary }
-                  ]}>
-                    {habit.completed_today && (
-                      <Ionicons name="checkmark" size={16} color="#FFFFFF" />
-                    )}
-                  </View>
-                  <View style={styles.habitInfo}>
-                    <Text style={[
-                      styles.habitName,
-                      habit.completed_today && styles.habitNameCompleted
-                    ]}>
-                      {habit.name}
+        ) : (
+          habits.map((habit) => (
+            <TouchableOpacity
+              key={habit.habit_id}
+              style={styles.habitCard}
+              onPress={() => toggleHabit(habit.habit_id, habit.completed_today)}
+              onLongPress={() => deleteHabit(habit.habit_id, habit.name)}
+            >
+              <View style={styles.habitLeft}>
+                <View
+                  style={[
+                    styles.habitIcon,
+                    {
+                      backgroundColor: habit.completed_today
+                        ? habit.color
+                        : '#F3F4F6',
+                    },
+                  ]}
+                >
+                  <Ionicons
+                    name="checkmark"
+                    size={24}
+                    color={habit.completed_today ? '#FFFFFF' : '#D1D5DB'}
+                  />
+                </View>
+                <View style={styles.habitInfo}>
+                  <Text style={styles.habitName}>{habit.name}</Text>
+                  <View style={styles.habitMeta}>
+                    <Text style={styles.habitStreak}>
+                      {habit.streak} días 🔥
                     </Text>
-                    {habit.streak > 0 && (
-                      <View style={styles.streakBadge}>
-                        <Text style={styles.streakText}>🔥 {habit.streak} días</Text>
-                      </View>
-                    )}
+                    <Text style={styles.habitFrequency}>
+                      • {habit.frequency === 'daily' ? 'Diario' : habit.frequency}
+                    </Text>
                   </View>
                 </View>
-                <View style={styles.habitRight}>
-                  {habit.time_of_day && habit.time_of_day !== 'anytime' && (
-                    <Ionicons 
-                      name={
-                        habit.time_of_day === 'morning' ? 'sunny-outline' :
-                        habit.time_of_day === 'afternoon' ? 'partly-sunny-outline' : 'moon-outline'
-                      } 
-                      size={16} 
-                      color={theme.text.muted} 
-                    />
-                  )}
-                  <Ionicons name="chevron-forward" size={20} color={theme.text.muted} />
-                </View>
-              </TouchableOpacity>
-            ))
-          )}
-        </View>
-
-        {/* AI Insights Button */}
-        <TouchableOpacity 
-          style={styles.insightsButton}
-          onPress={() => setShowInsights(true)}
-        >
-          <Ionicons name="analytics" size={20} color={theme.accent.warning} />
-          <Text style={styles.insightsButtonText}>Ver Análisis IA</Text>
-          <Ionicons name="chevron-forward" size={20} color={theme.text.muted} />
-        </TouchableOpacity>
-
-        <View style={{ height: 100 }} />
+              </View>
+              <View style={styles.habitRight}>
+                {habit.completed_today && (
+                  <View style={[styles.completedBadge, { backgroundColor: habit.color }]}>
+                    <Text style={styles.completedText}>✓</Text>
+                  </View>
+                )}
+              </View>
+            </TouchableOpacity>
+          ))
+        )}
       </ScrollView>
 
-      {/* AI Insights Modal */}
-      <HabitsInsights 
-        visible={showInsights} 
-        onClose={() => setShowInsights(false)} 
-      />
+      {/* Floating Add Button */}
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => setModalVisible(true)}
+      >
+        <Ionicons name="add" size={28} color="#FFFFFF" />
+      </TouchableOpacity>
 
       {/* Add Habit Modal */}
       <Modal
@@ -356,20 +234,20 @@ export default function HabitsScreen() {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Nuevo Hábito</Text>
               <TouchableOpacity onPress={() => setModalVisible(false)}>
-                <Ionicons name="close" size={24} color={theme.text.secondary} />
+                <Ionicons name="close" size={24} color="#6B7280" />
               </TouchableOpacity>
             </View>
 
             <TextInput
               style={styles.input}
-              placeholder="Nombre del hábito"
-              placeholderTextColor={theme.text.muted}
+              placeholder="Nombre del hábito (ej. Meditación 5 min)"
+              placeholderTextColor="#9CA3AF"
               value={habitName}
               onChangeText={setHabitName}
               autoFocus
             />
 
-            <Text style={styles.sectionLabel}>Color</Text>
+            <Text style={styles.colorLabel}>Color</Text>
             <View style={styles.colorPicker}>
               {COLORS.map((color) => (
                 <TouchableOpacity
@@ -382,34 +260,8 @@ export default function HabitsScreen() {
                   onPress={() => setSelectedColor(color)}
                 >
                   {selectedColor === color && (
-                    <Ionicons name="checkmark" size={18} color="#FFFFFF" />
+                    <Ionicons name="checkmark" size={20} color="#FFFFFF" />
                   )}
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            <Text style={styles.sectionLabel}>Momento del día</Text>
-            <View style={styles.timeOptions}>
-              {TIME_OPTIONS.map((option) => (
-                <TouchableOpacity
-                  key={option.key}
-                  style={[
-                    styles.timeOption,
-                    selectedTime === option.key && styles.timeOptionSelected,
-                  ]}
-                  onPress={() => setSelectedTime(option.key)}
-                >
-                  <Ionicons 
-                    name={option.icon as any} 
-                    size={20} 
-                    color={selectedTime === option.key ? theme.text.primary : theme.text.muted} 
-                  />
-                  <Text style={[
-                    styles.timeOptionText,
-                    selectedTime === option.key && styles.timeOptionTextSelected,
-                  ]}>
-                    {option.label}
-                  </Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -420,190 +272,172 @@ export default function HabitsScreen() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
-    </SafeAreaView>
+
+      {/* Modal de Insights */}
+      <Modal
+        visible={showInsights}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowInsights(false)}
+      >
+        <View style={styles.insightsModal}>
+          <View style={styles.insightsModalHeader}>
+            <Text style={styles.insightsModalTitle}>📊 Análisis de Hábitos</Text>
+            <TouchableOpacity onPress={() => setShowInsights(false)}>
+              <Ionicons name="close" size={28} color="#6B7280" />
+            </TouchableOpacity>
+          </View>
+          <HabitsInsights onClose={() => setShowInsights(false)} />
+        </View>
+      </Modal>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.background.primary,
+    backgroundColor: '#F9FAFB',
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: theme.text.primary,
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: theme.text.secondary,
-    marginTop: 2,
-  },
-  headerActions: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  calendarButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: theme.background.secondary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  addButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: theme.accent.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  scrollView: {
-    flex: 1,
+    paddingTop: 50,
+    paddingBottom: 12,
     paddingHorizontal: 16,
   },
-  progressCard: {
-    backgroundColor: theme.background.secondary,
-    borderRadius: theme.radius.lg,
-    padding: 20,
-    marginBottom: 16,
-  },
-  progressHeader: {
+  headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
   },
-  progressTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: theme.text.primary,
+  insightsBtn: {
+    backgroundColor: '#FFFFFF',
+    padding: 8,
+    borderRadius: 10,
   },
-  progressPercent: {
-    fontSize: 24,
+  headerTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
-    color: theme.accent.primary,
+    color: '#FFFFFF',
   },
-  progressBar: {
-    height: 8,
-    backgroundColor: theme.background.tertiary,
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: theme.accent.primary,
-    borderRadius: 4,
-  },
-  progressText: {
+  headerSubtitle: {
     fontSize: 13,
-    color: theme.text.secondary,
+    color: '#F0FDFA',
+    marginTop: 2,
+  },
+  content: {
+    flex: 1,
+    padding: 16,
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 64,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    marginTop: 16,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#6B7280',
     marginTop: 8,
-  },
-  filtersSection: {
-    marginBottom: 16,
-  },
-  filterLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: theme.text.secondary,
-    marginBottom: 8,
-    marginLeft: 4,
-  },
-  habitsList: {
-    gap: 8,
+    textAlign: 'center',
   },
   habitCard: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: theme.background.secondary,
-    borderRadius: theme.radius.md,
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
     padding: 16,
+    borderRadius: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   habitLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
   },
-  habitCheck: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    borderWidth: 2,
-    borderColor: theme.border.secondary,
+  habitIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 14,
+    marginRight: 12,
   },
   habitInfo: {
     flex: 1,
   },
   habitName: {
     fontSize: 16,
-    color: theme.text.primary,
-    fontWeight: '500',
+    fontWeight: '600',
+    color: '#1F2937',
   },
-  habitNameCompleted: {
-    textDecorationLine: 'line-through',
-    color: theme.text.muted,
-  },
-  streakBadge: {
-    marginTop: 4,
-  },
-  streakText: {
-    fontSize: 12,
-    color: theme.accent.warning,
-  },
-  habitRight: {
+  habitMeta: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    marginTop: 4,
   },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: 60,
+  habitStreak: {
+    fontSize: 14,
+    color: '#F59E0B',
+    fontWeight: '600',
   },
-  emptyIcon: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+  habitFrequency: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginLeft: 4,
+  },
+  habitRight: {
+    marginLeft: 12,
+  },
+  completedBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
   },
-  emptyTitle: {
+  completedText: {
+    color: '#FFFFFF',
     fontSize: 18,
-    fontWeight: '600',
-    color: theme.text.primary,
-    marginBottom: 8,
+    fontWeight: 'bold',
   },
-  emptyText: {
-    fontSize: 14,
-    color: theme.text.secondary,
-    textAlign: 'center',
+  fab: {
+    position: 'absolute',
+    right: 24,
+    bottom: 24,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#10B981',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
-  // Modal
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: theme.background.secondary,
+    backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
     paddingBottom: Platform.OS === 'android' ? 40 : 24,
+    minHeight: 300,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -612,95 +446,96 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: theme.text.primary,
+    color: '#1F2937',
   },
   input: {
-    backgroundColor: theme.background.tertiary,
-    borderRadius: theme.radius.md,
+    backgroundColor: '#F3F4F6',
     padding: 16,
+    borderRadius: 12,
     fontSize: 16,
-    color: theme.text.primary,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: theme.border.primary,
+    marginBottom: 24,
   },
-  sectionLabel: {
-    fontSize: 14,
+  colorLabel: {
+    fontSize: 16,
     fontWeight: '600',
-    color: theme.text.secondary,
+    color: '#1F2937',
     marginBottom: 12,
   },
   colorPicker: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 12,
-    marginBottom: 20,
+    marginBottom: 24,
   },
   colorOption: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
   },
   colorSelected: {
     borderWidth: 3,
-    borderColor: '#FFFFFF',
-  },
-  timeOptions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 24,
-  },
-  timeOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: theme.radius.md,
-    backgroundColor: theme.background.tertiary,
-    borderWidth: 1,
-    borderColor: theme.border.primary,
-  },
-  timeOptionSelected: {
-    backgroundColor: theme.accent.primary,
-    borderColor: theme.accent.primary,
-  },
-  timeOptionText: {
-    fontSize: 13,
-    color: theme.text.muted,
-  },
-  timeOptionTextSelected: {
-    color: theme.text.primary,
-    fontWeight: '500',
+    borderColor: '#1F2937',
   },
   createButton: {
-    backgroundColor: theme.accent.primary,
-    borderRadius: theme.radius.md,
+    backgroundColor: '#10B981',
     padding: 16,
+    borderRadius: 12,
     alignItems: 'center',
   },
   createButtonText: {
+    color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '600',
-    color: theme.text.primary,
+    fontWeight: 'bold',
   },
-  insightsButton: {
+  // Insights Card Styles
+  insightsCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: theme.background.secondary,
-    padding: 16,
-    borderRadius: theme.radius.md,
-    marginTop: 16,
+    backgroundColor: '#ECFDF5',
+    marginHorizontal: 16,
+    marginTop: 12,
+    marginBottom: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
     gap: 12,
   },
-  insightsButtonText: {
+  insightsCardContent: {
     flex: 1,
-    fontSize: 15,
-    fontWeight: '600',
-    color: theme.accent.warning,
+  },
+  insightsCardTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#059669',
+  },
+  insightsCardSubtitle: {
+    fontSize: 12,
+    color: '#10B981',
+    marginTop: 2,
+  },
+  // Modal Styles
+  insightsModal: {
+    flex: 1,
+    backgroundColor: '#F9FAFB',
+  },
+  insightsModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 12,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  insightsModalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1F2937',
   },
 });
