@@ -432,7 +432,7 @@ export default function AllGoals() {
               <Text style={styles.modalButtonText}>Crear objetivo</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* Guide Modal - How to write SMART goals */}
