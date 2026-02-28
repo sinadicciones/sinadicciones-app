@@ -402,6 +402,7 @@ export default function AllGoals() {
               <TextInput
                 style={styles.input}
                 placeholder="Ej: Meditar 10 minutos cada mañana durante 30 días"
+              placeholderTextColor="#9CA3AF"
                 value={newGoal.title}
                 onChangeText={(text) => setNewGoal({ ...newGoal, title: text })}
               />
@@ -410,6 +411,7 @@ export default function AllGoals() {
               <TextInput
                 style={[styles.input, styles.inputMultiline]}
                 placeholder="Añade detalles sobre cómo lo lograrás..."
+              placeholderTextColor="#9CA3AF"
                 value={newGoal.description}
                 onChangeText={(text) => setNewGoal({ ...newGoal, description: text })}
                 multiline

@@ -193,6 +193,7 @@ export default function PurposeTestScreen() {
             <TextInput
               style={styles.textArea}
               placeholder="Escribe aquí..."
+              placeholderTextColor="#9CA3AF"
               value={answers.happyBefore}
               onChangeText={(text) => setAnswers({ ...answers, happyBefore: text })}
               multiline
@@ -271,6 +272,7 @@ export default function PurposeTestScreen() {
             <TextInput
               style={styles.textArea}
               placeholder="Escribe aquí..."
+              placeholderTextColor="#9CA3AF"
               value={answers.peopleAsk}
               onChangeText={(text) => setAnswers({ ...answers, peopleAsk: text })}
               multiline
@@ -288,6 +290,7 @@ export default function PurposeTestScreen() {
             <TextInput
               style={styles.textArea}
               placeholder="Escribe aquí..."
+              placeholderTextColor="#9CA3AF"
               value={answers.enjoyFree}
               onChangeText={(text) => setAnswers({ ...answers, enjoyFree: text })}
               multiline
@@ -308,6 +311,7 @@ export default function PurposeTestScreen() {
             <TextInput
               style={styles.textArea}
               placeholder="Escribe aquí..."
+              placeholderTextColor="#9CA3AF"
               value={answers.futureVision}
               onChangeText={(text) => setAnswers({ ...answers, futureVision: text })}
               multiline
@@ -327,6 +331,7 @@ export default function PurposeTestScreen() {
             <TextInput
               style={styles.textArea}
               placeholder="Escribe aquí..."
+              placeholderTextColor="#9CA3AF"
               value={answers.whatTheySay}
               onChangeText={(text) => setAnswers({ ...answers, whatTheySay: text })}
               multiline
@@ -346,6 +351,7 @@ export default function PurposeTestScreen() {
             <TextInput
               style={styles.textArea}
               placeholder="Escribe aquí..."
+              placeholderTextColor="#9CA3AF"
               value={answers.noFailure}
               onChangeText={(text) => setAnswers({ ...answers, noFailure: text })}
               multiline
@@ -365,6 +371,7 @@ export default function PurposeTestScreen() {
             <TextInput
               style={styles.textArea}
               placeholder="Escribe aquí..."
+              placeholderTextColor="#9CA3AF"
               value={answers.worldProblem}
               onChangeText={(text) => setAnswers({ ...answers, worldProblem: text })}
               multiline
@@ -384,6 +391,7 @@ export default function PurposeTestScreen() {
             <TextInput
               style={styles.textArea}
               placeholder="Escribe aquí..."
+              placeholderTextColor="#9CA3AF"
               value={answers.helpWho}
               onChangeText={(text) => setAnswers({ ...answers, helpWho: text })}
               multiline
@@ -402,6 +410,7 @@ export default function PurposeTestScreen() {
             <TextInput
               style={styles.textArea}
               placeholder="Escribe aquí..."
+              placeholderTextColor="#9CA3AF"
               value={answers.legacy}
               onChangeText={(text) => setAnswers({ ...answers, legacy: text })}
               multiline

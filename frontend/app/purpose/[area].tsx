@@ -276,6 +276,7 @@ export default function AreaDetail() {
             <TextInput
               style={styles.input}
               placeholder="Ej: Hacer ejercicio 3 veces por semana"
+              placeholderTextColor="#9CA3AF"
               value={newGoal.title}
               onChangeText={(text) => setNewGoal({ ...newGoal, title: text })}
             />
@@ -284,6 +285,7 @@ export default function AreaDetail() {
             <TextInput
               style={[styles.input, styles.inputMultiline]}
               placeholder="Describe tu objetivo con más detalle..."
+              placeholderTextColor="#9CA3AF"
               value={newGoal.description}
               onChangeText={(text) => setNewGoal({ ...newGoal, description: text })}
               multiline

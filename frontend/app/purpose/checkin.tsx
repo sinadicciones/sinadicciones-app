@@ -126,6 +126,7 @@ export default function WeeklyCheckin() {
       <TextInput
         style={styles.textArea}
         placeholder="Ej: Hice ejercicio 3 veces\nLlamé a mi familia\nAsistí a una reunión de grupo"
+              placeholderTextColor="#9CA3AF"
         value={achievements}
         onChangeText={setAchievements}
         multiline
@@ -144,6 +145,7 @@ export default function WeeklyCheckin() {
       <TextInput
         style={styles.textArea}
         placeholder="Ej: Ansiedad el martes\nDificultad para dormir\nTentación de usar"
+              placeholderTextColor="#9CA3AF"
         value={challenges}
         onChangeText={setChallenges}
         multiline
@@ -162,6 +164,7 @@ export default function WeeklyCheckin() {
       <TextInput
         style={styles.textArea}
         placeholder="Escribe tu plan para la próxima semana..."
+              placeholderTextColor="#9CA3AF"
         value={nextWeekPlan}
         onChangeText={setNextWeekPlan}
         multiline
