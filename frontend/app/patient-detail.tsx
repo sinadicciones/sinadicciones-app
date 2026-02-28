@@ -295,12 +295,12 @@ export default function PatientDetailScreen() {
               <TouchableOpacity style={styles.submitBtn} onPress={handleCreateTask}><Text style={styles.submitBtnText}>Crear Tarea</Text></TouchableOpacity>
             </ScrollView>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* Note Modal */}
       <Modal visible={showNoteModal} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}><Text style={styles.modalTitle}>Nota de Sesión</Text><TouchableOpacity onPress={() => setShowNoteModal(false)}><Ionicons name="close" size={24} color="#6B7280" /></TouchableOpacity></View>
             <ScrollView style={styles.modalBody}>
