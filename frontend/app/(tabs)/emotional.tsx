@@ -241,72 +241,78 @@ export default function EmotionalScreen() {
         transparent={true}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>¿Cómo te sientes?</Text>
-              <TouchableOpacity onPress={() => setModalVisible(false)}>
-                <Ionicons name="close" size={24} color="#6B7280" />
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalOverlay}
+        >
+          <ScrollView contentContainerStyle={styles.modalScrollContent}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>¿Cómo te sientes?</Text>
+                <TouchableOpacity onPress={() => setModalVisible(false)}>
+                  <Ionicons name="close" size={24} color="#6B7280" />
+                </TouchableOpacity>
+              </View>
+
+              {/* Mood Selector */}
+              <View style={styles.moodSelector}>
+                {MOOD_EMOJIS.map((mood) => (
+                  <TouchableOpacity
+                    key={mood.value}
+                    style={[
+                      styles.moodOption,
+                      selectedMood === mood.value && styles.moodSelected,
+                    ]}
+                    onPress={() => setSelectedMood(mood.value)}
+                  >
+                    <Text style={styles.moodEmoji}>{mood.emoji}</Text>
+                    <Text style={styles.moodValue}>{mood.value}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {/* Tags */}
+              <Text style={styles.tagsLabel}>Emociones (opcional)</Text>
+              <View style={styles.tagsContainer}>
+                {EMOTION_TAGS.map((tag) => (
+                  <TouchableOpacity
+                    key={tag}
+                    style={[
+                      styles.tagOption,
+                      selectedTags.includes(tag) && styles.tagSelected,
+                    ]}
+                    onPress={() => toggleTag(tag)}
+                  >
+                    <Text
+                      style={[
+                        styles.tagOptionText,
+                        selectedTags.includes(tag) && styles.tagSelectedText,
+                      ]}
+                    >
+                      {tag}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {/* Note */}
+              <TextInput
+                style={styles.noteInput}
+                placeholder="¿Qué sucedió? ¿Qué lo gatilló? (opcional)"
+                placeholderTextColor="#9CA3AF"
+                value={note}
+                onChangeText={setNote}
+                multiline
+                numberOfLines={4}
+                textAlignVertical="top"
+              />
+
+              <TouchableOpacity style={styles.saveButton} onPress={saveLog}>
+                <Text style={styles.saveButtonText}>Guardar Registro</Text>
               </TouchableOpacity>
             </View>
-
-            {/* Mood Selector */}
-            <View style={styles.moodSelector}>
-              {MOOD_EMOJIS.map((mood) => (
-                <TouchableOpacity
-                  key={mood.value}
-                  style={[
-                    styles.moodOption,
-                    selectedMood === mood.value && styles.moodSelected,
-                  ]}
-                  onPress={() => setSelectedMood(mood.value)}
-                >
-                  <Text style={styles.moodEmoji}>{mood.emoji}</Text>
-                  <Text style={styles.moodValue}>{mood.value}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            {/* Tags */}
-            <Text style={styles.tagsLabel}>Emociones (opcional)</Text>
-            <View style={styles.tagsContainer}>
-              {EMOTION_TAGS.map((tag) => (
-                <TouchableOpacity
-                  key={tag}
-                  style={[
-                    styles.tagOption,
-                    selectedTags.includes(tag) && styles.tagSelected,
-                  ]}
-                  onPress={() => toggleTag(tag)}
-                >
-                  <Text
-                    style={[
-                      styles.tagOptionText,
-                      selectedTags.includes(tag) && styles.tagSelectedText,
-                    ]}
-                  >
-                    {tag}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            {/* Note */}
-            <TextInput
-              style={styles.noteInput}
-              placeholder="¿Qué sucedió? ¿Qué lo gatilló? (opcional)"
-              value={note}
-              onChangeText={setNote}
-              multiline
-              numberOfLines={4}
-              textAlignVertical="top"
-            />
-
-            <TouchableOpacity style={styles.saveButton} onPress={saveLog}>
-              <Text style={styles.saveButtonText}>Guardar Registro</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* Modal de Insights */}
