@@ -3802,9 +3802,36 @@ async def complete_active_user_onboarding(data: ActiveUserOnboardingRequest, cur
 
 
 # ============== AI WELLNESS ANALYSIS ==============
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+from openai import AsyncOpenAI
 
-EMERGENT_LLM_KEY = os.getenv("EMERGENT_LLM_KEY")
+# For production: Use OPENAI_API_KEY
+# For development with Emergent: Use EMERGENT_LLM_KEY
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or os.getenv("EMERGENT_LLM_KEY")
+
+# Initialize OpenAI client
+openai_client = None
+if OPENAI_API_KEY:
+    openai_client = AsyncOpenAI(api_key=OPENAI_API_KEY)
+
+async def generate_ai_response(system_message: str, user_prompt: str) -> str:
+    """Generate AI response using OpenAI GPT-4"""
+    if not openai_client:
+        return '{"error": "AI no configurada"}'
+    
+    try:
+        response = await openai_client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": user_prompt}
+            ],
+            temperature=0.7,
+            max_tokens=2000
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        print(f"Error calling OpenAI: {e}")
+        return '{"error": "Error generando análisis"}'
 
 class AnalysisPeriod(str, Enum):
     week = "week"
