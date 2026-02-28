@@ -568,9 +568,11 @@ export default function PurposeDashboard() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <Text>Cargando...</Text>
-      </View>
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={styles.loadingContainer}>
+          <Text>Cargando...</Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
