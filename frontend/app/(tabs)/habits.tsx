@@ -17,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { authenticatedFetch, getBackendURL } from '../../utils/api';
 import { theme, STATUS_FILTERS, TIME_FILTERS, DAYS_SHORT } from '../../utils/theme';
 import { WeekSelector, MonthCalendar, FilterChips } from '../../components/Calendar';
+import HabitsInsights from '../../components/HabitsInsights';
 
 const BACKEND_URL = getBackendURL();
 
