@@ -12,227 +12,310 @@ import {
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BarChart } from 'react-native-gifted-charts';
-import { format } from 'date-fns';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { authenticatedFetch, getBackendURL } from '../../utils/api';
-import EmotionalInsights from '../../components/EmotionalInsights';
+import { theme, MOOD_EMOJIS, getMoodEmoji, getMoodColor } from '../../utils/theme';
+import { WeekSelector, MonthCalendar, FilterChips } from '../../components/Calendar';
 
 const BACKEND_URL = getBackendURL();
 
-const MOOD_EMOJIS = [
-  { value: 1, emoji: '😭', label: 'Muy mal' },
-  { value: 2, emoji: '😟', label: 'Mal' },
-  { value: 3, emoji: '😔', label: 'Regular bajo' },
-  { value: 4, emoji: '😕', label: 'Regular' },
-  { value: 5, emoji: '😐', label: 'Neutro' },
-  { value: 6, emoji: '🙂', label: 'Bien' },
-  { value: 7, emoji: '😊', label: 'Bien +' },
-  { value: 8, emoji: '😄', label: 'Muy bien' },
-  { value: 9, emoji: '😁', label: 'Excelente' },
-  { value: 10, emoji: '🤩', label: 'Increíble' },
+const EMOTION_TAGS = [
+  'Calma', 'Ansiedad', 'Felicidad', 'Tristeza', 'Enojo', 'Miedo',
+  'Esperanza', 'Frustración', 'Gratitud', 'Culpa', 'Motivación', 'Soledad'
 ];
 
-const EMOTION_TAGS = [
-  'ansiedad',
-  'ira',
-  'vacío',
-  'tristeza',
-  'paz',
-  'motivación',
-  'orgullo',
-  'gratitud',
-  'esperanza',
-  'miedo',
+const MOOD_FILTERS = [
+  { key: 'all', label: 'Todos' },
+  { key: 'high', label: 'Alto (7-10)' },
+  { key: 'medium', label: 'Medio (4-6)' },
+  { key: 'low', label: 'Bajo (1-3)' },
 ];
 
 export default function EmotionalScreen() {
   const [logs, setLogs] = useState<any[]>([]);
-  const [stats, setStats] = useState<any>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedMood, setSelectedMood] = useState(5);
-  const [note, setNote] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [note, setNote] = useState('');
   const [refreshing, setRefreshing] = useState(false);
-  const [showInsights, setShowInsights] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [moodFilter, setMoodFilter] = useState('all');
+  const [moodHistory, setMoodHistory] = useState<any>({});
 
   useEffect(() => {
-    loadData();
-  }, []);
+    loadLogs();
+    loadHistory();
+  }, [selectedDate]);
 
-  const loadData = async () => {
+  const loadLogs = async () => {
     try {
-      // Load emotional logs
-      const logsResponse = await authenticatedFetch(`${BACKEND_URL}/api/emotional-logs`);
-      if (logsResponse.ok) {
-        setLogs(await logsResponse.json());
-      }
-
-      // Load stats
-      const statsResponse = await authenticatedFetch(`${BACKEND_URL}/api/emotional-logs/stats`);
-      if (statsResponse.ok) {
-        setStats(await statsResponse.json());
+      const response = await authenticatedFetch(`${BACKEND_URL}/api/emotional/logs`);
+      if (response.ok) {
+        const data = await response.json();
+        setLogs(data);
       }
     } catch (error) {
-      console.error('Failed to load emotional data:', error);
+      console.error('Failed to load logs:', error);
     } finally {
       setRefreshing(false);
     }
   };
 
+  const loadHistory = async () => {
+    try {
+      const response = await authenticatedFetch(`${BACKEND_URL}/api/emotional/history`);
+      if (response.ok) {
+        const data = await response.json();
+        const historyMap: any = {};
+        data.forEach((entry: any) => {
+          const dateKey = entry.date || entry.created_at?.split('T')[0];
+          if (dateKey) {
+            historyMap[dateKey] = {
+              mood: entry.mood,
+              emoji: getMoodEmoji(entry.mood),
+              color: getMoodColor(entry.mood),
+            };
+          }
+        });
+        setMoodHistory(historyMap);
+      }
+    } catch (error) {
+      console.error('Failed to load history:', error);
+    }
+  };
+
   const saveLog = async () => {
     try {
-      await authenticatedFetch(`${BACKEND_URL}/api/emotional-logs`, {
+      const dateStr = selectedDate.toISOString().split('T')[0];
+      const response = await authenticatedFetch(`${BACKEND_URL}/api/emotional/log`, {
         method: 'POST',
         body: JSON.stringify({
-          mood_scale: selectedMood,
+          mood: selectedMood,
+          emotions: selectedTags,
           note: note,
-          tags: selectedTags,
+          date: dateStr,
         }),
       });
 
-      setModalVisible(false);
-      setNote('');
-      setSelectedTags([]);
-      setSelectedMood(5);
-      loadData();
+      if (response.ok) {
+        setSelectedMood(5);
+        setSelectedTags([]);
+        setNote('');
+        setModalVisible(false);
+        loadLogs();
+        loadHistory();
+      }
     } catch (error) {
-      console.error('Failed to save emotional log:', error);
+      console.error('Failed to save log:', error);
     }
   };
 
   const toggleTag = (tag: string) => {
-    if (selectedTags.includes(tag)) {
-      setSelectedTags(selectedTags.filter((t) => t !== tag));
-    } else {
-      setSelectedTags([...selectedTags, tag]);
-    }
+    setSelectedTags(prev =>
+      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+    );
   };
 
-  const getMoodColor = (mood: number) => {
-    if (mood <= 3) return '#EF4444';
-    if (mood <= 5) return '#F59E0B';
-    if (mood <= 7) return '#3B82F6';
-    return '#10B981';
+  // Get today's log if exists
+  const todayKey = selectedDate.toISOString().split('T')[0];
+  const todayLog = logs.find(log => {
+    const logDate = log.created_at?.split('T')[0];
+    return logDate === todayKey;
+  });
+
+  // Calculate average mood for the week
+  const weekAverage = logs.length > 0 
+    ? Math.round(logs.reduce((acc, log) => acc + log.mood, 0) / logs.length * 10) / 10
+    : 0;
+
+  const formatDate = (date: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const compareDate = new Date(date);
+    compareDate.setHours(0, 0, 0, 0);
+    
+    if (compareDate.getTime() === today.getTime()) return 'Hoy';
+    
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    if (compareDate.getTime() === yesterday.getTime()) return 'Ayer';
+    
+    return `${date.getDate()} ${['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'][date.getMonth()]}`;
   };
+
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const filteredLogs = logs.filter(log => {
+    if (moodFilter === 'high' && log.mood < 7) return false;
+    if (moodFilter === 'medium' && (log.mood < 4 || log.mood > 6)) return false;
+    if (moodFilter === 'low' && log.mood > 3) return false;
+    return true;
+  });
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
-      <LinearGradient
-        colors={['#EC4899', '#8B5CF6']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.header}
-      >
-        <View style={styles.headerTop}>
-          <View>
-            <Text style={styles.headerTitle}>Estado Emocional</Text>
-            <Text style={styles.headerSubtitle}>Monitorea cómo te sientes</Text>
-          </View>
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.headerTitle}>Emociones</Text>
+          <Text style={styles.headerSubtitle}>{formatDate(selectedDate)}</Text>
+        </View>
+        <View style={styles.headerActions}>
           <TouchableOpacity 
-            style={styles.insightsBtn}
-            onPress={() => setShowInsights(true)}
+            style={styles.calendarButton}
+            onPress={() => setShowCalendar(!showCalendar)}
           >
-            <Ionicons name="analytics" size={20} color="#EC4899" />
+            <Ionicons name="calendar-outline" size={22} color={theme.text.primary} />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.addButton}
+            onPress={() => setModalVisible(true)}
+          >
+            <Ionicons name="add" size={24} color={theme.text.primary} />
           </TouchableOpacity>
         </View>
-      </LinearGradient>
-
-      {/* Insights Button Card */}
-      <TouchableOpacity 
-        style={styles.insightsCard}
-        onPress={() => setShowInsights(true)}
-      >
-        <Ionicons name="sparkles" size={20} color="#EC4899" />
-        <View style={styles.insightsCardContent}>
-          <Text style={styles.insightsCardTitle}>💭 Análisis Emocional</Text>
-          <Text style={styles.insightsCardSubtitle}>Patrones y bienestar con IA</Text>
-        </View>
-        <Ionicons name="chevron-forward" size={20} color="#EC4899" />
-      </TouchableOpacity>
+      </View>
 
       <ScrollView
-        style={styles.content}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loadData} />}
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={() => { setRefreshing(true); loadLogs(); loadHistory(); }}
+            tintColor={theme.accent.primary}
+          />
+        }
       >
-        {/* Stats Card */}
-        {stats && (
-          <View style={styles.statsCard}>
-            <View style={styles.statRow}>
-              <View style={styles.stat}>
-                <Text style={styles.statNumber}>{stats.average_mood}</Text>
-                <Text style={styles.statLabel}>Promedio</Text>
-              </View>
-              <View style={styles.stat}>
-                <Text style={styles.statNumber}>{stats.total_logs}</Text>
-                <Text style={styles.statLabel}>Registros</Text>
-              </View>
-            </View>
+        {/* Week Selector */}
+        <WeekSelector
+          selectedDate={selectedDate}
+          onDateSelect={setSelectedDate}
+          markedDates={moodHistory}
+        />
 
-            {stats.recent_logs && stats.recent_logs.length > 0 && (
-              <View style={styles.chartContainer}>
-                <Text style={styles.chartTitle}>Últimos 7 días</Text>
-                <BarChart
-                  data={stats.recent_logs.map((log: any) => ({
-                    value: log.mood_scale,
-                    frontColor: getMoodColor(log.mood_scale),
-                  }))}
-                  barWidth={32}
-                  spacing={20}
-                  roundedTop
-                  hideRules
-                  xAxisThickness={0}
-                  yAxisThickness={0}
-                  yAxisTextStyle={{ color: '#6B7280' }}
-                  noOfSections={5}
-                  maxValue={10}
-                />
+        {/* Calendar (expandable) */}
+        {showCalendar && (
+          <MonthCalendar
+            selectedDate={selectedDate}
+            onDateSelect={(date) => {
+              setSelectedDate(date);
+              setShowCalendar(false);
+            }}
+            markedDates={moodHistory}
+          />
+        )}
+
+        {/* Today's Mood Card */}
+        <View style={styles.todayCard}>
+          <View style={styles.todayHeader}>
+            <Text style={styles.todayTitle}>Estado de hoy</Text>
+            {todayLog && (
+              <View style={[styles.moodBadge, { backgroundColor: getMoodColor(todayLog.mood) }]}>
+                <Text style={styles.moodBadgeText}>{todayLog.mood}/10</Text>
               </View>
             )}
           </View>
-        )}
-
-        {/* Recent Logs */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Historial</Text>
-          {logs.length === 0 ? (
-            <View style={styles.emptyState}>
-              <Ionicons name="heart-outline" size={64} color="#D1D5DB" />
-              <Text style={styles.emptyText}>Aún no has registrado tus emociones</Text>
-            </View>
-          ) : (
-            logs.slice(0, 10).map((log) => (
-              <View key={log.log_id} style={styles.logCard}>
-                <View style={styles.logHeader}>
-                  <Text style={styles.logMood}>
-                    {MOOD_EMOJIS[log.mood_scale - 1]?.emoji} {log.mood_scale}/10
-                  </Text>
-                  <Text style={styles.logDate}>{log.date}</Text>
-                </View>
-                {log.note && <Text style={styles.logNote}>{log.note}</Text>}
-                {log.tags && log.tags.length > 0 && (
-                  <View style={styles.logTags}>
-                    {log.tags.map((tag: string) => (
-                      <View key={tag} style={styles.tag}>
-                        <Text style={styles.tagText}>{tag}</Text>
+          
+          {todayLog ? (
+            <View style={styles.todayContent}>
+              <Text style={styles.todayEmoji}>{getMoodEmoji(todayLog.mood)}</Text>
+              <View style={styles.todayInfo}>
+                <Text style={styles.todayMoodLabel}>
+                  {MOOD_EMOJIS.find(m => m.value === todayLog.mood)?.label || 'Neutral'}
+                </Text>
+                {todayLog.emotions?.length > 0 && (
+                  <View style={styles.todayTags}>
+                    {todayLog.emotions.slice(0, 3).map((tag: string) => (
+                      <View key={tag} style={styles.todayTag}>
+                        <Text style={styles.todayTagText}>{tag}</Text>
                       </View>
                     ))}
                   </View>
                 )}
               </View>
+            </View>
+          ) : (
+            <TouchableOpacity 
+              style={styles.addMoodButton}
+              onPress={() => setModalVisible(true)}
+            >
+              <Ionicons name="add-circle-outline" size={24} color={theme.accent.primary} />
+              <Text style={styles.addMoodText}>Registrar estado de ánimo</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* Stats Card */}
+        <View style={styles.statsCard}>
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>{weekAverage || '-'}</Text>
+            <Text style={styles.statLabel}>Promedio</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>{logs.length}</Text>
+            <Text style={styles.statLabel}>Registros</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>{Object.keys(moodHistory).length}</Text>
+            <Text style={styles.statLabel}>Días</Text>
+          </View>
+        </View>
+
+        {/* Filters */}
+        <View style={styles.filtersSection}>
+          <Text style={styles.filterLabel}>Filtrar por nivel</Text>
+          <FilterChips
+            filters={MOOD_FILTERS}
+            selected={moodFilter}
+            onSelect={setMoodFilter}
+            accentColor={theme.accent.purple}
+          />
+        </View>
+
+        {/* History */}
+        <Text style={styles.sectionTitle}>Historial Reciente</Text>
+        <View style={styles.logsList}>
+          {filteredLogs.length === 0 ? (
+            <View style={styles.emptyState}>
+              <View style={styles.emptyIcon}>
+                <Ionicons name="heart-outline" size={48} color={theme.accent.purple} />
+              </View>
+              <Text style={styles.emptyTitle}>Sin registros</Text>
+              <Text style={styles.emptyText}>
+                Toca "+" para registrar cómo te sientes
+              </Text>
+            </View>
+          ) : (
+            filteredLogs.slice(0, 10).map((log, index) => (
+              <View key={log.log_id || index} style={styles.logCard}>
+                <View style={styles.logLeft}>
+                  <Text style={styles.logEmoji}>{getMoodEmoji(log.mood)}</Text>
+                  <View style={styles.logInfo}>
+                    <Text style={styles.logMood}>
+                      {MOOD_EMOJIS.find(m => m.value === log.mood)?.label}
+                    </Text>
+                    <Text style={styles.logTime}>
+                      {log.created_at ? formatTime(log.created_at) : 'Hoy'}
+                    </Text>
+                  </View>
+                </View>
+                <View style={[styles.moodIndicator, { backgroundColor: getMoodColor(log.mood) }]}>
+                  <Text style={styles.moodIndicatorText}>{log.mood}</Text>
+                </View>
+              </View>
             ))
           )}
         </View>
-      </ScrollView>
 
-      {/* Floating Add Button */}
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => setModalVisible(true)}
-      >
-        <Ionicons name="add" size={28} color="#FFFFFF" />
-      </TouchableOpacity>
+        <View style={{ height: 100 }} />
+      </ScrollView>
 
       {/* Add Log Modal */}
       <Modal
@@ -245,34 +328,41 @@ export default function EmotionalScreen() {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.modalOverlay}
         >
-          <ScrollView contentContainerStyle={styles.modalScrollContent}>
+          <ScrollView contentContainerStyle={styles.modalScroll}>
             <View style={styles.modalContent}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>¿Cómo te sientes?</Text>
                 <TouchableOpacity onPress={() => setModalVisible(false)}>
-                  <Ionicons name="close" size={24} color="#6B7280" />
+                  <Ionicons name="close" size={24} color={theme.text.secondary} />
                 </TouchableOpacity>
               </View>
 
-              {/* Mood Selector */}
+              {/* Mood Slider */}
               <View style={styles.moodSelector}>
+                <Text style={styles.selectedMoodEmoji}>{getMoodEmoji(selectedMood)}</Text>
+                <Text style={styles.selectedMoodLabel}>
+                  {MOOD_EMOJIS.find(m => m.value === selectedMood)?.label}
+                </Text>
+                <Text style={styles.selectedMoodValue}>{selectedMood}/10</Text>
+              </View>
+
+              <View style={styles.moodGrid}>
                 {MOOD_EMOJIS.map((mood) => (
                   <TouchableOpacity
                     key={mood.value}
                     style={[
                       styles.moodOption,
-                      selectedMood === mood.value && styles.moodSelected,
+                      selectedMood === mood.value && styles.moodOptionSelected,
                     ]}
                     onPress={() => setSelectedMood(mood.value)}
                   >
-                    <Text style={styles.moodEmoji}>{mood.emoji}</Text>
-                    <Text style={styles.moodValue}>{mood.value}</Text>
+                    <Text style={styles.moodOptionEmoji}>{mood.emoji}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
 
               {/* Tags */}
-              <Text style={styles.tagsLabel}>Emociones (opcional)</Text>
+              <Text style={styles.sectionLabel}>Emociones (opcional)</Text>
               <View style={styles.tagsContainer}>
                 {EMOTION_TAGS.map((tag) => (
                   <TouchableOpacity
@@ -283,12 +373,10 @@ export default function EmotionalScreen() {
                     ]}
                     onPress={() => toggleTag(tag)}
                   >
-                    <Text
-                      style={[
-                        styles.tagOptionText,
-                        selectedTags.includes(tag) && styles.tagSelectedText,
-                      ]}
-                    >
+                    <Text style={[
+                      styles.tagText,
+                      selectedTags.includes(tag) && styles.tagTextSelected,
+                    ]}>
                       {tag}
                     </Text>
                   </TouchableOpacity>
@@ -296,14 +384,15 @@ export default function EmotionalScreen() {
               </View>
 
               {/* Note */}
+              <Text style={styles.sectionLabel}>Nota (opcional)</Text>
               <TextInput
                 style={styles.noteInput}
-                placeholder="¿Qué sucedió? ¿Qué lo gatilló? (opcional)"
-                placeholderTextColor="#9CA3AF"
+                placeholder="¿Qué sucedió? ¿Qué lo gatilló?"
+                placeholderTextColor={theme.text.muted}
                 value={note}
                 onChangeText={setNote}
                 multiline
-                numberOfLines={4}
+                numberOfLines={3}
                 textAlignVertical="top"
               />
 
@@ -314,238 +403,249 @@ export default function EmotionalScreen() {
           </ScrollView>
         </KeyboardAvoidingView>
       </Modal>
-
-      {/* Modal de Insights */}
-      <Modal
-        visible={showInsights}
-        animationType="slide"
-        presentationStyle="pageSheet"
-        onRequestClose={() => setShowInsights(false)}
-      >
-        <View style={styles.insightsModal}>
-          <View style={styles.insightsModalHeader}>
-            <Text style={styles.insightsModalTitle}>💭 Análisis Emocional</Text>
-            <TouchableOpacity onPress={() => setShowInsights(false)}>
-              <Ionicons name="close" size={28} color="#6B7280" />
-            </TouchableOpacity>
-          </View>
-          <EmotionalInsights onClose={() => setShowInsights(false)} />
-        </View>
-      </Modal>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: theme.background.primary,
   },
   header: {
-    paddingTop: 50,
-    paddingBottom: 12,
-    paddingHorizontal: 16,
-  },
-  headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  insightsBtn: {
-    backgroundColor: '#FFFFFF',
-    padding: 8,
-    borderRadius: 10,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
-  headerSubtitle: {
-    fontSize: 13,
-    color: '#FAE8FF',
-    marginTop: 2,
-  },
-  // Insights Card Styles
-  insightsCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FCE7F3',
-    marginHorizontal: 16,
-    marginTop: 12,
-    marginBottom: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    gap: 12,
-  },
-  insightsCardContent: {
-    flex: 1,
-  },
-  insightsCardTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#BE185D',
-  },
-  insightsCardSubtitle: {
-    fontSize: 12,
-    color: '#EC4899',
-    marginTop: 2,
-  },
-  // Modal Styles
-  insightsModal: {
-    flex: 1,
-    backgroundColor: '#F9FAFB',
-  },
-  insightsModalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 12,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    paddingVertical: 16,
   },
-  insightsModalTitle: {
-    fontSize: 20,
+  headerTitle: {
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: theme.text.primary,
   },
-  content: {
-    flex: 1,
+  headerSubtitle: {
+    fontSize: 14,
+    color: theme.text.secondary,
+    marginTop: 2,
   },
-  statsCard: {
-    backgroundColor: '#FFFFFF',
-    margin: 16,
-    padding: 20,
-    borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  statRow: {
+  headerActions: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 20,
+    gap: 12,
   },
-  stat: {
+  calendarButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: theme.background.secondary,
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  statNumber: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#EC4899',
+  addButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: theme.accent.purple,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  statLabel: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginTop: 4,
+  scrollView: {
+    flex: 1,
+    paddingHorizontal: 16,
   },
-  chartContainer: {
-    marginTop: 16,
-  },
-  chartTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 12,
-  },
-  section: {
-    padding: 16,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1F2937',
+  todayCard: {
+    backgroundColor: theme.background.secondary,
+    borderRadius: theme.radius.lg,
+    padding: 20,
     marginBottom: 16,
   },
-  emptyState: {
-    alignItems: 'center',
-    padding: 48,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#6B7280',
-    marginTop: 12,
-    textAlign: 'center',
-  },
-  logCard: {
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  logHeader: {
+  todayHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 16,
   },
-  logMood: {
+  todayTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.text.primary,
+  },
+  moodBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  moodBadgeText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.text.primary,
+  },
+  todayContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  todayEmoji: {
+    fontSize: 48,
+    marginRight: 16,
+  },
+  todayInfo: {
+    flex: 1,
+  },
+  todayMoodLabel: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1F2937',
-  },
-  logDate: {
-    fontSize: 14,
-    color: '#6B7280',
-  },
-  logNote: {
-    fontSize: 14,
-    color: '#4B5563',
+    color: theme.text.primary,
     marginBottom: 8,
   },
-  logTags: {
+  todayTags: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    gap: 6,
+  },
+  todayTag: {
+    backgroundColor: theme.background.tertiary,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  todayTagText: {
+    fontSize: 12,
+    color: theme.text.secondary,
+  },
+  addMoodButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
     gap: 8,
   },
-  tag: {
-    backgroundColor: '#F3F4F6',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
+  addMoodText: {
+    fontSize: 15,
+    color: theme.accent.primary,
+    fontWeight: '500',
   },
-  tagText: {
+  statsCard: {
+    flexDirection: 'row',
+    backgroundColor: theme.background.secondary,
+    borderRadius: theme.radius.lg,
+    padding: 20,
+    marginBottom: 16,
+  },
+  statItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  statValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: theme.text.primary,
+  },
+  statLabel: {
     fontSize: 12,
-    color: '#6B7280',
+    color: theme.text.secondary,
+    marginTop: 4,
   },
-  fab: {
-    position: 'absolute',
-    right: 24,
-    bottom: 24,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#EC4899',
+  statDivider: {
+    width: 1,
+    backgroundColor: theme.border.primary,
+    marginHorizontal: 16,
+  },
+  filtersSection: {
+    marginBottom: 16,
+  },
+  filterLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: theme.text.secondary,
+    marginBottom: 8,
+    marginLeft: 4,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: theme.text.primary,
+    marginBottom: 12,
+    marginLeft: 4,
+  },
+  logsList: {
+    gap: 8,
+  },
+  logCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: theme.background.secondary,
+    borderRadius: theme.radius.md,
+    padding: 16,
+  },
+  logLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logEmoji: {
+    fontSize: 32,
+    marginRight: 12,
+  },
+  logInfo: {
+    gap: 2,
+  },
+  logMood: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: theme.text.primary,
+  },
+  logTime: {
+    fontSize: 12,
+    color: theme.text.muted,
+  },
+  moodIndicator: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
   },
+  moodIndicatorText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.text.primary,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 60,
+  },
+  emptyIcon: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: theme.text.primary,
+    marginBottom: 8,
+  },
+  emptyText: {
+    fontSize: 14,
+    color: theme.text.secondary,
+    textAlign: 'center',
+  },
+  // Modal
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'flex-end',
   },
-  modalScrollContent: {
+  modalScroll: {
     flexGrow: 1,
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.background.secondary,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
@@ -559,81 +659,101 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   modalTitle: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: theme.text.primary,
   },
   moodSelector: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  selectedMoodEmoji: {
+    fontSize: 64,
+    marginBottom: 8,
+  },
+  selectedMoodLabel: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: theme.text.primary,
+    marginBottom: 4,
+  },
+  selectedMoodValue: {
+    fontSize: 14,
+    color: theme.text.secondary,
+  },
+  moodGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 12,
+    gap: 8,
     marginBottom: 24,
   },
   moodOption: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: theme.background.tertiary,
+    justifyContent: 'center',
     alignItems: 'center',
-    padding: 8,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: 'transparent',
   },
-  moodSelected: {
-    borderColor: '#EC4899',
-    backgroundColor: '#FCE7F3',
+  moodOptionSelected: {
+    backgroundColor: theme.accent.purple,
   },
-  moodEmoji: {
-    fontSize: 32,
+  moodOptionEmoji: {
+    fontSize: 24,
   },
-  moodValue: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginTop: 4,
-  },
-  tagsLabel: {
-    fontSize: 16,
+  sectionLabel: {
+    fontSize: 14,
     fontWeight: '600',
-    color: '#1F2937',
+    color: theme.text.secondary,
     marginBottom: 12,
   },
   tagsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-    marginBottom: 24,
+    marginBottom: 20,
   },
   tagOption: {
-    paddingHorizontal: 16,
     paddingVertical: 8,
+    paddingHorizontal: 14,
     borderRadius: 20,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: theme.background.tertiary,
+    borderWidth: 1,
+    borderColor: theme.border.primary,
   },
   tagSelected: {
-    backgroundColor: '#EC4899',
+    backgroundColor: theme.accent.purple,
+    borderColor: theme.accent.purple,
   },
-  tagOptionText: {
-    fontSize: 14,
-    color: '#6B7280',
+  tagText: {
+    fontSize: 13,
+    color: theme.text.secondary,
   },
-  tagSelectedText: {
-    color: '#FFFFFF',
+  tagTextSelected: {
+    color: theme.text.primary,
+    fontWeight: '500',
   },
   noteInput: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: theme.background.tertiary,
+    borderRadius: theme.radius.md,
     padding: 16,
-    borderRadius: 12,
-    fontSize: 16,
-    marginBottom: 24,
-    minHeight: 100,
+    fontSize: 15,
+    color: theme.text.primary,
+    minHeight: 80,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: theme.border.primary,
   },
   saveButton: {
-    backgroundColor: '#EC4899',
+    backgroundColor: theme.accent.purple,
+    borderRadius: theme.radius.md,
     padding: 16,
-    borderRadius: 12,
     alignItems: 'center',
   },
   saveButtonText: {
-    color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
+    color: theme.text.primary,
   },
 });
