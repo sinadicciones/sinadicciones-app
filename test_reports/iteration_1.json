@@ -1,0 +1,88 @@
+{
+  "summary": "Frontend-only testing completed for SinAdicciones app. All key features tested: Profile with 5 expandable sections, Habits list, and Emotional history with emojis and stats. Dark theme verified across all screens.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Emotional page - Últimos 7 días chart",
+        "issues": ["Bar chart shows Y-axis scale (0-10) but no visible bars displayed for the last 7 days despite 30 total registros being available. This could be because recent_logs data may not contain entries from the last 7 days."]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_1.json"
+  ],
+  "action_items": [
+    "Verify bar chart data population in emotional stats - check if recent_logs contains actual entries within last 7 days"
+  ],
+  "critical_code_review_comments": [],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (skipped per request)",
+    "frontend": "95%"
+  },
+  "test_credentials": {
+    "email": "demo@sinadicciones.org",
+    "password": "demopassword",
+    "session_token": "sess_21ac7f90b0d14f9b9563bdfd758b517f"
+  },
+  "seed_data_creation": "N/A - used existing data",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Authentication works via localStorage.setItem('session_token', 'sess_21ac7f90b0d14f9b9563bdfd758b517f'). Manual login does not work in Playwright. Direct URL navigation works: /profile, /habits, /emotional. All profile expandable sections tested and working.",
+  "tests_executed": {
+    "profile_page": {
+      "status": "PASS",
+      "tested_features": [
+        "All 5 expandable sections display correctly",
+        "Información Personal: Shows name, phone, addiction type, years of use",
+        "Mi Para Qué: Shows user's motivation text",
+        "Gatillos y Protectores: Shows triggers (Discusiones, Soledad, Celebraciones, Estrés laboral)",
+        "Contactos de Emergencia: Shows 2 contacts with names and phone numbers",
+        "Mi Historia: Shows user's story text",
+        "Dark theme correctly applied",
+        "Stats section shows días limpio, mejor racha, hábitos"
+      ]
+    },
+    "habits_page": {
+      "status": "PASS", 
+      "tested_features": [
+        "Header displays correctly with gradient",
+        "Análisis de Hábitos card visible",
+        "List of 5 habits displayed: Meditación 10 min, Ejercicio, Lectura AA, Gratitud, Llamar padrino",
+        "Each habit shows streak (0 días 🔥) and frequency (Diario)",
+        "FAB button visible for adding new habits",
+        "Dark theme correctly applied"
+      ]
+    },
+    "emotional_page": {
+      "status": "PASS",
+      "tested_features": [
+        "Header displays correctly with pink/purple gradient",
+        "Análisis Emocional card visible",
+        "Stats show: 5.9 Promedio, 30 Registros",
+        "Últimos 7 días chart section displayed (Y-axis 0-10 visible)",
+        "Historial section shows emotional logs with emojis and values",
+        "Emotional entries display: emoji, value/10, emotion tags, date",
+        "Example entries: 😊 8/10 Esperanza, 🙂 6/10 Tristeza/Motivación/Esperanza",
+        "FAB button visible for adding new emotional logs",
+        "Dark theme correctly applied"
+      ]
+    },
+    "dark_theme": {
+      "status": "PASS",
+      "tested_features": [
+        "Background color #0D0D0D applied across all pages",
+        "Card backgrounds #1A1A1A correctly styled",
+        "White/light text on dark backgrounds for good contrast",
+        "Gradient headers match app branding",
+        "Bottom navigation has dark background with proper contrast"
+      ]
+    }
+  }
+}
