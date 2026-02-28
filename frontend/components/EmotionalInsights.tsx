@@ -179,6 +179,27 @@ export default function EmotionalInsights({ onClose }: Props) {
   const aiAnalysis = analysis?.analysis;
   const trendInfo = getTrendIcon(stats?.mood_trend || 'estable');
 
+  // Generate calendar data from daily_avg
+  const getCalendarData = () => {
+    if (!stats?.daily_avg) return [];
+    const today = new Date();
+    const data = [];
+    for (let i = 30; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      const dateKey = date.toISOString().split('T')[0];
+      const dayName = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][date.getDay()];
+      const dayValue = stats.daily_avg[dayName];
+      if (dayValue) {
+        data.push({
+          date: dateKey,
+          value: dayValue,
+        });
+      }
+    }
+    return data;
+  };
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Period Selector */}
@@ -199,6 +220,62 @@ export default function EmotionalInsights({ onClose }: Props) {
             Este Mes
           </Text>
         </TouchableOpacity>
+      </View>
+
+      {/* Calendar View */}
+      <CalendarView 
+        data={getCalendarData()}
+        type="emotional"
+        accentColor="#EC4899"
+      />
+
+      {/* Mood Stats Ring */}
+      <View style={styles.moodStatsContainer}>
+        <View style={styles.moodRingWrapper}>
+          <Svg width={140} height={140}>
+            <G rotation="-90" origin="70, 70">
+              <Circle cx={70} cy={70} r={55} stroke="#2D2D2D" strokeWidth={12} fill="none" />
+              <Circle 
+                cx={70} cy={70} r={55} 
+                stroke="#EC4899" 
+                strokeWidth={12} 
+                fill="none" 
+                strokeDasharray={`${2 * Math.PI * 55}`}
+                strokeDashoffset={2 * Math.PI * 55 * (1 - (stats?.avg_mood || 0) / 10)}
+                strokeLinecap="round"
+              />
+            </G>
+            <SvgText x={70} y={65} textAnchor="middle" fontSize="24" fontWeight="bold" fill="#FFFFFF">
+              {stats?.avg_mood?.toFixed(1) || '0'}
+            </SvgText>
+            <SvgText x={70} y={85} textAnchor="middle" fontSize="12" fill="#A1A1AA">
+              Promedio
+            </SvgText>
+          </Svg>
+        </View>
+        <View style={styles.moodStatsRight}>
+          <View style={styles.moodStatItem}>
+            <Text style={styles.moodStatEmoji}>{MOOD_EMOJIS[Math.round(stats?.max_mood || 10)]}</Text>
+            <View>
+              <Text style={styles.moodStatValue}>{stats?.max_mood || 0}</Text>
+              <Text style={styles.moodStatLabel}>Mejor día</Text>
+            </View>
+          </View>
+          <View style={styles.moodStatItem}>
+            <Text style={styles.moodStatEmoji}>{MOOD_EMOJIS[Math.round(stats?.min_mood || 1)]}</Text>
+            <View>
+              <Text style={styles.moodStatValue}>{stats?.min_mood || 0}</Text>
+              <Text style={styles.moodStatLabel}>Peor día</Text>
+            </View>
+          </View>
+          <View style={styles.moodStatItem}>
+            <Text style={styles.moodStatEmoji}>📊</Text>
+            <View>
+              <Text style={styles.moodStatValue}>{stats?.entries || 0}</Text>
+              <Text style={styles.moodStatLabel}>Registros</Text>
+            </View>
+          </View>
+        </View>
       </View>
 
       {/* AI Summary Card */}
