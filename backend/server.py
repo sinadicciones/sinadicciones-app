@@ -1748,6 +1748,29 @@ async def get_habit_logs(habit_id: str, current_user: User = Depends(get_current
     
     return logs
 
+@app.get("/api/habits/history")
+async def get_habits_history(current_user: User = Depends(get_current_user)):
+    """Get habit completion history by date"""
+    # Get all habit logs for user
+    logs = await db.habit_logs.find(
+        {"user_id": current_user.user_id},
+        {"_id": 0, "date": 1, "completed": 1}
+    ).to_list(365)
+    
+    # Aggregate by date
+    history_map = {}
+    for log in logs:
+        date = log.get("date", "")
+        if date:
+            if date not in history_map:
+                history_map[date] = {"date": date, "completed_count": 0, "total_count": 0}
+            history_map[date]["total_count"] += 1
+            if log.get("completed"):
+                history_map[date]["completed_count"] += 1
+    
+    return list(history_map.values())
+
+
 # ============== EMOTIONAL LOG ENDPOINTS ==============
 
 @app.get("/api/emotional-logs")
