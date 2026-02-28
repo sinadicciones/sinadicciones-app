@@ -1010,7 +1010,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#0D0D0D',
   },
   scrollContainer: {
     flex: 1,
@@ -1019,12 +1019,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#0D0D0D',
   },
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#6B7280',
+    color: '#A1A1AA',
   },
   header: {
     paddingTop: 50,
@@ -1047,7 +1047,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 13,
-    color: '#D1FAE5',
+    color: 'rgba(255,255,255,0.7)',
     marginTop: 2,
   },
   headerActions: {
@@ -1080,7 +1080,7 @@ const styles = StyleSheet.create({
   sosButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: 'rgba(255,255,255,0.15)',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
@@ -1094,7 +1094,7 @@ const styles = StyleSheet.create({
   sobrietyRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: 'rgba(255,255,255,0.1)',
     borderRadius: 12,
     padding: 12,
   },
