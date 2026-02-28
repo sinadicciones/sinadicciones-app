@@ -1986,7 +1986,7 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
         "total_habits": total_habits,
         "completion_rate": round(completion_rate, 1),
         "longest_streak": longest_streak,
-        "recent_mood": recent_mood["mood_scale"] if recent_mood else None
+        "recent_mood": recent_mood.get("mood") or recent_mood.get("mood_scale") if recent_mood else None
     }
 
 @app.get("/api/dashboard/integrated")
