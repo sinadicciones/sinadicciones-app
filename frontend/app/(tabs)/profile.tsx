@@ -923,7 +923,7 @@ export default function ProfileScreen() {
                             border: 'none',
                             background: 'transparent',
                             fontSize: 16,
-                            color: '#1F2937',
+                            color: '#FFFFFF',
                             marginLeft: 8,
                             cursor: editing ? 'pointer' : 'not-allowed',
                             opacity: editing ? 1 : 0.6,
@@ -1463,7 +1463,7 @@ const styles = StyleSheet.create({
   },
   // Estilos para la sección de cuenta
   accountSection: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     marginHorizontal: 16,
     marginTop: -20,
     borderRadius: 16,
@@ -1521,11 +1521,11 @@ const styles = StyleSheet.create({
   accountName: {
     fontSize: 17,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   accountEmail: {
     fontSize: 13,
-    color: '#6B7280',
+    color: '#A1A1AA',
     marginTop: 2,
   },
   accountActions: {
@@ -1535,14 +1535,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 12,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#0D0D0D',
     borderRadius: 10,
     gap: 10,
   },
   accountButtonText: {
     flex: 1,
     fontSize: 14,
-    color: '#374151',
+    color: '#E5E5E5',
   },
   logoutButton: {
     backgroundColor: '#FEF2F2',
@@ -1566,7 +1566,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
@@ -1581,7 +1581,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   passwordError: {
     flexDirection: 'row',
@@ -1603,15 +1603,15 @@ const styles = StyleSheet.create({
   passwordLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
+    color: '#E5E5E5',
     marginBottom: 8,
   },
   passwordInput: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#0D0D0D',
     padding: 14,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#2D2D2D',
     fontSize: 16,
   },
   savePasswordButton: {
@@ -1633,12 +1633,12 @@ const styles = StyleSheet.create({
   resourceCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#2D2D2D',
   },
   resourceIcon: {
     width: 48,
@@ -1654,11 +1654,11 @@ const styles = StyleSheet.create({
   resourceTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   resourceDesc: {
     fontSize: 13,
-    color: '#6B7280',
+    color: '#A1A1AA',
     marginTop: 2,
   },
   tipCard: {
@@ -1673,7 +1673,7 @@ const styles = StyleSheet.create({
   tipText: {
     flex: 1,
     fontSize: 14,
-    color: '#374151',
+    color: '#E5E5E5',
     lineHeight: 20,
   },
   tipBold: {
@@ -1698,7 +1698,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -1727,13 +1727,13 @@ const styles = StyleSheet.create({
   noTherapistText: {
     flex: 1,
     fontSize: 13,
-    color: '#6B7280',
+    color: '#A1A1AA',
     lineHeight: 18,
   },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#0D0D0D',
     padding: 14,
     borderRadius: 10,
     marginBottom: 10,
@@ -1744,12 +1744,12 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: 12,
-    color: '#6B7280',
+    color: '#A1A1AA',
   },
   infoValue: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1F2937',
+    color: '#FFFFFF',
     marginTop: 2,
   },
   linkedRelativeCard: {
@@ -1765,7 +1765,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -1794,7 +1794,7 @@ const styles = StyleSheet.create({
   noLinkedText: {
     flex: 1,
     fontSize: 13,
-    color: '#6B7280',
+    color: '#A1A1AA',
     lineHeight: 18,
   },
   // New Visual Profile Styles
@@ -1803,7 +1803,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     paddingHorizontal: 16,
     paddingVertical: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     marginHorizontal: 16,
     marginTop: -20,
     borderRadius: 16,
@@ -1827,15 +1827,15 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   statLabel: {
     fontSize: 11,
-    color: '#6B7280',
+    color: '#A1A1AA',
     marginTop: 2,
   },
   expandableSection: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     marginHorizontal: 16,
     marginTop: 12,
     borderRadius: 12,
@@ -1865,15 +1865,15 @@ const styles = StyleSheet.create({
   expandableTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   expandableSubtitle: {
     fontSize: 12,
-    color: '#6B7280',
+    color: '#A1A1AA',
     marginTop: 2,
   },
   expandableContent: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     marginHorizontal: 16,
     marginTop: -8,
     borderBottomLeftRadius: 12,
@@ -1886,22 +1886,22 @@ const styles = StyleSheet.create({
   phoneInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     padding: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#2D2D2D',
     gap: 10,
   },
   phoneInput: {
     flex: 1,
     fontSize: 16,
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   subsectionTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
+    color: '#E5E5E5',
     marginBottom: 4,
   },
   subsectionDesc: {
