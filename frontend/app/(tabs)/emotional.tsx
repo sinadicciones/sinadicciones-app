@@ -50,7 +50,7 @@ export default function EmotionalScreen() {
 
   const loadLogs = async () => {
     try {
-      const response = await authenticatedFetch(`${BACKEND_URL}/api/emotional/logs`);
+      const response = await authenticatedFetch(`${BACKEND_URL}/api/emotional-logs`);
       if (response.ok) {
         const data = await response.json();
         setLogs(data);
@@ -64,7 +64,7 @@ export default function EmotionalScreen() {
 
   const loadHistory = async () => {
     try {
-      const response = await authenticatedFetch(`${BACKEND_URL}/api/emotional/history`);
+      const response = await authenticatedFetch(`${BACKEND_URL}/api/emotional-logs`);
       if (response.ok) {
         const data = await response.json();
         const historyMap: any = {};
@@ -87,14 +87,12 @@ export default function EmotionalScreen() {
 
   const saveLog = async () => {
     try {
-      const dateStr = selectedDate.toISOString().split('T')[0];
-      const response = await authenticatedFetch(`${BACKEND_URL}/api/emotional/log`, {
+      const response = await authenticatedFetch(`${BACKEND_URL}/api/emotional-logs`, {
         method: 'POST',
         body: JSON.stringify({
           mood: selectedMood,
           emotions: selectedTags,
           note: note,
-          date: dateStr,
         }),
       });
 
