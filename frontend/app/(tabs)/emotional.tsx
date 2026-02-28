@@ -16,6 +16,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { authenticatedFetch, getBackendURL } from '../../utils/api';
 import { theme, MOOD_EMOJIS, getMoodEmoji, getMoodColor } from '../../utils/theme';
 import { WeekSelector, MonthCalendar, FilterChips } from '../../components/Calendar';
+import EmotionalInsights from '../../components/EmotionalInsights';
 
 const BACKEND_URL = getBackendURL();
 
