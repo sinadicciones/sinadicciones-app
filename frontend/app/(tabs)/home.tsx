@@ -193,6 +193,8 @@ export default function HomeScreen() {
   const [profile, setProfile] = useState<any>(null);
   const [showInsights, setShowInsights] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [expandedEducation, setExpandedEducation] = useState<string | null>(null);
+  const [education, setEducation] = useState<any>(null);
 
   useEffect(() => {
     loadData();
