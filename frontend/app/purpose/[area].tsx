@@ -310,7 +310,7 @@ export default function AreaDetail() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#0D0D0D',
   },
   header: {
     paddingTop: 20,
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   ratingCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     margin: 16,
     padding: 20,
     borderRadius: 16,
@@ -361,7 +361,7 @@ const styles = StyleSheet.create({
   ratingTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: '#FFFFFF',
     marginBottom: 16,
     textAlign: 'center',
   },
@@ -374,21 +374,21 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#0D0D0D',
     justifyContent: 'center',
     alignItems: 'center',
   },
   ratingText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#6B7280',
+    color: '#A1A1AA',
   },
   ratingTextActive: {
     color: '#FFFFFF',
   },
   ratingHelper: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#A1A1AA',
     textAlign: 'center',
   },
   section: {
@@ -403,7 +403,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   addButton: {
     flexDirection: 'row',
@@ -417,13 +417,13 @@ const styles = StyleSheet.create({
   emptyState: {
     alignItems: 'center',
     padding: 32,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     borderRadius: 16,
   },
   emptyText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#6B7280',
+    color: '#A1A1AA',
     marginTop: 12,
   },
   emptySubtext: {
@@ -434,7 +434,7 @@ const styles = StyleSheet.create({
   goalCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
@@ -456,21 +456,21 @@ const styles = StyleSheet.create({
   goalTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: '#FFFFFF',
     marginBottom: 4,
   },
   goalTitleCompleted: {
     textDecorationLine: 'line-through',
-    color: '#6B7280',
+    color: '#A1A1AA',
   },
   goalDescription: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#A1A1AA',
     marginBottom: 8,
   },
   goalProgress: {
     height: 4,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#0D0D0D',
     borderRadius: 2,
     overflow: 'hidden',
   },
@@ -487,7 +487,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
@@ -502,18 +502,18 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   inputLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
+    color: '#E5E5E5',
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#0D0D0D',
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#2D2D2D',
     borderRadius: 12,
     padding: 16,
     fontSize: 16,

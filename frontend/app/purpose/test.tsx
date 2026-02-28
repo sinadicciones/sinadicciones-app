@@ -463,7 +463,7 @@ export default function PurposeTestScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#0D0D0D',
   },
   header: {
     paddingTop: 50,
@@ -507,7 +507,7 @@ const styles = StyleSheet.create({
   },
   progress: {
     height: '100%',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     borderRadius: 3,
   },
   content: {
@@ -522,13 +522,13 @@ const styles = StyleSheet.create({
   question: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
     marginBottom: 12,
     lineHeight: 30,
   },
   helper: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#A1A1AA',
     marginBottom: 24,
   },
   legacyPrompt: {
@@ -547,9 +547,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 24,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#0D0D0D',
     borderWidth: 2,
-    borderColor: '#E5E7EB',
+    borderColor: '#2D2D2D',
   },
   optionSelected: {
     backgroundColor: '#FEF3C7',
@@ -557,7 +557,7 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 15,
-    color: '#6B7280',
+    color: '#A1A1AA',
     fontWeight: '500',
   },
   optionTextSelected: {
@@ -565,19 +565,19 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   textArea: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     padding: 16,
     borderRadius: 12,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#2D2D2D',
     minHeight: 150,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: 24,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
   },
@@ -587,13 +587,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 12,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#0D0D0D',
     gap: 8,
   },
   backBtnText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#6B7280',
+    color: '#A1A1AA',
   },
   continueBtn: {
     flexDirection: 'row',

@@ -252,7 +252,7 @@ export default function InspirationLibrary() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#0D0D0D',
   },
   header: {
     paddingTop: 20,
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
     color: '#E9D5FF',
   },
   categoriesContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
   },
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#0D0D0D',
     marginRight: 8,
     gap: 6,
   },
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
   categoryText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#6B7280',
+    color: '#A1A1AA',
   },
   categoryTextActive: {
     color: '#FFFFFF',
@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     borderRadius: 16,
     marginBottom: 12,
     overflow: 'hidden',
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   cardText: {
     fontSize: 14,
@@ -353,7 +353,7 @@ const styles = StyleSheet.create({
   quoteText: {
     fontStyle: 'italic',
     fontSize: 15,
-    color: '#374151',
+    color: '#E5E5E5',
   },
   watchButton: {
     flexDirection: 'row',

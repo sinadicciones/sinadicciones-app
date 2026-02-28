@@ -197,7 +197,7 @@ export default function AllGoals() {
           </View>
         ) : (
           Object.entries(goalsByArea).map(([areaKey, areaGoals]: [string, any]) => {
-            const areaInfo = AREAS[areaKey] || { label: areaKey, icon: 'ellipse', color: '#6B7280' };
+            const areaInfo = AREAS[areaKey] || { label: areaKey, icon: 'ellipse', color: '#A1A1AA' };
             return (
               <View key={areaKey} style={styles.areaSection}>
                 <TouchableOpacity
@@ -564,7 +564,7 @@ export default function AllGoals() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#0D0D0D',
   },
   header: {
     paddingTop: 10,
@@ -597,7 +597,7 @@ const styles = StyleSheet.create({
   smartBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 10,
@@ -622,7 +622,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     alignItems: 'center',
   },
   filterTabActive: {
@@ -631,7 +631,7 @@ const styles = StyleSheet.create({
   filterText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#6B7280',
+    color: '#A1A1AA',
   },
   filterTextActive: {
     color: '#FFFFFF',
@@ -642,7 +642,7 @@ const styles = StyleSheet.create({
   addGoalCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     marginHorizontal: 16,
     marginBottom: 16,
     padding: 16,
@@ -666,11 +666,11 @@ const styles = StyleSheet.create({
   addGoalTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   addGoalSubtitle: {
     fontSize: 13,
-    color: '#6B7280',
+    color: '#A1A1AA',
     marginTop: 2,
   },
   emptyState: {
@@ -680,13 +680,13 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
     marginTop: 16,
     marginBottom: 8,
   },
   emptyText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#A1A1AA',
     textAlign: 'center',
     marginBottom: 24,
   },
@@ -711,11 +711,11 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   goalCard: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     marginHorizontal: 16,
     marginBottom: 8,
     padding: 16,
@@ -736,7 +736,7 @@ const styles = StyleSheet.create({
   goalTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1F2937',
+    color: '#FFFFFF',
     marginBottom: 4,
   },
   goalTitleCompleted: {
@@ -745,7 +745,7 @@ const styles = StyleSheet.create({
   },
   goalDescription: {
     fontSize: 13,
-    color: '#6B7280',
+    color: '#A1A1AA',
     marginBottom: 8,
   },
   goalMeta: {
@@ -756,7 +756,7 @@ const styles = StyleSheet.create({
   progressBar: {
     flex: 1,
     height: 4,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#0D0D0D',
     borderRadius: 2,
     overflow: 'hidden',
   },
@@ -766,7 +766,7 @@ const styles = StyleSheet.create({
   },
   progressText: {
     fontSize: 12,
-    color: '#6B7280',
+    color: '#A1A1AA',
     fontWeight: '600',
     width: 35,
     textAlign: 'right',
@@ -778,7 +778,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
@@ -793,7 +793,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   modalIntro: {
     fontSize: 15,
@@ -824,7 +824,7 @@ const styles = StyleSheet.create({
   smartItemTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: '#FFFFFF',
     marginBottom: 4,
   },
   smartItemDesc: {
@@ -834,7 +834,7 @@ const styles = StyleSheet.create({
   },
   smartItemExample: {
     fontSize: 13,
-    color: '#6B7280',
+    color: '#A1A1AA',
     fontStyle: 'italic',
   },
   tipBox: {
@@ -871,7 +871,7 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
+    color: '#E5E5E5',
     marginBottom: 10,
     marginTop: 8,
   },
@@ -885,7 +885,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#E5E7EB',
+    borderColor: '#2D2D2D',
     gap: 12,
   },
   areaOptionIcon: {
@@ -899,12 +899,12 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     fontWeight: '500',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   input: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#0D0D0D',
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#2D2D2D',
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
@@ -979,17 +979,17 @@ const styles = StyleSheet.create({
   examplesTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
     marginBottom: 12,
   },
   exampleCard: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     padding: 12,
     borderRadius: 12,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#2D2D2D',
     gap: 10,
   },
   exampleIcon: {
@@ -1005,7 +1005,7 @@ const styles = StyleSheet.create({
   exampleArea: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
     marginBottom: 6,
   },
   exampleBad: {

@@ -274,7 +274,7 @@ export default function WeeklyCheckin() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#0D0D0D',
   },
   header: {
     paddingTop: 20,
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
   },
@@ -343,17 +343,17 @@ const styles = StyleSheet.create({
   stepTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
     marginBottom: 8,
   },
   stepSubtitle: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#A1A1AA',
     marginBottom: 24,
     lineHeight: 20,
   },
   areaRating: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     fontWeight: '600',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   ratingValue: {
     fontSize: 20,
@@ -397,9 +397,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#E5E7EB',
   },
   textArea: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#2D2D2D',
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
@@ -410,7 +410,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 16,
     gap: 12,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
   },
@@ -421,13 +421,13 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 20,
     borderRadius: 12,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#0D0D0D',
     gap: 8,
   },
   navButtonSecondaryText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#6B7280',
+    color: '#A1A1AA',
   },
   navButtonPrimary: {
     flex: 1,
