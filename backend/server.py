@@ -16,17 +16,10 @@ load_dotenv()
 
 app = FastAPI()
 
-# CORS Configuration - Allow specific origins with credentials
-origins = [
-    "http://localhost:3000",
-    "https://wellness-insights-3.preview.emergentagent.com",
-    "https://preview.emergentagent.com",
-    "exp://",  # For Expo Go
-]
-
+# CORS Configuration - Allow all origins for production
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -34,8 +27,15 @@ app.add_middleware(
 
 # MongoDB Connection
 MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017")
-client = AsyncIOMotorClient(MONGO_URL)
-db = client.test_database
+print(f"Connecting to MongoDB: {MONGO_URL[:50]}...")  # Log connection (truncated for security)
+
+try:
+    client = AsyncIOMotorClient(MONGO_URL, serverSelectionTimeoutMS=5000)
+    db = client.get_default_database() if "?" in MONGO_URL or "/" in MONGO_URL.split("@")[-1] else client.sinadicciones
+except Exception as e:
+    print(f"MongoDB connection error: {e}")
+    client = AsyncIOMotorClient(MONGO_URL, serverSelectionTimeoutMS=5000)
+    db = client.sinadicciones
 
 # Emergent Auth URL
 EMERGENT_AUTH_URL = "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data"
