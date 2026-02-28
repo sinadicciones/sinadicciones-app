@@ -50,3 +50,10 @@ export async function authenticatedFetch(url: string, options: FetchOptions = {}
 export function getBackendURL(): string {
   return BACKEND_URL;
 }
+
+/**
+ * Get stored token from storage
+ */
+export async function getStoredToken(): Promise<string | null> {
+  return await getToken();
+}
