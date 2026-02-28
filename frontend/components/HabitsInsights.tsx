@@ -10,6 +10,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { authenticatedFetch, getBackendURL } from '../utils/api';
+import CalendarView from './CalendarView';
+import Svg, { Circle, G, Text as SvgText } from 'react-native-svg';
 
 const BACKEND_URL = getBackendURL();
 
