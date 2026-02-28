@@ -85,7 +85,7 @@ const WellnessWheel = ({ scores }: { scores: any }) => {
           textAnchor="middle"
           fontSize="28"
           fontWeight="bold"
-          fill="#1F2937"
+          fill="#FFFFFF"
         >
           {scores?.overall || 0}
         </SvgText>
@@ -94,7 +94,7 @@ const WellnessWheel = ({ scores }: { scores: any }) => {
           y={center + 18}
           textAnchor="middle"
           fontSize="12"
-          fill="#6B7280"
+          fill="#A1A1AA"
         >
           Bienestar
         </SvgText>
