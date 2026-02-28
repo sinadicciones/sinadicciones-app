@@ -3991,7 +3991,7 @@ Genera un análisis JSON con esta estructura exacta (responde SOLO el JSON, sin 
         # Parse AI response
         try:
             # Clean response if it has markdown
-            clean_response = ai_response.strip()
+            clean_response = ai_response_text.strip()
             if clean_response.startswith("```"):
                 clean_response = clean_response.split("```")[1]
                 if clean_response.startswith("json"):
