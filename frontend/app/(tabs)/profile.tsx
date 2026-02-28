@@ -535,7 +535,7 @@ export default function ProfileScreen() {
                   onChangeText={(text) =>
                     setFormData({ ...formData, specialization: text })
                   }
-                  placeholder="Ej: Adicciones, Salud Mental..."
+                  placeholderTextColor="#9CA3AF" placeholder="Ej: Adicciones, Salud Mental..."
                   editable={editing}
                 />
               </View>
@@ -548,7 +548,7 @@ export default function ProfileScreen() {
                   onChangeText={(text) =>
                     setFormData({ ...formData, institution: text })
                   }
-                  placeholder="Centro o clínica donde trabajas"
+                  placeholderTextColor="#9CA3AF" placeholder="Centro o clínica donde trabajas"
                   editable={editing}
                 />
               </View>
@@ -561,7 +561,7 @@ export default function ProfileScreen() {
                   onChangeText={(text) =>
                     setFormData({ ...formData, years_experience: parseInt(text) || 0 })
                   }
-                  placeholder="Número de años"
+                  placeholderTextColor="#9CA3AF" placeholder="Número de años"
                   keyboardType="numeric"
                   editable={editing}
                 />
@@ -575,7 +575,7 @@ export default function ProfileScreen() {
                   onChangeText={(text) =>
                     setFormData({ ...formData, license_number: text })
                   }
-                  placeholder="Número de registro profesional"
+                  placeholderTextColor="#9CA3AF" placeholder="Número de registro profesional"
                   editable={editing}
                 />
               </View>
@@ -591,7 +591,7 @@ export default function ProfileScreen() {
                 style={[styles.input, styles.textArea]}
                 value={formData.bio || ''}
                 onChangeText={(text) => setFormData({ ...formData, bio: text })}
-                placeholder="Tu experiencia trabajando con adicciones, metodologías que utilizas..."
+                placeholderTextColor="#9CA3AF" placeholder="Tu experiencia trabajando con adicciones, metodologías que utilizas..."
                 multiline
                 numberOfLines={4}
                 textAlignVertical="top"
@@ -853,7 +853,7 @@ export default function ProfileScreen() {
                     style={styles.input}
                     value={formData.name || user?.name || ''}
                     onChangeText={(text) => setFormData({ ...formData, name: text })}
-                    placeholder="Tu nombre"
+                    placeholderTextColor="#9CA3AF" placeholder="Tu nombre"
                     editable={editing}
                   />
                 </View>
@@ -866,7 +866,7 @@ export default function ProfileScreen() {
                       style={styles.phoneInput}
                       value={formData.phone || ''}
                       onChangeText={(text) => setFormData({ ...formData, phone: text })}
-                      placeholder="+56 9 1234 5678"
+                      placeholderTextColor="#9CA3AF" placeholder="+56 9 1234 5678"
                       keyboardType="phone-pad"
                       editable={editing}
                     />
@@ -879,7 +879,7 @@ export default function ProfileScreen() {
                     style={styles.input}
                     value={formData.addiction_type || ''}
                     onChangeText={(text) => setFormData({ ...formData, addiction_type: text })}
-                    placeholder="Ej: Alcohol, Drogas, Juego..."
+                    placeholderTextColor="#9CA3AF" placeholder="Ej: Alcohol, Drogas, Juego..."
                     editable={editing}
                   />
                 </View>
@@ -890,7 +890,7 @@ export default function ProfileScreen() {
                     style={styles.input}
                     value={formData.years_using?.toString() || ''}
                     onChangeText={(text) => setFormData({ ...formData, years_using: parseInt(text) || 0 })}
-                    placeholder="Número de años"
+                    placeholderTextColor="#9CA3AF" placeholder="Número de años"
                     keyboardType="numeric"
                     editable={editing}
                   />
@@ -976,7 +976,7 @@ export default function ProfileScreen() {
                   style={[styles.input, styles.textArea]}
                   value={formData.my_why || ''}
                   onChangeText={(text) => setFormData({ ...formData, my_why: text })}
-                  placeholder="Ej: Para estar presente para mis hijos, para recuperar mi salud..."
+                  placeholderTextColor="#9CA3AF" placeholder="Ej: Para estar presente para mis hijos, para recuperar mi salud..."
                   multiline
                   numberOfLines={4}
                   textAlignVertical="top"
@@ -1023,7 +1023,7 @@ export default function ProfileScreen() {
                 {editing && (
                   <TextInput
                     style={styles.input}
-                    placeholder="Agregar gatillo y presionar Enter"
+                    placeholderTextColor="#9CA3AF" placeholder="Agregar gatillo y presionar Enter"
                     onSubmitEditing={(e) => {
                       addItemToList('triggers', e.nativeEvent.text);
                       e.currentTarget.clear();
@@ -1046,7 +1046,7 @@ export default function ProfileScreen() {
                 {editing && (
                   <TextInput
                     style={styles.input}
-                    placeholder="Agregar factor protector y presionar Enter"
+                    placeholderTextColor="#9CA3AF" placeholder="Agregar factor protector y presionar Enter"
                     onSubmitEditing={(e) => {
                       addItemToList('protective_factors', e.nativeEvent.text);
                       e.currentTarget.clear();
@@ -1087,14 +1087,14 @@ export default function ProfileScreen() {
                       style={styles.input}
                       value={contact.name}
                       onChangeText={(text) => updateEmergencyContact(index, 'name', text)}
-                      placeholder="Nombre"
+                      placeholderTextColor="#9CA3AF" placeholder="Nombre"
                       editable={editing}
                     />
                     <TextInput
                       style={styles.input}
                       value={contact.phone}
                       onChangeText={(text) => updateEmergencyContact(index, 'phone', text)}
-                      placeholder="Teléfono"
+                      placeholderTextColor="#9CA3AF" placeholder="Teléfono"
                       keyboardType="phone-pad"
                       editable={editing}
                     />
@@ -1102,7 +1102,7 @@ export default function ProfileScreen() {
                       style={styles.input}
                       value={contact.relationship}
                       onChangeText={(text) => updateEmergencyContact(index, 'relationship', text)}
-                      placeholder="Relación (ej: Padrino, Terapeuta)"
+                      placeholderTextColor="#9CA3AF" placeholder="Relación (ej: Padrino, Terapeuta)"
                       editable={editing}
                     />
                     {editing && (
@@ -1157,7 +1157,7 @@ export default function ProfileScreen() {
                   style={[styles.input, styles.textArea]}
                   value={formData.life_story || ''}
                   onChangeText={(text) => setFormData({ ...formData, life_story: text })}
-                  placeholder="Escribe tu historia, hitos importantes, traumas, motivadores..."
+                  placeholderTextColor="#9CA3AF" placeholder="Escribe tu historia, hitos importantes, traumas, motivadores..."
                   multiline
                   numberOfLines={6}
                   textAlignVertical="top"
@@ -1225,7 +1225,7 @@ export default function ProfileScreen() {
               <Text style={styles.passwordLabel}>Contraseña actual</Text>
               <TextInput
                 style={styles.passwordInput}
-                placeholder="Ingresa tu contraseña actual"
+                placeholderTextColor="#9CA3AF" placeholder="Ingresa tu contraseña actual"
                 secureTextEntry
                 value={passwordData.currentPassword}
                 onChangeText={(text) => setPasswordData({ ...passwordData, currentPassword: text })}
@@ -1236,7 +1236,7 @@ export default function ProfileScreen() {
               <Text style={styles.passwordLabel}>Nueva contraseña</Text>
               <TextInput
                 style={styles.passwordInput}
-                placeholder="Mínimo 6 caracteres"
+                placeholderTextColor="#9CA3AF" placeholder="Mínimo 6 caracteres"
                 secureTextEntry
                 value={passwordData.newPassword}
                 onChangeText={(text) => setPasswordData({ ...passwordData, newPassword: text })}
@@ -1247,7 +1247,7 @@ export default function ProfileScreen() {
               <Text style={styles.passwordLabel}>Confirmar nueva contraseña</Text>
               <TextInput
                 style={styles.passwordInput}
-                placeholder="Repite tu nueva contraseña"
+                placeholderTextColor="#9CA3AF" placeholder="Repite tu nueva contraseña"
                 secureTextEntry
                 value={passwordData.confirmPassword}
                 onChangeText={(text) => setPasswordData({ ...passwordData, confirmPassword: text })}
