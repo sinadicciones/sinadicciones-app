@@ -75,36 +75,56 @@ const MiniBarChart = ({ data, color }: { data: number[]; color: string }) => {
   );
 };
 
-// Progress ring component
-const ProgressRing = ({ percentage, size = 80, strokeWidth = 8, color = '#10B981' }: any) => {
+// Progress ring component with SVG
+const ProgressRing = ({ percentage, size = 120, strokeWidth = 10, color = '#10B981' }: any) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
   return (
     <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
-      <View style={{ transform: [{ rotate: '-90deg' }] }}>
-        <View style={{
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          borderWidth: strokeWidth,
-          borderColor: '#E5E7EB',
-          position: 'absolute'
-        }} />
-        <View style={{
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          borderWidth: strokeWidth,
-          borderColor: color,
-          borderTopColor: 'transparent',
-          borderRightColor: percentage > 25 ? color : 'transparent',
-          borderBottomColor: percentage > 50 ? color : 'transparent',
-          borderLeftColor: percentage > 75 ? color : 'transparent',
-        }} />
-      </View>
-      <Text style={styles.ringText}>{percentage}%</Text>
+      <Svg width={size} height={size}>
+        <G rotation="-90" origin={`${size/2}, ${size/2}`}>
+          <Circle
+            cx={size/2}
+            cy={size/2}
+            r={radius}
+            stroke="#2D2D2D"
+            strokeWidth={strokeWidth}
+            fill="none"
+          />
+          <Circle
+            cx={size/2}
+            cy={size/2}
+            r={radius}
+            stroke={color}
+            strokeWidth={strokeWidth}
+            fill="none"
+            strokeDasharray={`${circumference}`}
+            strokeDashoffset={strokeDashoffset}
+            strokeLinecap="round"
+          />
+        </G>
+        <SvgText
+          x={size/2}
+          y={size/2 - 8}
+          textAnchor="middle"
+          fontSize="24"
+          fontWeight="bold"
+          fill="#FFFFFF"
+        >
+          {percentage}%
+        </SvgText>
+        <SvgText
+          x={size/2}
+          y={size/2 + 14}
+          textAnchor="middle"
+          fontSize="12"
+          fill="#A1A1AA"
+        >
+          Tasa General
+        </SvgText>
+      </Svg>
     </View>
   );
 };
