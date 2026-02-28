@@ -480,23 +480,24 @@ export default function PurposeDashboard() {
   };
 
   const WheelOfLife = () => {
-    const centerX = 150;
-    const centerY = 150;
-    const maxRadius = 120;
-    const numSides = 6;
-    
-    const createPolygonPoints = () => {
-      const points: string[] = [];
-      AREAS.forEach((area, index) => {
-        const angle = (Math.PI * 2 * index) / numSides - Math.PI / 2;
-        const rating = areaRatings[area.key] || 5;
-        const radius = (rating / 10) * maxRadius;
-        const x = centerX + radius * Math.cos(angle);
-        const y = centerY + radius * Math.sin(angle);
-        points.push(`${x},${y}`);
-      });
-      return points.join(' ');
-    };
+    try {
+      const centerX = 150;
+      const centerY = 150;
+      const maxRadius = 120;
+      const numSides = 6;
+      
+      const createPolygonPoints = () => {
+        const points: string[] = [];
+        AREAS.forEach((area, index) => {
+          const angle = (Math.PI * 2 * index) / numSides - Math.PI / 2;
+          const rating = areaRatings[area.key] || 5;
+          const radius = (rating / 10) * maxRadius;
+          const x = centerX + radius * Math.cos(angle);
+          const y = centerY + radius * Math.sin(angle);
+          points.push(`${x},${y}`);
+        });
+        return points.join(' ');
+      };
 
     const guideCircles = [2, 4, 6, 8, 10].map((value) => {
       const radius = (value / 10) * maxRadius;
