@@ -20,6 +20,5 @@ aiohttp==3.13.3
 python-dotenv==1.2.1
 pydantic==2.12.5
 
-# AI Integration
+# AI Integration - Using OpenAI directly
 openai==1.99.9
-emergentintegrations==0.1.0
