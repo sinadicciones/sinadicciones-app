@@ -1563,4 +1563,72 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1F2937',
   },
+  // Education Section Styles - Dark Theme
+  educationSection: {
+    backgroundColor: '#1A1A1A',
+    borderRadius: 20,
+    marginHorizontal: 16,
+    marginTop: 16,
+    padding: 20,
+  },
+  educationSectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 16,
+  },
+  eduSection: {
+    marginBottom: 12,
+  },
+  eduSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    padding: 16,
+    borderRadius: 12,
+  },
+  eduSectionTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  eduSectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  eduActionsList: {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 12,
+    marginTop: 8,
+    padding: 12,
+    gap: 12,
+  },
+  eduActionItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
+  eduActionIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  eduActionContent: {
+    flex: 1,
+  },
+  eduActionTitle: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  eduActionDescription: {
+    color: '#9CA3AF',
+    fontSize: 12,
+    lineHeight: 16,
+  },
 });
