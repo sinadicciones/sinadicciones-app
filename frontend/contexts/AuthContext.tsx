@@ -196,14 +196,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       let redirectUrl: string;
       
       if (Platform.OS === 'web') {
-        // Check if we're on localhost or the actual preview URL
+        // Use current origin for web
         const currentOrigin = window.location.origin;
-        if (currentOrigin.includes('localhost') || currentOrigin.includes('127.0.0.1')) {
-          // Use the public preview URL instead of localhost
-          redirectUrl = 'https://version-code-fix.preview.emergentagent.com/';
-        } else {
-          redirectUrl = currentOrigin + window.location.pathname;
-        }
+        redirectUrl = currentOrigin + window.location.pathname;
       } else {
         redirectUrl = Linking.createURL('/');
       }
