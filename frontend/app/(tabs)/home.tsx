@@ -1270,6 +1270,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#1A1A1A',
   },
+  statMiniIconBg: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   statMiniNumber: {
     fontSize: 18,
     fontWeight: 'bold',
