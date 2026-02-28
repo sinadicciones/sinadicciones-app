@@ -1336,6 +1336,7 @@ const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: 'row',
     gap: 12,
+    marginBottom: 16,
   },
   actionButton: {
     flex: 1,
