@@ -569,6 +569,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     fontSize: 16,
+    color: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#2D2D2D',
     minHeight: 150,
