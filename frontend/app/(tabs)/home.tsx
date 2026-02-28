@@ -1196,7 +1196,7 @@ const styles = StyleSheet.create({
   alertCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FEF3C7',
+    backgroundColor: 'rgba(245, 158, 11, 0.15)',
     padding: 14,
     borderRadius: 12,
     marginBottom: 10,
@@ -1209,23 +1209,18 @@ const styles = StyleSheet.create({
   alertTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   alertMessage: {
     fontSize: 12,
-    color: '#6B7280',
+    color: '#A1A1AA',
     marginTop: 2,
   },
   wellnessCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     borderRadius: 16,
     padding: 20,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
   },
   wheelContainer: {
     alignItems: 'center',
@@ -1248,12 +1243,12 @@ const styles = StyleSheet.create({
   legendText: {
     flex: 1,
     fontSize: 14,
-    color: '#374151',
+    color: '#E5E5E5',
   },
   legendScore: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   statsRow: {
     flexDirection: 'row',
@@ -1265,16 +1260,17 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 12,
     alignItems: 'center',
+    backgroundColor: '#1A1A1A',
   },
   statMiniNumber: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
     marginTop: 6,
   },
   statMiniLabel: {
     fontSize: 11,
-    color: '#6B7280',
+    color: '#A1A1AA',
     marginTop: 2,
     textAlign: 'center',
   },
@@ -1289,14 +1285,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   moodChartCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     borderRadius: 12,
     padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
   },
   moodChart: {
     alignItems: 'center',
