@@ -42,6 +42,7 @@ export default function HabitsScreen() {
   const [timeFilter, setTimeFilter] = useState('all');
   const [showCalendar, setShowCalendar] = useState(false);
   const [habitHistory, setHabitHistory] = useState<any>({});
+  const [showInsights, setShowInsights] = useState(false);
 
   useEffect(() => {
     loadHabits();
