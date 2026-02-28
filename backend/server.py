@@ -2756,6 +2756,11 @@ async def get_centers():
 
 # ============== HEALTH CHECK ==============
 
+@app.get("/health")
+async def health_check_root():
+    """Health check for Railway"""
+    return {"status": "ok", "service": "sinadicciones-api", "timestamp": datetime.now(timezone.utc).isoformat()}
+
 @app.get("/api/health")
 async def health_check():
     return {"status": "ok", "timestamp": datetime.now(timezone.utc).isoformat()}
