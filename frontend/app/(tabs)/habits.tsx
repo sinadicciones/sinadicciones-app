@@ -226,7 +226,10 @@ export default function HabitsScreen() {
         transparent={true}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalOverlay}
+        >
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Nuevo Hábito</Text>
@@ -238,6 +241,7 @@ export default function HabitsScreen() {
             <TextInput
               style={styles.input}
               placeholder="Nombre del hábito (ej. Meditación 5 min)"
+              placeholderTextColor="#9CA3AF"
               value={habitName}
               onChangeText={setHabitName}
               autoFocus
@@ -266,7 +270,7 @@ export default function HabitsScreen() {
               <Text style={styles.createButtonText}>Crear Hábito</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* Modal de Insights */}
