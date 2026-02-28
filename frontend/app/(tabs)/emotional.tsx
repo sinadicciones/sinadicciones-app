@@ -43,6 +43,7 @@ export default function EmotionalScreen() {
   const [showCalendar, setShowCalendar] = useState(false);
   const [moodFilter, setMoodFilter] = useState('all');
   const [moodHistory, setMoodHistory] = useState<any>({});
+  const [showInsights, setShowInsights] = useState(false);
 
   useEffect(() => {
     loadLogs();
