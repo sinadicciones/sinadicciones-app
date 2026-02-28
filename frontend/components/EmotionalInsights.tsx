@@ -954,4 +954,39 @@ const styles = StyleSheet.create({
     color: '#9D174D',
     lineHeight: 22,
   },
+  moodStatsContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#1A1A1A',
+    borderRadius: 16,
+    padding: 20,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  moodRingWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  moodStatsRight: {
+    flex: 1,
+    marginLeft: 16,
+    gap: 14,
+  },
+  moodStatItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  moodStatEmoji: {
+    fontSize: 24,
+  },
+  moodStatValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  moodStatLabel: {
+    fontSize: 12,
+    color: '#A1A1AA',
+  },
 });
