@@ -670,4 +670,14 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
     textAlign: 'center',
   },
+  versionContainer: {
+    alignItems: 'center',
+    paddingVertical: 20,
+    marginTop: 10,
+  },
+  versionText: {
+    color: 'rgba(255,255,255,0.4)',
+    fontSize: 12,
+    fontWeight: '500',
+  },
 });
