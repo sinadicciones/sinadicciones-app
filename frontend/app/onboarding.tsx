@@ -549,6 +549,49 @@ export default function OnboardingScreen() {
               numberOfLines={6}
               textAlignVertical="top"
             />
+
+            {/* Fotos de Mi Para Qué */}
+            <Text style={styles.photoSectionTitle}>Fotos que te inspiran (opcional)</Text>
+            <Text style={styles.photoHelperText}>Agrega hasta 5 fotos que representen tu "para qué": familia, metas, momentos especiales</Text>
+            
+            <View style={styles.photosGrid}>
+              {myWhyPhotos.map((photo, index) => (
+                <View key={index} style={styles.photoContainer}>
+                  <Image source={{ uri: photo }} style={styles.photoThumb} />
+                  <TouchableOpacity 
+                    style={styles.removePhotoBtn}
+                    onPress={() => setMyWhyPhotos(myWhyPhotos.filter((_, i) => i !== index))}
+                  >
+                    <Ionicons name="close-circle" size={24} color="#EF4444" />
+                  </TouchableOpacity>
+                </View>
+              ))}
+              
+              {myWhyPhotos.length < 5 && (
+                <TouchableOpacity 
+                  style={styles.addPhotoBtn}
+                  onPress={async () => {
+                    const result = await ImagePicker.launchImageLibraryAsync({
+                      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                      allowsEditing: true,
+                      aspect: [1, 1],
+                      quality: 0.7,
+                      base64: true,
+                    });
+                    
+                    if (!result.canceled && result.assets[0]) {
+                      const base64 = result.assets[0].base64;
+                      if (base64) {
+                        setMyWhyPhotos([...myWhyPhotos, `data:image/jpeg;base64,${base64}`]);
+                      }
+                    }
+                  }}
+                >
+                  <Ionicons name="add" size={32} color="#6B7280" />
+                  <Text style={styles.addPhotoText}>{myWhyPhotos.length}/5</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
         )}
 
