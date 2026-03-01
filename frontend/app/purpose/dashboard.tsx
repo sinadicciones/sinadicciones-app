@@ -432,6 +432,11 @@ export default function PurposeDashboard() {
         const data = await response.json();
         setStats(data);
         setAreaRatings(data.latest_area_ratings || {});
+        
+        // Load cached AI analysis if test is completed
+        if (data.test_completed) {
+          loadCachedAnalysis();
+        }
       }
     } catch (error) {
       console.error('Failed to load purpose data:', error);
