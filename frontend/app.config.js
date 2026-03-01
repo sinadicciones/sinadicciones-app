@@ -56,6 +56,13 @@ export default {
           cameraPermission: "Permite acceso a la cámara para tomar foto de perfil"
         }
       ],
+      [
+        "expo-notifications",
+        {
+          icon: "./assets/images/icon.png",
+          color: "#10B981"
+        }
+      ],
       "expo-font",
       "expo-web-browser"
     ],
