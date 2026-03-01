@@ -4898,11 +4898,12 @@ async def notify_user(user_id: str, title: str, body: str, notification_type: st
 @app.post("/api/notifications/register-token")
 async def register_push_token(data: RegisterPushTokenRequest, current_user: User = Depends(get_current_user)):
     """Registrar token de push notification para un usuario"""
+    # Usar current_user.user_id para mayor seguridad
     await db.push_tokens.update_one(
-        {"user_id": data.user_id},
+        {"user_id": current_user.user_id},
         {
             "$set": {
-                "user_id": data.user_id,
+                "user_id": current_user.user_id,
                 "push_token": data.push_token,
                 "platform": data.platform,
                 "updated_at": datetime.now(timezone.utc)
@@ -4910,7 +4911,21 @@ async def register_push_token(data: RegisterPushTokenRequest, current_user: User
         },
         upsert=True
     )
-    return {"success": True, "message": "Token registrado"}
+    return {"success": True, "message": "Token registrado", "user_id": current_user.user_id}
+
+
+@app.get("/api/notifications/debug-token")
+async def debug_push_token(current_user: User = Depends(get_current_user)):
+    """Debug: Ver si hay token registrado para el usuario actual"""
+    token_doc = await db.push_tokens.find_one({"user_id": current_user.user_id})
+    if token_doc:
+        return {
+            "has_token": True,
+            "user_id": current_user.user_id,
+            "platform": token_doc.get("platform"),
+            "token_preview": token_doc.get("push_token", "")[:30] + "..." if token_doc.get("push_token") else None
+        }
+    return {"has_token": False, "user_id": current_user.user_id}
 
 @app.post("/api/notifications/unregister-token")
 async def unregister_push_token(current_user: User = Depends(get_current_user)):
