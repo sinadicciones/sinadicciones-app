@@ -245,14 +245,32 @@ export default function RecommendationsScreen() {
             <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
           </TouchableOpacity>
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>🎯 Tu Plan de Recuperación</Text>
-            <Text style={styles.headerSubtitle}>Recomendaciones personalizadas para ti</Text>
+            <Text style={styles.headerTitle}>Mi Plan de Recuperación</Text>
+            <Text style={styles.headerSubtitle}>Tu guía personalizada hacia una vida libre</Text>
           </View>
         </View>
       </LinearGradient>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         
+        {/* Tu Reto - Resumen de Recuperación */}
+        <View style={styles.retoSection}>
+          <View style={styles.retoHeader}>
+            <Ionicons name="flag" size={22} color="#F59E0B" />
+            <Text style={styles.retoTitle}>Tu Reto</Text>
+          </View>
+          <View style={styles.retoCards}>
+            <View style={styles.retoCard}>
+              <Text style={styles.retoCardLabel}>Tipo de adicción</Text>
+              <Text style={styles.retoCardValue}>{profile?.addiction_type || 'No especificado'}</Text>
+            </View>
+            <View style={styles.retoCardHighlight}>
+              <Text style={styles.retoCardLabel}>Días en recuperación</Text>
+              <Text style={styles.retoCardValueBig}>{profile?.days_clean || 0} días</Text>
+            </View>
+          </View>
+        </View>
+
         {/* Mi Para Qué - Recordatorio */}
         {myWhy && (
           <View style={styles.whyCard}>
