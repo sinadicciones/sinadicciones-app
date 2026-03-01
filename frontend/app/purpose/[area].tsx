@@ -220,40 +220,67 @@ export default function AreaDetail() {
               <Text style={styles.emptySubtext}>Crea tu primer objetivo para esta área</Text>
             </View>
           ) : (
-            activeGoals.map((goal) => (
-              <View key={goal.goal_id} style={styles.goalCard}>
-                <TouchableOpacity
-                  style={styles.goalCheckbox}
-                  onPress={() => handleToggleComplete(goal)}
-                >
-                  <Ionicons
-                    name="ellipse-outline"
-                    size={24}
-                    color={areaInfo.color}
-                  />
-                </TouchableOpacity>
-                <View style={styles.goalContent}>
-                  <Text style={styles.goalTitle}>{goal.title}</Text>
-                  {goal.description && (
-                    <Text style={styles.goalDescription}>{goal.description}</Text>
-                  )}
-                  <View style={styles.goalProgress}>
-                    <View
-                      style={[
-                        styles.goalProgressBar,
-                        { width: `${goal.progress}%`, backgroundColor: areaInfo.color },
-                      ]}
-                    />
+            activeGoals.map((goal) => {
+              const completedDays = Object.values(goal.weekly_progress || {}).filter(Boolean).length;
+              const targetDays = goal.target_days || 5;
+              
+              return (
+                <View key={goal.goal_id} style={styles.goalCard}>
+                  <View style={styles.goalHeader}>
+                    <View style={styles.goalInfo}>
+                      <Text style={styles.goalTitle}>{goal.title}</Text>
+                      {goal.description && (
+                        <Text style={styles.goalDescription}>{goal.description}</Text>
+                      )}
+                    </View>
+                    <TouchableOpacity
+                      style={styles.goalDelete}
+                      onPress={() => handleDeleteGoal(goal)}
+                    >
+                      <Ionicons name="trash-outline" size={18} color="#EF4444" />
+                    </TouchableOpacity>
+                  </View>
+                  
+                  {/* Weekly Day Circles */}
+                  <View style={styles.weekDaysContainer}>
+                    {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map((day, index) => {
+                      const dayLabels = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+                      const isCompleted = goal.weekly_progress?.[day] || false;
+                      return (
+                        <TouchableOpacity
+                          key={day}
+                          style={[
+                            styles.dayCircle,
+                            isCompleted && { backgroundColor: areaInfo.color, borderColor: areaInfo.color }
+                          ]}
+                          onPress={() => handleToggleDay(goal, day)}
+                        >
+                          <Text style={[
+                            styles.dayLabel,
+                            isCompleted && styles.dayLabelCompleted
+                          ]}>
+                            {dayLabels[index]}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                  
+                  {/* Progress indicator */}
+                  <View style={styles.progressRow}>
+                    <View style={styles.goalProgress}>
+                      <View
+                        style={[
+                          styles.goalProgressBar,
+                          { width: `${goal.progress || 0}%`, backgroundColor: areaInfo.color },
+                        ]}
+                      />
+                    </View>
+                    <Text style={styles.progressText}>{completedDays}/{targetDays} días</Text>
                   </View>
                 </View>
-                <TouchableOpacity
-                  style={styles.goalDelete}
-                  onPress={() => handleDeleteGoal(goal)}
-                >
-                  <Ionicons name="trash-outline" size={18} color="#EF4444" />
-                </TouchableOpacity>
-              </View>
-            ))
+              );
+            })
           )}
         </View>
 
