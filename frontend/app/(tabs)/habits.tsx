@@ -277,7 +277,7 @@ export default function HabitsScreen() {
                   <Text style={styles.habitName}>{habit.name}</Text>
                   <View style={styles.habitMeta}>
                     <Text style={styles.habitStreak}>
-                      {habit.streak} días 🔥
+                      {habit.streak} {habit.streak === 1 ? 'día' : 'días'} 🔥
                     </Text>
                     <Text style={styles.habitFrequency}>
                       • {habit.frequency === 'daily' ? 'Diario' : habit.frequency}
