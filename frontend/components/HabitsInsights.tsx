@@ -351,7 +351,12 @@ export default function HabitsInsights({ onClose }: Props) {
 
       {/* Habit Rankings */}
       <View style={styles.sectionCard}>
-        <Text style={styles.sectionTitle}>📈 Rendimiento por Hábito</Text>
+        <View style={styles.sectionHeaderRow}>
+          <Text style={styles.sectionTitle}>📈 Rendimiento por Hábito</Text>
+          <View style={styles.periodBadgeSmall}>
+            <Text style={styles.periodBadgeSmallText}>{period === 'week' ? 'Semana' : 'Mes'}</Text>
+          </View>
+        </View>
         {habitStats.slice(0, 6).map((habit, index) => (
           <View key={habit.habit_id} style={styles.habitRankItem}>
             <View style={styles.habitRankLeft}>
