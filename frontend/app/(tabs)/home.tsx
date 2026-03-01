@@ -807,52 +807,162 @@ export default function HomeScreen() {
               <Text style={styles.triggersSectionTitle}>Estrategias para tus Gatillos</Text>
             </View>
             <Text style={styles.triggersSubtitle}>
-              Has identificado {profile.triggers.length} gatillos. Aquí tienes estrategias específicas:
+              Has identificado {profile.triggers.length} gatillos. Toca cada uno para ver estrategias:
             </Text>
             
             <View style={styles.triggersList}>
               {profile.triggers.slice(0, 6).map((trigger: string, index: number) => {
-                const triggerStrategies: { [key: string]: { icon: string; color: string; strategy: string } } = {
-                  'Estrés': { icon: 'pulse', color: '#EF4444', strategy: 'Practica respiración diafragmática 4-7-8 cuando sientas tensión' },
-                  'Estrés laboral': { icon: 'pulse', color: '#EF4444', strategy: 'Practica respiración diafragmática 4-7-8 cuando sientas tensión' },
-                  'stress': { icon: 'pulse', color: '#EF4444', strategy: 'Practica respiración diafragmática 4-7-8 cuando sientas tensión' },
-                  'Soledad': { icon: 'people', color: '#8B5CF6', strategy: 'Llama a alguien de tu red de apoyo cuando te sientas solo/a' },
-                  'loneliness': { icon: 'people', color: '#8B5CF6', strategy: 'Llama a alguien de tu red de apoyo cuando te sientas solo/a' },
-                  'Ciertos lugares': { icon: 'location', color: '#06B6D4', strategy: 'Identifica y evita lugares asociados al consumo' },
-                  'places': { icon: 'location', color: '#06B6D4', strategy: 'Identifica y evita lugares asociados al consumo' },
-                  'Emociones negativas': { icon: 'heart-dislike', color: '#EC4899', strategy: 'Practica el reconocimiento y nombrado de emociones' },
-                  'emotions': { icon: 'heart-dislike', color: '#EC4899', strategy: 'Practica el reconocimiento y nombrado de emociones' },
-                  'Celebraciones': { icon: 'wine', color: '#A855F7', strategy: 'Planifica con anticipación eventos sociales' },
-                  'Fiestas y celebraciones': { icon: 'wine', color: '#A855F7', strategy: 'Planifica con anticipación eventos sociales' },
-                  'celebration': { icon: 'wine', color: '#A855F7', strategy: 'Planifica con anticipación eventos sociales' },
-                  'Aburrimiento': { icon: 'game-controller', color: '#22C55E', strategy: 'Desarrolla nuevos hobbies y pasatiempos' },
-                  'boredom': { icon: 'game-controller', color: '#22C55E', strategy: 'Desarrolla nuevos hobbies y pasatiempos' },
-                  'Personas del pasado': { icon: 'person-remove', color: '#F97316', strategy: 'Establece límites claros con personas que consumen' },
-                  'people': { icon: 'person-remove', color: '#F97316', strategy: 'Establece límites claros con personas que consumen' },
-                  'Discusiones familiares': { icon: 'chatbubbles', color: '#EF4444', strategy: 'Practica comunicación asertiva y toma pausas' },
-                  'Problemas financieros': { icon: 'cash', color: '#F59E0B', strategy: 'Crea un plan financiero y busca ayuda profesional' },
-                  'Insomnio': { icon: 'moon', color: '#6366F1', strategy: 'Establece una rutina de sueño saludable' },
-                  'Ansiedad': { icon: 'fitness', color: '#EC4899', strategy: 'Practica técnicas de grounding y mindfulness' },
+                const triggerStrategies: { [key: string]: { icon: string; color: string; strategy: string; tips: string[] } } = {
+                  'Estrés': { 
+                    icon: 'pulse', 
+                    color: '#EF4444', 
+                    strategy: 'Practica respiración diafragmática 4-7-8 cuando sientas tensión',
+                    tips: [
+                      'Inhala 4 segundos, mantén 7, exhala 8',
+                      'Realiza ejercicio físico regular (30 min diarios)',
+                      'Identifica las fuentes de estrés y trabaja en reducirlas',
+                      'Considera técnicas como yoga o tai chi'
+                    ]
+                  },
+                  'Estrés laboral': { 
+                    icon: 'briefcase', 
+                    color: '#EF4444', 
+                    strategy: 'Establece límites entre trabajo y vida personal',
+                    tips: [
+                      'Toma pausas activas cada 2 horas',
+                      'Practica técnicas de respiración en momentos de presión',
+                      'Habla con tu jefe sobre carga de trabajo si es necesario',
+                      'Define horarios claros de desconexión'
+                    ]
+                  },
+                  'Soledad': { 
+                    icon: 'people', 
+                    color: '#8B5CF6', 
+                    strategy: 'Llama a alguien de tu red de apoyo cuando te sientas solo/a',
+                    tips: [
+                      'Asiste a reuniones de grupos de apoyo (AA, NA)',
+                      'Llama a tu padrino o contacto de emergencia',
+                      'Participa en actividades comunitarias',
+                      'Considera adoptar una mascota'
+                    ]
+                  },
+                  'Discusiones familiares': { 
+                    icon: 'home', 
+                    color: '#F59E0B', 
+                    strategy: 'Practica comunicación asertiva y toma pausas',
+                    tips: [
+                      'Aléjate de la situación antes de reaccionar impulsivamente',
+                      'Practica la escucha activa sin interrumpir',
+                      'Expresa tus sentimientos usando "yo siento" en lugar de acusar',
+                      'Considera terapia familiar para mejorar la comunicación'
+                    ]
+                  },
+                  'Fiestas y celebraciones': { 
+                    icon: 'wine', 
+                    color: '#A855F7', 
+                    strategy: 'Planifica con anticipación eventos sociales',
+                    tips: [
+                      'Llega con un plan claro y hora de salida definida',
+                      'Lleva tu propia bebida sin alcohol',
+                      'Ten un "compañero de recuperación" en el evento',
+                      'Prepara respuestas para cuando te ofrezcan alcohol'
+                    ]
+                  },
+                  'Emociones negativas': { 
+                    icon: 'heart-dislike', 
+                    color: '#EC4899', 
+                    strategy: 'Practica el reconocimiento y nombrado de emociones',
+                    tips: [
+                      'Usa la técnica HALT: Hambre, Enojo, Soledad, Cansancio',
+                      'Escribe un diario emocional',
+                      'Habla con alguien de confianza sobre cómo te sientes',
+                      'Practica mindfulness para observar sin juzgar'
+                    ]
+                  },
+                  'Aburrimiento': { 
+                    icon: 'game-controller', 
+                    color: '#22C55E', 
+                    strategy: 'Desarrolla nuevos hobbies y pasatiempos',
+                    tips: [
+                      'Crea una lista de actividades para momentos de ocio',
+                      'Aprende algo nuevo (idioma, instrumento, arte)',
+                      'Mantén una rutina estructurada',
+                      'Involúcrate en actividades de voluntariado'
+                    ]
+                  },
+                  'Ciertos lugares': { 
+                    icon: 'location', 
+                    color: '#06B6D4', 
+                    strategy: 'Identifica y evita lugares asociados al consumo',
+                    tips: [
+                      'Planifica rutas alternativas',
+                      'Si debes ir, hazlo acompañado',
+                      'Crea nuevos lugares "seguros" para socializar',
+                      'Informa a tu red de apoyo sobre estos lugares'
+                    ]
+                  },
+                  'Personas del pasado': { 
+                    icon: 'person-remove', 
+                    color: '#F97316', 
+                    strategy: 'Establece límites claros con personas que consumen',
+                    tips: [
+                      'No temas alejarte de amistades tóxicas',
+                      'Construye nuevas relaciones en grupos de recuperación',
+                      'Comunica tus necesidades de forma clara',
+                      'Practica decir "no" de manera asertiva'
+                    ]
+                  },
+                  'Ansiedad': { 
+                    icon: 'fitness', 
+                    color: '#EC4899', 
+                    strategy: 'Practica técnicas de grounding y mindfulness',
+                    tips: [
+                      'Usa la técnica 5-4-3-2-1 para conectar con tus sentidos',
+                      'Practica la respiración 4-7-8',
+                      'Limita el consumo de cafeína',
+                      'Establece una rutina de sueño regular'
+                    ]
+                  },
+                  'Problemas financieros': { 
+                    icon: 'cash', 
+                    color: '#F59E0B', 
+                    strategy: 'Crea un plan financiero y busca ayuda profesional',
+                    tips: [
+                      'Crea un presupuesto simple y síguelo',
+                      'Busca apoyo en organizaciones de ayuda económica',
+                      'No tomes decisiones financieras cuando estés estresado',
+                      'Recuerda que el consumo empeora los problemas económicos'
+                    ]
+                  },
                 };
                 
                 const triggerInfo = triggerStrategies[trigger] || { 
                   icon: 'alert-circle', 
                   color: '#6B7280', 
-                  strategy: 'Identifica patrones y desarrolla estrategias personalizadas' 
+                  strategy: 'Identifica patrones y desarrolla estrategias personalizadas',
+                  tips: [
+                    'Observa cuándo aparece este gatillo',
+                    'Identifica las señales tempranas',
+                    'Desarrolla un plan de acción personalizado',
+                    'Habla con tu terapeuta sobre este gatillo'
+                  ]
                 };
                 
                 return (
                   <TouchableOpacity 
                     key={index} 
                     style={styles.triggerItem}
-                    onPress={() => router.push('/recommendations')}
+                    onPress={() => {
+                      setSelectedTrigger({ name: trigger, ...triggerInfo });
+                      setShowTriggerModal(true);
+                    }}
                   >
                     <View style={[styles.triggerIconContainer, { backgroundColor: `${triggerInfo.color}20` }]}>
                       <Ionicons name={triggerInfo.icon as any} size={22} color={triggerInfo.color} />
                     </View>
                     <View style={styles.triggerContent}>
                       <Text style={styles.triggerName}>{trigger}</Text>
-                      <Text style={styles.triggerStrategy}>{triggerInfo.strategy}</Text>
+                      <Text style={styles.triggerStrategy} numberOfLines={1}>{triggerInfo.strategy}</Text>
                     </View>
                     <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
                   </TouchableOpacity>
