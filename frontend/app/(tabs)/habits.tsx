@@ -640,4 +640,36 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
+  // Sugerencias de hábitos
+  suggestionsLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#A1A1AA',
+    marginBottom: 10,
+  },
+  suggestionsContainer: {
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
+  suggestionChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1A1A1A',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginRight: 8,
+    borderWidth: 1,
+    gap: 6,
+  },
+  suggestionText: {
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  orText: {
+    fontSize: 13,
+    color: '#6B7280',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
 });
