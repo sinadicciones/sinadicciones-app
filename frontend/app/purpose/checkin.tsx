@@ -28,6 +28,7 @@ const AREAS = [
 
 export default function WeeklyCheckin() {
   const router = useRouter();
+  const [showIntro, setShowIntro] = useState(true);
   const [step, setStep] = useState(0);
   const [ratings, setRatings] = useState<{ [key: string]: number }>({});
   const [achievements, setAchievements] = useState('');
