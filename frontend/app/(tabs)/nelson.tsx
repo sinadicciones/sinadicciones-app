@@ -371,11 +371,6 @@ export default function NelsonChat() {
       </ScrollView>
 
       {/* Input Area */}
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 20}
-        style={styles.keyboardAvoidingView}
-      >
         <View style={styles.inputContainer}>
           <TouchableOpacity
             style={styles.crisisButton}
