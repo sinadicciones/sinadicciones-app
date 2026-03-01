@@ -129,6 +129,21 @@ export default function NelsonChat() {
     }
   }, [messages]);
 
+  const getWelcomeMessage = (role: string | undefined): string => {
+    switch (role) {
+      case 'patient':
+        return '¡Hola! Soy Nelson, tu compañero de apoyo en este camino de recuperación. 🤝\n\nEstoy aquí para escucharte las 24 horas, sin juzgarte. Puedes contarme cómo te sientes, pedirme técnicas para momentos difíciles, o simplemente conversar.\n\n⚠️ Recuerda: Soy un apoyo complementario, no reemplazo a un profesional de salud mental.\n\n¿Cómo te sientes hoy?';
+      case 'active_user':
+        return '¡Hola! Soy Nelson, tu coach personal en este reto de transformación. 💪\n\nEstoy aquí para motivarte, ayudarte a superar obstáculos y celebrar cada logro contigo. Pregúntame sobre tu progreso, técnicas de motivación, o cuando necesites un impulso.\n\n¿Cómo va tu reto hoy?';
+      case 'professional':
+        return '¡Hola! Soy Nelson. Reconozco que cuidar a otros puede ser agotador. 🌱\n\nEstoy aquí para apoyarte en tu autocuidado profesional. Podemos hablar sobre prevención de burnout, casos difíciles, o simplemente desahogarte.\n\n⚠️ Recuerda: Tu bienestar también importa.\n\n¿Cómo estás llevando la carga hoy?';
+      case 'family':
+        return '¡Hola! Soy Nelson. Sé que acompañar a un ser querido con adicción es muy difícil. 💙\n\nEstoy aquí para escucharte y apoyarte. Podemos hablar sobre cómo te sientes, cómo poner límites sanos, o cómo cuidarte a ti mismo.\n\n⚠️ Recuerda: Tú también mereces apoyo.\n\n¿Cómo te encuentras hoy?';
+      default:
+        return '¡Hola! Soy Nelson, tu compañero de apoyo. 🤝\n\n¿Cómo te sientes hoy?';
+    }
+  };
+
   const loadConversation = async () => {
     try {
       const response = await authenticatedFetch('/api/nelson/conversation');
@@ -140,11 +155,13 @@ export default function NelsonChat() {
             timestamp: new Date(m.timestamp)
           })));
         } else {
-          // Add welcome message
+          // Add welcome message based on profile role
+          const profileResponse = await authenticatedFetch('/api/profile');
+          const profileData = profileResponse.ok ? await profileResponse.json() : null;
           setMessages([{
             id: 'welcome',
             role: 'assistant',
-            content: '¡Hola! Soy Nelson, tu compañero de apoyo en este camino de recuperación. 🤝\n\nEstoy aquí para escucharte las 24 horas, sin juzgarte. Puedes contarme cómo te sientes, pedirme técnicas para momentos difíciles, o simplemente conversar.\n\n⚠️ Recuerda: Soy un apoyo complementario, no reemplazo a un profesional de salud mental.\n\n¿Cómo te sientes hoy?',
+            content: getWelcomeMessage(profileData?.role),
             timestamp: new Date(),
           }]);
         }
