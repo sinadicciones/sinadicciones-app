@@ -1622,4 +1622,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 16,
   },
+  versionContainer: {
+    alignItems: 'center',
+    paddingVertical: 20,
+    marginTop: 10,
+  },
+  versionText: {
+    color: '#4B5563',
+    fontSize: 12,
+    fontWeight: '500',
+  },
 });
