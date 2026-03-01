@@ -182,6 +182,26 @@ class WeeklyCheckin(BaseModel):
     next_week_plan: Optional[str] = None
     created_at: datetime
 
+# ============== NOTIFICATION MODELS ==============
+
+class NotificationSettings(BaseModel):
+    motivational: bool = True
+    habit_reminders: bool = True
+    emotion_reminders: bool = True
+    goal_reminders: bool = True
+    preferred_time: str = "09:00"  # HH:MM format
+
+class UpdateNotificationSettingsRequest(BaseModel):
+    motivational: Optional[bool] = None
+    habit_reminders: Optional[bool] = None
+    emotion_reminders: Optional[bool] = None
+    goal_reminders: Optional[bool] = None
+    preferred_time: Optional[str] = None
+
+class RegisterPushTokenRequest(BaseModel):
+    push_token: str
+    device_type: str = "expo"  # expo, fcm, apns
+
 # ============== AUTH HELPERS ==============
 
 async def get_current_user(request: Request) -> Optional[User]:
