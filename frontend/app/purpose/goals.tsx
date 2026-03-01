@@ -1333,11 +1333,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#9CA3AF',
     marginBottom: 8,
+    marginTop: 12,
   },
   weekDaysRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 0,
+    marginBottom: 12,
   },
   weekDaysContainer: {
     flexDirection: 'row',
