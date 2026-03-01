@@ -2538,7 +2538,7 @@ async def get_purpose_ai_analysis(current_user: User = Depends(get_current_user)
         profile = test.get("profile", {})
         
         # Get user profile for context
-        user_profile = await db.profiles.find_one(
+        user_profile = await db.user_profiles.find_one(
             {"user_id": current_user.user_id},
             {"_id": 0}
         )
