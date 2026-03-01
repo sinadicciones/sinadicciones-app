@@ -568,6 +568,15 @@ export default function ProfileScreen() {
 
             <TouchableOpacity 
               style={styles.accountButton}
+              onPress={() => setShowNotificationsModal(true)}
+            >
+              <Ionicons name="notifications-outline" size={20} color="#6B7280" />
+              <Text style={styles.accountButtonText}>Configurar notificaciones</Text>
+              <Ionicons name="chevron-forward" size={20} color="#D1D5DB" />
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.accountButton}
               onPress={() => setShowPasswordModal(true)}
             >
               <Ionicons name="key-outline" size={20} color="#6B7280" />
