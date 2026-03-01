@@ -6146,6 +6146,118 @@ async def setup_demo_user():
     }
 
 
+@app.post("/api/admin/setup-demo-professional")
+async def setup_demo_professional():
+    """Create or update the demo professional user with all necessary data."""
+    
+    import hashlib
+    
+    demo_email = "profesional@sinadicciones.org"
+    demo_password = "demopassword"
+    demo_user_id = "user_demo_profesional"
+    patient_demo_id = "user_demo_carlos"
+    
+    # Hash password
+    password_hash = hashlib.sha256(demo_password.encode()).hexdigest()
+    
+    # Create/update user
+    await db.users.update_one(
+        {"email": demo_email},
+        {
+            "$set": {
+                "user_id": demo_user_id,
+                "email": demo_email,
+                "name": "Dra. María González",
+                "password_hash": password_hash,
+                "created_at": datetime.now(timezone.utc)
+            }
+        },
+        upsert=True
+    )
+    
+    # Create/update professional profile
+    await db.profiles.update_one(
+        {"user_id": demo_user_id},
+        {
+            "$set": {
+                "user_id": demo_user_id,
+                "name": "Dra. María González",
+                "email": demo_email,
+                "role": "professional",
+                "onboarding_completed": True,
+                "updated_at": datetime.now(timezone.utc)
+            }
+        },
+        upsert=True
+    )
+    
+    # Create/update user_profiles with professional details
+    await db.user_profiles.update_one(
+        {"user_id": demo_user_id},
+        {
+            "$set": {
+                "user_id": demo_user_id,
+                "role": "professional",
+                "professional_type": "Psicóloga Clínica",
+                "specialization": "Adicciones y trastornos relacionados",
+                "years_experience": 12,
+                "license_number": "PSI-12345-CL",
+                "institution": "Centro de Rehabilitación SinAdicciones",
+                "bio": "Psicóloga clínica con más de 12 años de experiencia en el tratamiento de adicciones. Mi enfoque combina terapia cognitivo-conductual con técnicas de mindfulness. Creo firmemente en que la recuperación es posible para todos.",
+                "whatsapp": "+56 9 1234 5678",
+                "consultation_fee": "$45.000 CLP / sesión",
+                "accepts_patients": True,
+                "profile_completed": True,
+                "updated_at": datetime.now(timezone.utc)
+            }
+        },
+        upsert=True
+    )
+    
+    # Link professional with patient demo
+    await db.therapist_patients.update_one(
+        {"therapist_id": demo_user_id, "patient_id": patient_demo_id},
+        {
+            "$set": {
+                "therapist_id": demo_user_id,
+                "patient_id": patient_demo_id,
+                "status": "active",
+                "linked_at": datetime.now(timezone.utc),
+                "notes": "Paciente demo para demostración"
+            }
+        },
+        upsert=True
+    )
+    
+    # Create a sample task for the patient
+    await db.therapist_tasks.update_one(
+        {"therapist_id": demo_user_id, "patient_id": patient_demo_id, "title": "Completar diario de emociones"},
+        {
+            "$set": {
+                "task_id": str(uuid.uuid4()),
+                "therapist_id": demo_user_id,
+                "patient_id": patient_demo_id,
+                "title": "Completar diario de emociones",
+                "description": "Escribir cómo te sentiste durante el día y qué situaciones te generaron emociones fuertes.",
+                "due_date": (datetime.now(timezone.utc) + timedelta(days=7)).isoformat(),
+                "status": "pending",
+                "priority": "medium",
+                "created_at": datetime.now(timezone.utc)
+            }
+        },
+        upsert=True
+    )
+    
+    return {
+        "success": True,
+        "message": "Usuario profesional demo creado/actualizado exitosamente",
+        "user_id": demo_user_id,
+        "email": demo_email,
+        "password": demo_password,
+        "linked_patient": patient_demo_id
+    }
+
+
 
 
 if __name__ == "__main__":
