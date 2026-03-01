@@ -5957,21 +5957,31 @@ async def nelson_chat(
         
         # Call OpenAI using emergentintegrations
         from emergentintegrations.llm.chat import LlmChat
+        import uuid
         
         # Build the conversation for emergentintegrations
-        chat = LlmChat(api_key=os.getenv("EMERGENT_LLM_KEY")).with_model("openai", "gpt-4o")
+        session_id = f"nelson_{current_user.user_id}_{uuid.uuid4().hex[:8]}"
+        chat = LlmChat(
+            api_key=os.getenv("EMERGENT_LLM_KEY"),
+            session_id=session_id,
+            system_message=system_prompt
+        ).with_model("openai", "gpt-4o")
         
-        # Build the conversation context
-        full_prompt = f"{system_prompt}\n\nConversación anterior:\n"
-        for msg in messages_history[-5:]:
-            role_label = "Usuario" if msg["role"] == "user" else "Nelson"
-            full_prompt += f"{role_label}: {msg['content']}\n"
-        full_prompt += f"\nUsuario: {user_message}\n\nNelson:"
+        # Build the user message with context
+        context_message = ""
+        if messages_history:
+            context_message = "Conversación reciente:\n"
+            for msg in messages_history[-3:]:
+                role_label = "Usuario" if msg["role"] == "user" else "Nelson"
+                context_message += f"{role_label}: {msg['content']}\n"
+            context_message += "\n"
+        
+        full_message = f"{context_message}{user_message}"
         
         if crisis_detected:
-            full_prompt += "\n\n[ALERTA CRISIS: Responde con máxima empatía y ofrece recursos de ayuda inmediata]"
+            full_message += "\n\n[ALERTA: El usuario podría estar en crisis. Responde con máxima empatía]"
         
-        nelson_response = chat.message(full_prompt)
+        nelson_response = chat.message(full_message)
         
         # Determine mode
         mode = "crisis" if crisis_detected else "normal"
