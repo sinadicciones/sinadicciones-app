@@ -5956,12 +5956,12 @@ async def nelson_chat(
             })
         
         # Call OpenAI using emergentintegrations
-        from emergentintegrations.llm.chat import Chat
+        from emergentintegrations.llm.chat import LlmChat
         
-        # Convert messages to the format expected by emergentintegrations
-        chat = Chat(api_key=os.getenv("EMERGENT_LLM_KEY")).with_model("openai", "gpt-4o")
+        # Build the conversation for emergentintegrations
+        chat = LlmChat(api_key=os.getenv("EMERGENT_LLM_KEY")).with_model("openai", "gpt-4o")
         
-        # Build the conversation
+        # Build the conversation context
         full_prompt = f"{system_prompt}\n\nConversación anterior:\n"
         for msg in messages_history[-5:]:
             role_label = "Usuario" if msg["role"] == "user" else "Nelson"
