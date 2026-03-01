@@ -368,7 +368,7 @@ export default function WelcomeScreen() {
                     </View>
                   )}
 
-                  <View style={styles.inputContainer}>
+                  <View style={[styles.inputContainer, { backgroundColor: 'rgba(255, 255, 255, 0.1)' }]}>
                     <Ionicons name="mail" size={20} color="#9CA3AF" style={styles.inputIcon} />
                     <TextInput
                       style={[styles.input, { backgroundColor: 'transparent', color: '#FFFFFF' }]}
@@ -381,7 +381,7 @@ export default function WelcomeScreen() {
                     />
                   </View>
 
-                  <View style={styles.inputContainer}>
+                  <View style={[styles.inputContainer, { backgroundColor: 'rgba(255, 255, 255, 0.1)' }]}>
                     <Ionicons name="lock-closed" size={20} color="#9CA3AF" style={styles.inputIcon} />
                     <TextInput
                       style={[styles.input, { backgroundColor: 'transparent', color: '#FFFFFF' }]}
