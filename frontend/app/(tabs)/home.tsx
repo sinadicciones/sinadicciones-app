@@ -820,16 +820,16 @@ export default function HomeScreen() {
                   />
                 </TouchableOpacity>
                 
-                {expandedEducation === 'understanding' && (
+                {expandedEducation === 'understanding' && education.understanding_addiction?.sections && (
                   <View style={styles.eduActionsList}>
-                    {education.understanding_addiction.topics.map((topic: any) => (
-                      <View key={topic.id} style={styles.eduActionItem}>
+                    {education.understanding_addiction.sections.map((section: any, index: number) => (
+                      <View key={section.title || index} style={styles.eduActionItem}>
                         <View style={[styles.eduActionIcon, { backgroundColor: 'rgba(59, 130, 246, 0.2)' }]}>
-                          <Ionicons name={topic.icon as any} size={20} color="#3B82F6" />
+                          <Ionicons name={(section.icon || 'information-circle') as any} size={20} color="#3B82F6" />
                         </View>
                         <View style={styles.eduActionContent}>
-                          <Text style={styles.eduActionTitle}>{topic.title}</Text>
-                          <Text style={styles.eduActionDescription}>{topic.description}</Text>
+                          <Text style={styles.eduActionTitle}>{section.title}</Text>
+                          <Text style={styles.eduActionDescription}>{section.content}</Text>
                         </View>
                       </View>
                     ))}
