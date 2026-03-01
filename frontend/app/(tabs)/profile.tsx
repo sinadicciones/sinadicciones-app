@@ -2416,4 +2416,135 @@ const styles = StyleSheet.create({
   notifToggleCircleActive: {
     alignSelf: 'flex-end',
   },
+  // Estilos para el Plan de Recuperación
+  recoveryPlanModal: {
+    flex: 1,
+    backgroundColor: '#0D0D0D',
+  },
+  recoveryPlanHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#2A2A2A',
+  },
+  recoveryPlanTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  recoveryPlanContent: {
+    flex: 1,
+    padding: 16,
+  },
+  recoveryPlanSection: {
+    marginBottom: 24,
+  },
+  recoveryPlanSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 12,
+  },
+  recoveryPlanSectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  recoveryPlanCard: {
+    backgroundColor: '#1A1A1A',
+    padding: 14,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  recoveryPlanLabel: {
+    fontSize: 13,
+    color: '#A1A1AA',
+    marginBottom: 4,
+  },
+  recoveryPlanValue: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    fontWeight: '500',
+  },
+  recoveryPlanValueBig: {
+    fontSize: 24,
+    color: '#10B981',
+    fontWeight: 'bold',
+  },
+  recoveryPlanWhyCard: {
+    backgroundColor: '#1A1A1A',
+    padding: 16,
+    borderRadius: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: '#EC4899',
+  },
+  recoveryPlanWhyText: {
+    fontSize: 15,
+    color: '#E5E5E5',
+    fontStyle: 'italic',
+    lineHeight: 22,
+  },
+  recoveryPlanTagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  recoveryPlanTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    gap: 6,
+  },
+  triggerTag: {
+    backgroundColor: '#EF444420',
+  },
+  triggerTagText: {
+    fontSize: 13,
+    color: '#EF4444',
+  },
+  protectorTag: {
+    backgroundColor: '#10B98120',
+  },
+  protectorTagText: {
+    fontSize: 13,
+    color: '#10B981',
+  },
+  supportTag: {
+    backgroundColor: '#8B5CF620',
+  },
+  supportTagText: {
+    fontSize: 13,
+    color: '#8B5CF6',
+  },
+  recoveryPlanEmptyText: {
+    fontSize: 14,
+    color: '#6B7280',
+    fontStyle: 'italic',
+  },
+  recoveryPlanTipsCard: {
+    backgroundColor: '#F59E0B15',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  recoveryPlanTipsTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#F59E0B',
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  recoveryPlanTipsText: {
+    fontSize: 14,
+    color: '#D4D4D4',
+    lineHeight: 22,
+    textAlign: 'left',
+  },
+  recoveryPlanButton: {
+    borderColor: '#10B98130',
+  },
 });
