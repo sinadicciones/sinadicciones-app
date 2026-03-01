@@ -482,6 +482,12 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
     textAlign: 'center',
   },
+  versionBadge: {
+    fontSize: 12,
+    color: '#10B981',
+    marginTop: 8,
+    fontWeight: '600',
+  },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
