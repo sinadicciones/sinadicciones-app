@@ -342,7 +342,7 @@ export default function HabitsScreen() {
             <Text style={styles.orText}>o escribe el tuyo</Text>
 
             <TextInput
-              style={styles.input}
+              style={[styles.input, { color: '#FFFFFF' }]}
               placeholder="Nombre del hábito (ej. Meditación 5 min)"
               placeholderTextColor="#9CA3AF"
               value={habitName}
