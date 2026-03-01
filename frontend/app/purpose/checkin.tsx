@@ -187,6 +187,98 @@ export default function WeeklyCheckin() {
     return true;
   };
 
+  // Intro screen explaining the importance of weekly check-in
+  if (showIntro) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <LinearGradient
+          colors={['#10B981', '#059669']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.introHeader}
+        >
+          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+          <View style={styles.introIconContainer}>
+            <Ionicons name="analytics" size={64} color="#FFFFFF" />
+          </View>
+          <Text style={styles.introTitle}>Check-in Semanal</Text>
+          <Text style={styles.introSubtitle}>Tu momento de reflexión</Text>
+        </LinearGradient>
+
+        <ScrollView style={styles.introContent} showsVerticalScrollIndicator={false}>
+          <View style={styles.introCard}>
+            <View style={styles.introCardIcon}>
+              <Ionicons name="heart" size={28} color="#10B981" />
+            </View>
+            <Text style={styles.introCardTitle}>¿Por qué es importante?</Text>
+            <Text style={styles.introCardText}>
+              El check-in semanal es una herramienta fundamental en tu recuperación. 
+              Te permite hacer una pausa consciente para evaluar cómo te fue en cada 
+              área de tu vida durante la semana.
+            </Text>
+          </View>
+
+          <View style={styles.introCard}>
+            <View style={styles.introCardIcon}>
+              <Ionicons name="trending-up" size={28} color="#3B82F6" />
+            </View>
+            <Text style={styles.introCardTitle}>Identifica patrones</Text>
+            <Text style={styles.introCardText}>
+              Al calificar cada área semana tras semana, podrás identificar qué aspectos 
+              de tu vida están mejorando y cuáles necesitan más atención. Esta información 
+              es valiosa para ti y tu terapeuta.
+            </Text>
+          </View>
+
+          <View style={styles.introCard}>
+            <View style={styles.introCardIcon}>
+              <Ionicons name="shield-checkmark" size={28} color="#F59E0B" />
+            </View>
+            <Text style={styles.introCardTitle}>Prevención de recaídas</Text>
+            <Text style={styles.introCardText}>
+              Cuando una área de tu vida baja mucho en calificación, es una señal de alerta. 
+              Detectar estos cambios a tiempo te ayuda a actuar antes de que afecte 
+              tu recuperación.
+            </Text>
+          </View>
+
+          <View style={styles.introCard}>
+            <View style={styles.introCardIcon}>
+              <Ionicons name="trophy" size={28} color="#EC4899" />
+            </View>
+            <Text style={styles.introCardTitle}>Celebra tus logros</Text>
+            <Text style={styles.introCardText}>
+              Cada semana tienes la oportunidad de reconocer tus avances, por pequeños 
+              que sean. Celebrar el progreso fortalece tu motivación y autoestima.
+            </Text>
+          </View>
+
+          <View style={styles.introTip}>
+            <Ionicons name="bulb" size={24} color="#F59E0B" />
+            <Text style={styles.introTipText}>
+              Dedica unos minutos cada semana a este ejercicio. La consistencia es más 
+              importante que la perfección.
+            </Text>
+          </View>
+        </ScrollView>
+
+        <View style={styles.introFooter}>
+          <TouchableOpacity
+            style={styles.introButton}
+            onPress={() => setShowIntro(false)}
+          >
+            <Text style={styles.introButtonText}>Comenzar Check-in</Text>
+            <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
+
+        <BottomNavigation />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <LinearGradient
