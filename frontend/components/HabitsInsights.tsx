@@ -328,8 +328,14 @@ export default function HabitsInsights({ onClose }: Props) {
       <View style={styles.chartCard}>
         <View style={styles.chartHeader}>
           <Text style={styles.chartTitle}>📊 Rendimiento por Día</Text>
-          <Text style={styles.chartSubtitle}>% de hábitos completados</Text>
+          <View style={styles.chartSubtitleRow}>
+            <Text style={styles.chartSubtitle}>% de hábitos completados</Text>
+            <View style={styles.periodBadge}>
+              <Text style={styles.periodBadgeText}>{period === 'week' ? 'Esta semana' : 'Este mes'}</Text>
+            </View>
+          </View>
         </View>
+        <View style={styles.chartSpacer} />
         <MiniBarChart data={getDayCompletionData()} color="#10B981" />
         <View style={styles.chartFooter}>
           <View style={styles.dayBadge}>
