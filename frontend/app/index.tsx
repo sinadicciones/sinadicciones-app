@@ -680,8 +680,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   versionText: {
-    color: 'rgba(255,255,255,0.4)',
-    fontSize: 12,
-    fontWeight: '500',
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
