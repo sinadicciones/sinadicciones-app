@@ -79,11 +79,12 @@ export default function AreaDetail() {
           area: area,
           title: newGoal.title,
           description: newGoal.description,
+          target_days: newGoal.target_days || 5,
         }),
       });
 
       if (response.ok) {
-        setNewGoal({ title: '', description: '' });
+        setNewGoal({ title: '', description: '', target_days: 5 });
         setShowAddModal(false);
         loadGoals();
       }
