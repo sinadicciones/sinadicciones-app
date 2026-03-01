@@ -124,6 +124,16 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="nelson"
+        options={{
+          title: 'Nelson',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="chatbubble-ellipses" size={size} color={color} />
+          ),
+          // Visible for all roles - AI therapist available to everyone
+        }}
+      />
+      <Tabs.Screen
         name="centers"
         options={{
           title: 'Centros',
