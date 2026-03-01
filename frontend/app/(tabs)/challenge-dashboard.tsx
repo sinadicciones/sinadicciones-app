@@ -390,7 +390,7 @@ export default function ChallengeDashboard() {
             
             {expandedSection === 'education' && (
               <View style={styles.educationList}>
-                {education.understanding_addiction.sections.map((section: any, index: number) => (
+                {(education.understanding_addiction?.sections || []).map((section: any, index: number) => (
                   <TouchableOpacity 
                     key={index} 
                     style={styles.educationItem}
@@ -463,7 +463,7 @@ export default function ChallengeDashboard() {
             
             {expandedSection === 'craving' && (
               <View style={styles.educationList}>
-                {education.craving_management.sections.map((section: any, index: number) => (
+                {(education.craving_management?.sections || []).map((section: any, index: number) => (
                   <TouchableOpacity 
                     key={index} 
                     style={styles.educationItem}
