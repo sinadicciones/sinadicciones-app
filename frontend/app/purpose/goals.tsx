@@ -655,6 +655,170 @@ export default function AllGoals() {
         </View>
       </Modal>
 
+      {/* Monthly Analysis Modal */}
+      <Modal visible={showMonthlyModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>
+                📊 Análisis de {monthlyAnalysis?.month_name || 'Mes'}
+              </Text>
+              <TouchableOpacity onPress={() => setShowMonthlyModal(false)}>
+                <Ionicons name="close" size={24} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {monthlyAnalysis ? (
+                <>
+                  {/* Summary Card */}
+                  <View style={[
+                    styles.summaryCard,
+                    monthlyAnalysis.summary.performance_level === 'excelente' && styles.summaryExcelente,
+                    monthlyAnalysis.summary.performance_level === 'bueno' && styles.summaryBueno,
+                    monthlyAnalysis.summary.performance_level === 'regular' && styles.summaryRegular,
+                    monthlyAnalysis.summary.performance_level === 'necesita_atencion' && styles.summaryAtencion,
+                  ]}>
+                    <View style={styles.summaryHeader}>
+                      <Ionicons 
+                        name={
+                          monthlyAnalysis.summary.performance_level === 'excelente' ? 'trophy' :
+                          monthlyAnalysis.summary.performance_level === 'bueno' ? 'thumbs-up' :
+                          monthlyAnalysis.summary.performance_level === 'regular' ? 'time' : 'alert-circle'
+                        } 
+                        size={32} 
+                        color={
+                          monthlyAnalysis.summary.performance_level === 'excelente' ? '#F59E0B' :
+                          monthlyAnalysis.summary.performance_level === 'bueno' ? '#10B981' :
+                          monthlyAnalysis.summary.performance_level === 'regular' ? '#3B82F6' : '#EF4444'
+                        }
+                      />
+                      <Text style={styles.summaryPercentage}>
+                        {monthlyAnalysis.summary.week_achievement_rate}%
+                      </Text>
+                    </View>
+                    <Text style={styles.summaryMessage}>
+                      {monthlyAnalysis.summary.performance_message}
+                    </Text>
+                    <View style={styles.summaryStats}>
+                      <View style={styles.summaryStat}>
+                        <Text style={styles.summaryStatValue}>{monthlyAnalysis.summary.weeks_achieved}</Text>
+                        <Text style={styles.summaryStatLabel}>semanas logradas</Text>
+                      </View>
+                      <View style={styles.summaryStatDivider} />
+                      <View style={styles.summaryStat}>
+                        <Text style={styles.summaryStatValue}>{monthlyAnalysis.summary.total_days_completed}</Text>
+                        <Text style={styles.summaryStatLabel}>días completados</Text>
+                      </View>
+                      <View style={styles.summaryStatDivider} />
+                      <View style={styles.summaryStat}>
+                        <Text style={styles.summaryStatValue}>{monthlyAnalysis.summary.total_goals}</Text>
+                        <Text style={styles.summaryStatLabel}>objetivos</Text>
+                      </View>
+                    </View>
+                  </View>
+
+                  {/* Goals Breakdown */}
+                  <Text style={styles.monthlyGoalsTitle}>Detalle por objetivo:</Text>
+                  
+                  {monthlyAnalysis.goals.map((goal: any) => {
+                    const areaInfo = AREAS[goal.area] || { label: goal.area, icon: 'ellipse', color: '#A1A1AA' };
+                    const isAchieved = goal.achievement_rate >= 80;
+                    const isPartial = goal.achievement_rate >= 50 && goal.achievement_rate < 80;
+                    
+                    return (
+                      <View key={goal.goal_id} style={styles.monthlyGoalCard}>
+                        <View style={styles.monthlyGoalHeader}>
+                          <View style={[styles.monthlyGoalIcon, { backgroundColor: areaInfo.color + '20' }]}>
+                            <Ionicons name={areaInfo.icon as any} size={18} color={areaInfo.color} />
+                          </View>
+                          <View style={styles.monthlyGoalInfo}>
+                            <Text style={styles.monthlyGoalTitle} numberOfLines={1}>{goal.title}</Text>
+                            <Text style={styles.monthlyGoalArea}>{areaInfo.label}</Text>
+                          </View>
+                          <View style={[
+                            styles.monthlyGoalBadge,
+                            isAchieved && styles.monthlyGoalBadgeSuccess,
+                            isPartial && styles.monthlyGoalBadgePartial,
+                            !isAchieved && !isPartial && styles.monthlyGoalBadgeLow,
+                          ]}>
+                            <Text style={[
+                              styles.monthlyGoalBadgeText,
+                              isAchieved && styles.monthlyGoalBadgeTextSuccess,
+                              isPartial && styles.monthlyGoalBadgeTextPartial,
+                            ]}>
+                              {Math.round(goal.achievement_rate)}%
+                            </Text>
+                          </View>
+                        </View>
+                        
+                        <View style={styles.monthlyGoalStats}>
+                          <View style={styles.monthlyGoalStat}>
+                            <Ionicons name="calendar-outline" size={14} color="#9CA3AF" />
+                            <Text style={styles.monthlyGoalStatText}>
+                              {goal.weeks_achieved}/{goal.weeks_in_month} semanas
+                            </Text>
+                          </View>
+                          <View style={styles.monthlyGoalStat}>
+                            <Ionicons name="checkmark-circle-outline" size={14} color="#9CA3AF" />
+                            <Text style={styles.monthlyGoalStatText}>
+                              {goal.total_days_completed}/{goal.total_days_target} días
+                            </Text>
+                          </View>
+                        </View>
+
+                        {/* Week details mini-view */}
+                        {goal.week_details && goal.week_details.length > 0 && (
+                          <View style={styles.weekDetailsRow}>
+                            {goal.week_details.slice(-4).map((week: any, idx: number) => (
+                              <View 
+                                key={idx} 
+                                style={[
+                                  styles.weekMini,
+                                  week.achieved && styles.weekMiniAchieved,
+                                  week.is_current && styles.weekMiniCurrent,
+                                ]}
+                              >
+                                <Text style={[
+                                  styles.weekMiniText,
+                                  week.achieved && styles.weekMiniTextAchieved,
+                                ]}>
+                                  {week.completed_days}/{week.target_days}
+                                </Text>
+                              </View>
+                            ))}
+                          </View>
+                        )}
+                      </View>
+                    );
+                  })}
+
+                  {monthlyAnalysis.goals.length === 0 && (
+                    <View style={styles.emptyAnalysis}>
+                      <Ionicons name="calendar-outline" size={48} color="#6B7280" />
+                      <Text style={styles.emptyAnalysisText}>
+                        No hay datos suficientes para este mes. Crea objetivos y registra tu progreso semanal.
+                      </Text>
+                    </View>
+                  )}
+                </>
+              ) : (
+                <View style={styles.loadingAnalysis}>
+                  <Text style={styles.loadingAnalysisText}>Cargando análisis...</Text>
+                </View>
+              )}
+            </ScrollView>
+
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => setShowMonthlyModal(false)}
+            >
+              <Text style={styles.modalButtonText}>Cerrar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       <BottomNavigation />
     </SafeAreaView>
   );
