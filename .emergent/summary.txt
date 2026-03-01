@@ -1,324 +1,149 @@
-<analysis>Análisis cronológico de la conversación:
+<analysis>**original_problem_statement:** El usuario solicitó inicialmente una serie de mejoras de UI y la implementación de un sistema de notificaciones y vinculación de perfiles. El enfoque luego cambió a solucionar problemas de despliegue en producción (Railway) y  en Google Play.
 
-1.  **Inicio (Resumen de traspaso)**: El problema principal heredado era guiar al usuario para resolver un error de  duplicado en Google Play Console. El agente anterior había incrementado el  a 2, pero el usuario no lograba generar un build correcto.
-2.  **Diagnóstico del **: El nuevo agente comienza verificando el código y confirma que el  es 2. El usuario sube los archivos  que ha generado, y el agente los analiza, descubriendo que **ambos todavía tienen **.
-3.  **Sincronización de Git**: El agente diagnostica correctamente que el código local del usuario no está sincronizado con el repositorio remoto. El usuario muestra la salida de , que falla por divergent branches. El agente proporciona el comando correcto para forzar la sincronización: .
-4.  **Problemas con An Expo user account is required to proceed.
-
-Log in to EAS with email or username (exit and run eas login --help to see other login options)
-Input is required, but stdin is not readable. Failed to display prompt: Email or username**: Después de sincronizar, el usuario intenta hacer el build (An Expo user account is required to proceed.
-
-Log in to EAS with email or username (exit and run eas login --help to see other login options)
-Input is required, but stdin is not readable. Failed to display prompt: Email or username) y se encuentra con un error de . El agente identifica que el  en  es incorrecto.
-5.  **Depuración de An Expo user account is required to proceed.
-
-Log in to EAS with email or username (exit and run eas login --help to see other login options)
-Input is required, but stdin is not readable. Failed to display prompt: Email or username**: El agente guía al usuario a través de una serie de comandos para re-inicializar el proyecto de Expo (An Expo user account is required to proceed.
-
-Log in to EAS with email or username (exit and run eas login --help to see other login options)
-Input is required, but stdin is not readable. Failed to display prompt: Email or username). Esto revela más problemas de configuración:
-    *   Permisos incorrectos ().
-    *   Nombre de usuario () incorrecto.
-    *    del proyecto no coincide ( vs ).
-    *   El agente guía pacientemente al usuario a través de  y  para corregir  y enlazar correctamente el proyecto.
-6.  **Éxito del **: Finalmente, el usuario logra generar un build con  y subirlo a Google Play.
-7.  **Nuevo Bug: Error de Conexión**: El usuario prueba la nueva versión y reporta un error de conexión al registrarse.
-8.  **Diagnóstico del Error de Conexión**: El agente investiga y descubre que una URL de fallback en el código () apunta a un entorno de preview antiguo y ya no existente. La variable de entorno de producción no se estaba inyectando correctamente.
-9.  **Solución Robusta con **: Para solucionar esto de forma definitiva, el agente reemplaza  por un nuevo archivo . Este archivo utiliza  y tiene un fallback a la URL de producción correcta, haciendo que la conexión sea mucho más robusta. También incrementa el  a 3.
-10. **Nuevo Ciclo de  Fallido**: El usuario intenta hacer el build de nuevo, pero obtiene un error de  duplicado. El agente se da cuenta de que olvidó instruir al usuario para que guardara los cambios en GitHub (Save to GitHub).
-11. **Corrección del Flujo de Trabajo**: El agente le explica al usuario la importancia de Save to GitHub antes de hacer . El usuario lo hace, sincroniza, y finalmente genera un build con .
-12. **Configuración de la API de OpenAI**: El usuario pregunta cómo agregar la clave de API de OpenAI. El agente le da instrucciones claras para agregarla como una variable de entorno en Railway.
-13. **Nuevo Bug: Error de Conexión (Otra vez)**: El usuario prueba la versión 3 y reporta otro error de conexión en la pantalla de selección de rol. El agente descubre que una llamada a  usaba una URL relativa () sin la URL base del backend. Lo corrige y sube el  a 4.
-14. **Nuevos Bugs de UI (Versión 4)**: El usuario prueba la versión 4 y reporta múltiples problemas de UI:
-    *   Faltan los textos de guía (placeholders) en el onboarding.
-    *   La barra de menú inferior se oculta bajo la barra de navegación de Android.
-    *   La IA no funciona.
-    *   El teclado oculta el campo de texto en el modal Nuevo Hábito.
-15. **Ronda de Correcciones de UI**: El agente aborda estos problemas uno por uno:
-    *   Agrega  a los .
-    *   Añade  a los modales para evitar que el teclado los oculte.
-    *   Ajusta el  para dar más espacio a la barra de pestañas.
-    *   Identifica un posible problema con la carga de la API key de OpenAI en Railway.
-16. **Más Bugs de UI y Crash**: El usuario reporta más problemas:
-    *   La app crashea al entrar en Mi propósito.
-    *   Los botones de Editar y Guardar en el perfil están demasiado pegados a otros elementos.
-    *   La foto de perfil se pierde en el fondo naranja.
-17. **Otra Ronda de Correcciones**: El agente implementa soluciones para estos problemas, añadiendo  para el SVG, ajustando márgenes en el perfil, y agregando un borde al avatar. El  se incrementa progresivamente (5, 6, 7, 8).
-18. **Gran Rediseño (Punto de Inflexión)**: El usuario solicita un rediseño masivo:
-    *   Aplicar un tema oscuro global y minimalista a toda la app.
-    *   Rediseñar Hábitos y Emociones para que se parezcan a la app Daily Planner.
-    *   Hacer el perfil más limpio, como una imagen de referencia.
-19. **Intento de Rediseño Destructivo**: El agente comienza a trabajar en el rediseño. Sin embargo, en lugar de modificar los archivos existentes, opta por **reescribirlos desde cero** (, , etc.). Esto provoca una **pérdida masiva de funcionalidad**:
-    *   Se pierden las estadísticas de IA.
-    *   Se rompe el guardado de emociones.
-    *   El perfil pierde todas sus secciones originales (factores de riesgo, protectores, etc.).
-20. **Detección del Error por Parte del Usuario**: El usuario prueba el preview y se da cuenta inmediatamente de que faltan funcionalidades clave. Reporta que el perfil está incompleto y que hábitos/emociones están rotos, proporcionando capturas de pantalla (, , ).
-21. **Intento de Corrección Final**: El agente reconoce el error y su nuevo plan es **restaurar los archivos originales y aplicar solo el tema oscuro** sin eliminar funcionalidades. Estaba en medio de este proceso de restauración y corrección de errores cuando finalizó la sesión. El último estado reportado por el usuario es que la UI sigue rota.
-
----
-original_problem_statement: El usuario solicitó inicialmente una serie de mejoras de UI, una función para vincular perfiles de paciente y profesional, y un sistema de notificaciones. Posteriormente, la tarea se centró en desplegar el backend en producción (Railway) y resolver repetidos problemas con el  de la app al subirla a Google Play Store.
-
-Las solicitudes más recientes del usuario son un rediseño completo de la aplicación para que tenga un **tema oscuro global y minimalista**, y que las secciones de **Hábitos y Emociones** se reestructuren para ser similares a la app Daily Planner. Además, pidió que la página de perfil fuera más limpia. Durante la implementación de este rediseño, se perdieron funcionalidades críticas y se introdujeron errores de UI, que es el problema principal actual.
+Recientemente, el usuario solicitó un rediseño completo a un tema oscuro y la creación de una nueva funcionalidad de IA llamada TerapeutIA (Nelson). Tras la implementación, se reportaron varios bugs: un crash en Manejo de craving, inconsistencias en el menú, mal contraste de texto en un test, y un fallo en el login que enviaba a los usuarios a la pantalla de onboarding incorrectamente. Los últimos bugs reportados son que el teclado oculta el campo de texto en el chat de Nelson y que algunos datos del perfil se muestran en inglés.
 
 **User's preferred language**: Spanish. The next agent MUST respond in Spanish.
 
 **what currently exists?**
-- Una aplicación full-stack con Expo (React Native) y FastAPI.
-- El backend está desplegado en producción en **Railway** y conectado a una base de datos MongoDB de producción. La clave de API de OpenAI ha sido configurada en las variables de entorno de Railway.
-- El frontend ha pasado por un intento de rediseño importante que resultó en la **pérdida de funcionalidades y errores visuales**.
-- Se ha reemplazado  por  para una gestión más robusta de las variables de entorno.
-- Existe un usuario de prueba ( / ) con 3 meses de datos de hábitos y emociones para facilitar las pruebas visuales.
+- Una aplicación full-stack con Expo (React Native) para el frontend y FastAPI para el backend.
+- El backend está desplegado en producción en **Railway**, conectado a una base de datos MongoDB de producción.
+- El frontend tiene un tema oscuro global implementado y funcionalidades clave como Perfil de Usuario, Hábitos, Emociones, y el nuevo asistente de IA Nelson.
+- La clave de API de OpenAI del usuario está configurada y funcionando en producción (Railway).
+- Existe un usuario de prueba ( / ) con datos históricos tanto en la base de datos de producción como en la de preview, lo que facilita las pruebas.
+- La versión de código actual () está en .
 
 **Last working item**:
-    - Last item agent was working: Intentando corregir los errores de UI y la pérdida de funcionalidad causados por un intento fallido de rediseño. El usuario reportó con capturas de pantalla (, , ) que la página de perfil está incompleta (faltan secciones como factores de riesgo) y que las páginas de hábitos y emociones están visualmente rotas. El agente reconoció que su enfoque de reescribir los archivos fue erróneo y estaba intentando restaurar los archivos originales para aplicarles únicamente el tema oscuro.
-    - Status: IN PROGRESS
-    - Agent Testing Done: N (El agente tomó una captura de pantalla que no reflejaba el estado real que el usuario experimentaba. El feedback del usuario confirma que la implementación está rota).
-    - Which testing method agent to use? Frontend testing agent. Es crucial que el agente de pruebas verifique no solo la apariencia visual con el tema oscuro, sino también la presencia y funcionamiento de **todas** las funcionalidades originales en las pantallas de Perfil, Hábitos y Emociones.
-    - User Testing Done: Y (El usuario probó el preview y confirmó que está roto).
+-   **Last item agent was working:** El agente estaba implementando correcciones para dos bugs críticos reportados por el usuario:
+    1.  **Teclado Oculta Input en Nelson:** En la pantalla del chat de IA, el teclado cubría el campo de texto. El agente implementó  en  para solucionar esto.
+    2.  **Textos en Inglés en el Perfil:** Los Gatillos y Factores Protectores se mostraban en inglés. El agente agregó un mapa de traducción en  para mostrar las etiquetas en español.
+-   **Status:** IN PROGRESS
+-   **Agent Testing Done:** N
+-   **Which testing method agent to use?** Frontend testing agent. Es crucial verificar que (1) el campo de texto de Nelson permanezca visible con el teclado abierto y (2) los textos de Gatillos/Protectores en el perfil aparezcan en español.
+-   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-  - Issue 1: (P0) Regresión Grave de UI y Funcionalidad en Perfil, Hábitos y Emociones.
-  - Issue 2: (P1) Funcionalidad de Análisis de IA ausente o rota.
-  - Issue 3: (P2) Inconsistencia en la UI del menú inferior (Tab Bar).
+-   Issue 1: (P0) El teclado oculta el campo de texto en el chat de Nelson.
+-   Issue 2: (P0) Los Gatillos y Factores Protectores en el perfil se muestran en inglés.
+-   Issue 3: (P1) La aplicación crashea al entrar en la sección Manejo de craving.
+-   Issue 4: (P1) El menú de navegación inferior es inconsistente en la sección Propósito.
+-   Issue 5: (P1) El texto es ilegible por falta de contraste en el Test de propósito.
 
-  Issues Detail:
-  - Issue 1: 
-     - Attempted fixes: El agente intentó un rediseño completo reescribiendo archivos, lo cual falló. Luego comenzó a restaurar los archivos originales para aplicarles el tema oscuro, pero el resultado, según el usuario, sigue siendo incorrecto.
-     - Next debug checklist:
-        1. **Restaurar**: Asegurarse de que las versiones completas y funcionales de ,  y  de antes del rediseño están en su lugar.
-        2. **Analizar**: Revisar las capturas de pantalla del usuario (, , ) para entender exactamente qué está roto.
-        3. **Aplicar Estilos (Cuidadosamente)**: Modificar los archivos restaurados para aplicar el tema oscuro **sin alterar la estructura JSX ni la lógica funcional**. Esto implica principalmente cambiar colores y estilos en el .
-        4. **Verificar Perfil**: Confirmar que la página de perfil muestra **todas** las secciones originales (factores de riesgo, protectores, etc.), simplemente con el nuevo tema oscuro.
-        5. **Verificar Hábitos/Emociones**: Confirmar que la funcionalidad de listar, añadir, completar y ver el historial funciona correctamente antes de validar el estilo.
-     - Why fix this issue and what will be achieved with the fix? La aplicación es actualmente inutilizable en sus secciones principales. Arreglar esto restaurará la funcionalidad básica y desbloqueará el progreso.
-     - Status:  IN PROGRESS
-     - Is recurring issue? Y (El agente ya intentó arreglar esto sin éxito).
-     - Should Test frontend/backend/both after fix? Frontend.
-     - Blocked on other issue: No. Este es el bloqueador principal.
+**Issues Detail**:
+-   **Issue 1: Teclado oculta input en Nelson**
+    -   **Attempted fixes:** Se envolvió la pantalla en un  en .
+    -   **Next debug checklist:**
+        1.  Probar la pantalla de Nelson en el preview.
+        2.  Abrir el teclado y verificar que el campo de texto se desplaza hacia arriba y permanece visible.
+        3.  Si falla, ajustar las propiedades de  (ej. , ).
+    -   **Why fix this issue and what will be achieved with the fix?** La funcionalidad principal del chat es actualmente inutilizable.
+    -   **Status:** IN PROGRESS
+    -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?** Frontend.
 
-  - Issue 2: 
-     - Attempted fixes: El agente re-agregó los componentes de Insights de IA después de que se perdieran en el rediseño, pero es probable que la implementación sea parte de la UI rota actual.
-     - Next debug checklist:
-        1. Una vez que la UI de Hábitos y Emociones esté estable, verificar que el botón para mostrar los análisis de IA esté visible.
-        2. Probar el botón y asegurarse de que llama al endpoint correcto del backend ( o similar).
-        3. Verificar que la respuesta del backend se muestra correctamente en el componente de Insights.
-        4. Revisar los logs de Railway si hay errores de la API de OpenAI.
-     - Why fix this issue and what will be achieved with the fix? Restaurará una de las características clave y de valor de la aplicación.
-     - Status:  IN PROGRESS
-     - Is recurring issue? Y
-     - Should Test frontend/backend/both after fix? Both.
+-   **Issue 2: Textos del perfil en inglés**
+    -   **Attempted fixes:** Se implementó un diccionario de traducción en  que mapea los uid=0(root) gid=0(root) groups=0(root) en inglés (ej. boredom) a etiquetas en español (ej. Aburrimiento).
+    -   **Next debug checklist:**
+        1.  Acceder al perfil del usuario de prueba.
+        2.  Verificar que las listas de Gatillos y Factores Protectores se muestren completamente en español.
+    -   **Why fix this issue and what will be achieved with the fix?** Mejora la consistencia y la experiencia de usuario para una app en español.
+    -   **Status:** IN PROGRESS
+    -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?** Frontend.
 
-  - Issue 3: 
-     - Attempted fixes: El agente modificó  para cambiar el color del tab bar a un estilo oscuro con acentos amarillos, pero el usuario mencionó que la pantalla Propósito no mantenía el mismo menú.
-     - Next debug checklist:
-        1. Revisar el  para asegurar que el  se aplica consistentemente a todas las pestañas.
-        2. Navegar a través de todas las pantallas (Home, Propósito, Hábitos, Emociones, Perfil) para confirmar que el menú inferior es idéntico en todas.
-     - Why fix this issue and what will be achieved with the fix? Proporcionará una experiencia de usuario coherente en toda la aplicación.
-     - Status:  IN PROGRESS
-     - Is recurring issue? N
-     - Should Test frontend/backend/both after fix? Frontend.
+-   **Issue 3, 4, 5: Bugs en la sección Propósito (Crash, Menú, Contraste)**
+    -   **Attempted fixes:** El agente ya escribió el código para solucionar estos tres problemas (añadiendo protección contra , unificando el estilo del menú y cambiando el color del texto).
+    -   **Next debug checklist:** Realizar una prueba de regresión completa en toda la sección de Propósito una vez que se despliegue la nueva versión.
+    -   **Why fix this issue and what will be achieved with the fix?** Hará que una sección importante de la app sea funcional y visualmente coherente.
+    -   **Status:** IN PROGRESS (Las correcciones están implementadas pero no verificadas por el usuario).
+    -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?** Frontend.
 
 **In progress Task List**:
-  - Task 1: (P0) Estabilizar la aplicación mediante la restauración de la funcionalidad perdida y la aplicación correcta del tema oscuro.
-     - Where to resume: En los archivos , , . El enfoque debe ser restaurar primero, y luego estilizar.
-     - What will be achieved with this? Una aplicación funcional que cumple con los requisitos básicos del usuario (tema oscuro) sin sacrificar la funcionalidad existente.
-     - Status:  IN PROGRESS
-     - Should Test frontend/backend/both after fix? Frontend.
-     - Blocked on something: Nada.
+-   **Task 1: Desplegar la versión con las correcciones de bugs**
+    -   **Where to resume:** Las correcciones de código ya están hechas. El siguiente paso es probarlas en el entorno de preview y luego guiar al usuario para generar un nuevo build (versionCode 16 o superior) y subirlo a producción.
+    -   **What will be achieved with this?** Una versión estable de la aplicación con todos los bugs recientes solucionados.
+    -   **Status:** IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?** Frontend.
 
 **Upcoming and Future Tasks**
-- **Upcoming Tasks**:
-    - (P1) **Rediseño de Hábitos y Emociones (Estilo Daily Planner)**: Una vez que la app sea estable, implementar el rediseño solicitado con selector de semana, calendario mensual y filtros.
-- **Future Tasks**:
-    - (P2) **Poblar Base de Datos de Producción**: Adaptar y ejecutar los scripts  y  contra la base de datos de Railway para crear usuarios de prueba permanentes.
-    - (P3) **Implementar Notificaciones Push en el Frontend**: Conectar el frontend al sistema de notificaciones ya existente en el backend.
-    - (P4) **Conectar Dominio Personalizado**: Guiar al usuario para apuntar un subdominio a su servicio de Railway.
+-   **Upcoming Tasks**:
+    -   (P1) **Rediseño de Hábitos y Emociones (Estilo Daily Planner)**: Implementar la vista de calendario, selectores de semana/mes y estadísticas avanzadas en las pantallas de análisis de hábitos y emociones.
+    -   (P2) **Dashboard de Propósito de Vida con IA**: Crear un nuevo dashboard que analice las respuestas del test de propósito y ofrezca sugerencias generadas por IA.
+-   **Future Tasks**:
+    -   (P3) Implementar notificaciones push.
+    -   (P4) Permitir que el usuario comparta resúmenes o conversaciones de IA con su terapeuta vinculado.
+    -   (P5) Añadir una función de diario de voz para interactuar con Nelson.
 
 **Completed work in this session**
-- Se resolvió un ciclo recurrente y complejo de errores de  y configuración de An Expo user account is required to proceed.
-
-Log in to EAS with email or username (exit and run eas login --help to see other login options)
-Input is required, but stdin is not readable. Failed to display prompt: Email or username, guiando al usuario a través de la sincronización de Git (HEAD is now at 089bb59 auto-commit for 2dc76cb9-0049-4b28-a744-6c5b0f2129ac) y la correcta inicialización del proyecto de Expo (An Expo user account is required to proceed.
-
-Log in to EAS with email or username (exit and run eas login --help to see other login options)
-Input is required, but stdin is not readable. Failed to display prompt: Email or username).
-- Se guio al usuario para agregar con éxito la  al entorno de producción de Railway.
-- Se refactorizó la configuración del frontend para usar  en lugar de , creando una solución robusta para el manejo de la URL del backend.
-- Se solucionaron múltiples bugs de UI, incluyendo errores de conexión, placeholders invisibles, el teclado ocultando inputs, y un crash en la pantalla Mi propósito.
-- Se creó y pobló un usuario de demostración con 3 meses de datos de hábitos y emociones para facilitar las pruebas.
-- Se inició un rediseño a gran escala para un tema oscuro global, aunque la implementación inicial fue fallida y actualmente se encuentra en estado de corrección.
-
-**Earlier issues found/mentioned but not fixed**
-- Los problemas mencionados por el usuario sobre la funcionalidad de IA y la consistencia del menú se han fusionado en la lista de problemas pendientes actual, ya que están entrelazados con el fallido rediseño.
-
-**Known issue recurrence from previous fork**
-- El usuario tiene dificultades con el flujo de trabajo local de  -> An Expo user account is required to proceed.
-
-Log in to EAS with email or username (exit and run eas login --help to see other login options)
-Input is required, but stdin is not readable. Failed to display prompt: Email or username -> . Los cambios realizados por el agente en el entorno de desarrollo no se reflejan en el build del usuario si no se le instruye explícitamente para que primero haga Save to GitHub y luego .
+-   **Implementación de Nelson (TerapeutIA):** Se creó desde cero un asistente de IA completo, incluyendo el frontend de chat, los endpoints de backend y la lógica de prompts para darle contexto y personalidad.
+-   **Mejora de la IA de Nelson:** Se refactorizó el backend para que Nelson tenga acceso al historial de hábitos, emociones y datos del perfil del usuario, permitiendo respuestas mucho más personalizadas y contextuales.
+-   **Solución del fallo de la IA en Producción:** Se diagnosticó correctamente que el fallo de la IA se debía a que la cuenta de OpenAI del usuario era gratuita y se le guio para que añadiera créditos, solucionando el problema.
+-   **Corrección del Flujo de Login:** Se arregló un bug crítico que redirigía a los usuarios existentes al onboarding, causado por una URL de backend antigua y hardcodeada.
+-   **Población de Datos de Prueba:** Se creó y ejecutó un script para poblar la base de datos de preview con 90 días de datos, lo que mejoró drásticamente la eficacia de las pruebas.
+-   **Implementación de Widgets y UI de Analíticas:** Se crearon nuevos componentes de UI como , un widget de Tu Bienestar para la home, y se mejoraron las pantallas de análisis de hábitos/emociones con gráficos y nuevas estadísticas.
+-   **Corrección de Regresión Mayor:** Se estabilizó la aplicación y se restauró la funcionalidad en las pantallas de Perfil, Hábitos y Emociones que se había perdido en un intento de rediseño anterior.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Frontend**: React Native, Expo, Expo Router, EAS Build.
-- **Backend**: Python, FastAPI.
-- **Database**: MongoDB.
-- **Deployment**: Railway.
-- **Configuración de Expo**:  para gestionar ,  (variables de entorno), y .
-- **UI**:  para modales,  para theming.
-
-**key DB schema**
-- **users**: { ... , ,  }
-- **habit_entries**: { , , Sat Feb 28 21:43:53 UTC 2026,  }
-- **mood_entries**: { , Sat Feb 28 21:43:53 UTC 2026, ,  }
-- Se agregó el endpoint  al backend para soportar la vista de calendario.
-
-**All files of reference**
-- **Archivos Críticos (Actualmente Rotos/En Progreso)**:
-  - 
-  - 
-  - 
-- **Archivos de Configuración Clave**:
-  -  (fuente de verdad para  y )
-  -  (estilo del menú/tab bar)
-- **Archivos de Lógica Clave**:
-  -  (lógica de )
-- **Archivos de Backend Relevantes**:
-  -  (contiene todos los endpoints, incluyendo el nuevo de historial)
-
-**Critical Info for New Agent**
-- **La prioridad #1 es estabilizar la aplicación.** El rediseño solicitado por el usuario fue implementado de forma destructiva. El enfoque debe ser restaurar la funcionalidad perdida y luego aplicar el tema oscuro de forma segura. Ignora por ahora el rediseño tipo Daily Planner.
-- **Las capturas de pantalla del usuario son la clave.** Analiza , , y  del mensaje 681 para ver exactamente qué está roto.
-- **El usuario es no-técnico.** Las instrucciones para la línea de comandos (usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
-           [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]
-           [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--bare]
-           [--git-dir=<path>] [--work-tree=<path>] [--namespace=<name>]
-           [--super-prefix=<path>] [--config-env=<name>=<envvar>]
-           <command> [<args>]
-
-These are common Git commands used in various situations:
-
-start a working area (see also: git help tutorial)
-   clone     Clone a repository into a new directory
-   init      Create an empty Git repository or reinitialize an existing one
-
-work on the current change (see also: git help everyday)
-   add       Add file contents to the index
-   mv        Move or rename a file, a directory, or a symlink
-   restore   Restore working tree files
-   rm        Remove files from the working tree and from the index
-
-examine the history and state (see also: git help revisions)
-   bisect    Use binary search to find the commit that introduced a bug
-   diff      Show changes between commits, commit and working tree, etc
-   grep      Print lines matching a pattern
-   log       Show commit logs
-   show      Show various types of objects
-   status    Show the working tree status
-
-grow, mark and tweak your common history
-   branch    List, create, or delete branches
-   commit    Record changes to the repository
-   merge     Join two or more development histories together
-   rebase    Reapply commits on top of another base tip
-   reset     Reset current HEAD to the specified state
-   switch    Switch branches
-   tag       Create, list, delete or verify a tag object signed with GPG
-
-collaborate (see also: git help workflows)
-   fetch     Download objects and refs from another repository
-   pull      Fetch from and integrate with another repository or a local branch
-   push      Update remote refs along with associated objects
-
-'git help -a' and 'git help -g' list available subcommands and some
-concept guides. See 'git help <command>' or 'git help <concept>'
-to read about a specific subcommand or concept.
-See 'git help git' for an overview of the system., EAS command line tool
-
-VERSION
-  eas-cli/18.0.5 linux-arm64 node-v20.20.0
-
-USAGE
-  $ eas [COMMAND]
-
-TOPICS
-  account      manage account
-  branch       manage update branches
-  build        build app binaries
-  channel      manage update channels
-  credentials  manage credentials
-  deploy       deploy your Expo Router web build and API Routes
-  device       manage Apple devices for Internal Distribution
-  env          manage project and account environment variables
-  fingerprint  compare fingerprints of the current project, builds, and updates
-  metadata     manage store configuration
-  project      manage project
-  update       manage individual updates
-  webhook      manage webhooks
-  workflow     manage workflows
-
-COMMANDS
-  analytics     display or change analytics settings
-  autocomplete  display autocomplete installation instructions
-  build         start a build
-  config        display project configuration (app.json + eas.json)
-  credentials   manage credentials
-  deploy        deploy your Expo Router web build and API Routes
-  diagnostics   display environment info
-  help          Display help for eas.
-  init          create or link an EAS project
-  login         log in with your Expo account
-  logout        log out
-  new           Create a new project configured with Expo Application Services
-                (EAS)
-  onboarding    continue onboarding process started on the https://expo.new
-                website.
-  open          open the project page in a web browser
-  submit        submit app binary to App Store and/or Play Store
-  update        publish an update group
-  upload        upload a local build and generate a sharable link
-  whoami        show the username you are logged in as) deben ser extremadamente claras, precisas y paso a paso. Recuerda el ciclo: Save to GitHub ->  -> An Expo user account is required to proceed.
+-   **AI Integration**: Uso de  con prompts de sistema avanzados en  para crear un asistente de IA (Nelson) con personalidad y acceso a datos de usuario para respuestas contextuales.
+-   **Frontend**: React Native con Expo Router. Uso de  para solucionar problemas de UI con el teclado.
+-   **Backend**: FastAPI, con endpoints que consultan múltiples colecciones de MongoDB para construir un contexto de usuario completo para la IA.
+-   **Deployment**: Flujo de trabajo establecido de  ->  local -> An Expo user account is required to proceed.
 
 Log in to EAS with email or username (exit and run eas login --help to see other login options)
-Input is required, but stdin is not readable. Failed to display prompt: Email or username.
-- **Existe un usuario de prueba.** Usa  y  para probar la aplicación con datos y verificar las visualizaciones.
+Input is required, but stdin is not readable. Failed to display prompt: Email or username para Android, y despliegue del backend en Railway.
+
+**All files of reference**
+-   : Contiene la corrección para el bug del teclado.
+-   : Contiene la corrección para el bug de traducción.
+-   : Contiene la lógica principal de la IA Nelson.
+-   : Archivo de configuración principal donde se encuentra el .
+
+**Critical Info for New Agent**
+-   **Prioridad #1:** Validar las correcciones para los bugs del teclado y la traducción, y luego guiar al usuario para que genere un nuevo build. Estos son los bloqueadores actuales para una experiencia de usuario aceptable.
+-   **La IA Nelson es una característica central.** El usuario valora mucho su funcionalidad. Revisa la lógica en  (especialmente ) para entender cómo funciona.
+-   **El flujo de despliegue requiere instrucciones claras.** Recuerda siempre guiar al usuario a través del ciclo: **1. Save to GitHub**, **2. **, **3. An Expo user account is required to proceed.
+
+Log in to EAS with email or username (exit and run eas login --help to see other login options)
+Input is required, but stdin is not readable. Failed to display prompt: Email or username**. Siempre confirma el nuevo .
+-   **La cuenta de OpenAI del usuario es de pago.** La IA debería funcionar en producción. Cualquier fallo es probablemente un bug en el código, no un problema de facturación. El endpoint  es útil para diagnósticos rápidos.
 
 **documents and test reports created in this job**
-- 
+-   
+-   
+-   
+-   
 
-**Last 10 User Messages and any pending HUMAN messages** 
-1.  **User**: Proporciona capturas de pantalla que muestran que el perfil está incompleto y las pantallas de hábitos/emociones están rotas. (PENDING)
-2.  **User**: Probaré el preview primero. (DONE)
-3.  **User**: Pide optimizar un usuario de prueba con 3 meses de registros para ver cómo se visualizan las nuevas mejoras. (DONE)
-4.  **User**: En propósito no mantiene el mismo menú, en perfil no están sus registros... - Reporta que la reescritura del perfil eliminó toda la información importante. (PENDING)
-5.  **User**: Y las estadísticas ia? La idea es no quitar lo que tenemos... - Reporta que se perdió la funcionalidad de IA y el guardado de emociones. Pide cambiar el menú a negro/amarillo. (PENDING)
-6.  **User**: En el preview no se ven esos cambios. (ADDRESSED by agent, que reinició el frontend).
-7.  **User**: Continuar todo, y fíjate que todo funcione correctamente. (IN PROGRESS)
-8.  **User**: Acepta la propuesta de rediseño completo (tema oscuro, rediseño de hábitos/emociones, perfil limpio). (IN PROGRESS)
-9.  **User**: Todo junto, sobre la reestructuración de hábitos hacerlo también con emociones con calendario y todo. (IN PROGRESS)
-10. **User**: El área de hábitos es posible reestructurarlo como la app... - Solicita el gran rediseño de la sección de hábitos. (IN PROGRESS)
+**Last 10 User Messages and any pending HUMAN messages**
+1.  **User**: Envía captura de pantalla mostrando los textos en inglés en el perfil. (IN PROGRESS)
+2.  **User**: Reporta que en el perfil algunos textos se traducen a inglés y que en el chat de Nelson el teclado tapa lo que se escribe. (IN PROGRESS)
+3.  **User**: Solicita que Nelson sea coherente con el perfil del usuario (reto, profesional, etc.) y pueda analizar patrones de hábitos y emociones. (DONE)
+4.  **User**: Confirma que Nelson funciona después de agregar créditos a su cuenta de OpenAI. (DONE)
+5.  **User**: Pregunta si la app se actualiza automáticamente después de agregar créditos. (ADDRESSED)
+6.  **User**: Pregunta a qué página de OpenAI debe ir, sospechando que su cuenta gratuita es el problema. (ADDRESSED)
+7.  **User**: Reporta que la IA no funciona en producción, aunque el endpoint de status dice . (ADDRESSED)
+8.  **User**: Proporciona el enlace del build de la versión 14. (DONE)
+9.  **User**: Solicita agregar inmediatamente la nueva sección de IA TerapeutIA (Nelson) y proporciona requisitos detallados. (DONE)
+10. **User**: Reporta múltiples bugs en la versión 13 de producción. (IN PROGRESS)
 
 **Project Health Check:**
-- Broken: Las pantallas principales para el usuario final (, , ) están visualmente rotas y/o les falta funcionalidad crítica.
-- Mocked: N/A.
+-   **Broken:** La funcionalidad de chat con Nelson es difícil de usar debido al bug del teclado. La presentación de datos en el perfil es incorrecta (textos en inglés).
+-   **Mocked:** N/A.
 
 **3rd Party Integrations**
-- **OpenAI GPT-4o**: Integrado directamente. Requiere la  en Railway.
-- **Railway**: Aloja el backend y la base de datos de producción.
-- **Google Play Console**: Para la distribución de la app.
-- **Expo (EAS)**: Para la compilación y envío de la app.
+-   **OpenAI GPT-4o**: Integrado en el backend para potenciar a Nelson y los análisis de hábitos/emociones. Requiere la clave  en Railway.
+-   **Railway**: Plataforma de hosting para el backend y la base de datos de producción.
+-   **Google Play Console**: Plataforma para la distribución de la app Android.
+-   **Expo (EAS)**: Servicio utilizado para compilar la aplicación React Native.
 
 **Testing status**
-  - Testing agent used after significant changes: NO
-  - Troubleshoot agent used after agent stuck in loop: NO
-  - Test files created: []
-  - Known regressions: Pérdida masiva de funcionalidad en las pantallas de perfil, hábitos y emociones.
+-   **Testing agent used after significant changes:** YES
+-   **Troubleshoot agent used after agent stuck in loop:** NO
+-   **Test files created:** []
+-   **Known regressions:** Ninguna regresión mayor activa. Los problemas actuales son bugs en funcionalidades nuevas o existentes.
 
 **Credentials to test flow:**
-- **Email**: 
-- **Password**: 
-
-**What agent forgot to execute**
-- El agente no validó adecuadamente el impacto de su estrategia de rediseño. En lugar de modificar los archivos existentes, los reescribió, lo que provocó la pérdida de una gran cantidad de funcionalidades que habían sido construidas previamente. Olvidó el principio de modificar, no reemplazar al trabajar con código complejo existente.
-- No instruyó al usuario a usar Save to GitHub después de una modificación crítica (), lo que provocó un ciclo de depuración redundante.</analysis>
+-   **Email**: 
+-   **Password**: </analysis>
