@@ -1552,6 +1552,124 @@ export default function ProfileScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Modal de Plan de Recuperación */}
+      <Modal
+        visible={showRecoveryPlanModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowRecoveryPlanModal(false)}
+      >
+        <SafeAreaView style={styles.recoveryPlanModal}>
+          <View style={styles.recoveryPlanHeader}>
+            <TouchableOpacity onPress={() => setShowRecoveryPlanModal(false)}>
+              <Ionicons name="close" size={28} color="#FFFFFF" />
+            </TouchableOpacity>
+            <Text style={styles.recoveryPlanTitle}>Mi Plan de Recuperación</Text>
+            <View style={{ width: 28 }} />
+          </View>
+          
+          <ScrollView style={styles.recoveryPlanContent} showsVerticalScrollIndicator={false}>
+            {/* Información del Reto/Recuperación */}
+            <View style={styles.recoveryPlanSection}>
+              <View style={styles.recoveryPlanSectionHeader}>
+                <Ionicons name="flag" size={20} color="#F59E0B" />
+                <Text style={styles.recoveryPlanSectionTitle}>Tu Reto</Text>
+              </View>
+              <View style={styles.recoveryPlanCard}>
+                <Text style={styles.recoveryPlanLabel}>Tipo de adicción</Text>
+                <Text style={styles.recoveryPlanValue}>{profile?.addiction_type || 'No especificado'}</Text>
+              </View>
+              <View style={styles.recoveryPlanCard}>
+                <Text style={styles.recoveryPlanLabel}>Días en recuperación</Text>
+                <Text style={styles.recoveryPlanValueBig}>{profile?.days_clean || 0} días</Text>
+              </View>
+            </View>
+
+            {/* Mi Para Qué */}
+            <View style={styles.recoveryPlanSection}>
+              <View style={styles.recoveryPlanSectionHeader}>
+                <Ionicons name="heart" size={20} color="#EC4899" />
+                <Text style={styles.recoveryPlanSectionTitle}>Mi "Para Qué"</Text>
+              </View>
+              <View style={styles.recoveryPlanWhyCard}>
+                <Text style={styles.recoveryPlanWhyText}>
+                  "{profile?.my_why || 'No has definido tu "para qué" aún. ¡Es importante tener una motivación clara!'}"
+                </Text>
+              </View>
+            </View>
+
+            {/* Gatillos Identificados */}
+            <View style={styles.recoveryPlanSection}>
+              <View style={styles.recoveryPlanSectionHeader}>
+                <Ionicons name="alert-circle" size={20} color="#EF4444" />
+                <Text style={styles.recoveryPlanSectionTitle}>Mis Gatillos</Text>
+              </View>
+              <View style={styles.recoveryPlanTagsContainer}>
+                {(profile?.triggers || []).length > 0 ? (
+                  profile.triggers.map((trigger: string, index: number) => (
+                    <View key={index} style={[styles.recoveryPlanTag, styles.triggerTag]}>
+                      <Text style={styles.triggerTagText}>{translateItem(trigger)}</Text>
+                    </View>
+                  ))
+                ) : (
+                  <Text style={styles.recoveryPlanEmptyText}>No has identificado gatillos aún</Text>
+                )}
+              </View>
+            </View>
+
+            {/* Factores Protectores */}
+            <View style={styles.recoveryPlanSection}>
+              <View style={styles.recoveryPlanSectionHeader}>
+                <Ionicons name="shield-checkmark" size={20} color="#10B981" />
+                <Text style={styles.recoveryPlanSectionTitle}>Mis Factores Protectores</Text>
+              </View>
+              <View style={styles.recoveryPlanTagsContainer}>
+                {(profile?.protective_factors || []).length > 0 ? (
+                  profile.protective_factors.map((factor: string, index: number) => (
+                    <View key={index} style={[styles.recoveryPlanTag, styles.protectorTag]}>
+                      <Text style={styles.protectorTagText}>{translateItem(factor)}</Text>
+                    </View>
+                  ))
+                ) : (
+                  <Text style={styles.recoveryPlanEmptyText}>No has identificado factores protectores aún</Text>
+                )}
+              </View>
+            </View>
+
+            {/* Red de Apoyo */}
+            {profile?.support_network && profile.support_network.length > 0 && (
+              <View style={styles.recoveryPlanSection}>
+                <View style={styles.recoveryPlanSectionHeader}>
+                  <Ionicons name="people" size={20} color="#8B5CF6" />
+                  <Text style={styles.recoveryPlanSectionTitle}>Mi Red de Apoyo</Text>
+                </View>
+                <View style={styles.recoveryPlanTagsContainer}>
+                  {profile.support_network.map((person: string, index: number) => (
+                    <View key={index} style={[styles.recoveryPlanTag, styles.supportTag]}>
+                      <Ionicons name="person" size={14} color="#8B5CF6" />
+                      <Text style={styles.supportTagText}>{person}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {/* Consejos */}
+            <View style={styles.recoveryPlanTipsCard}>
+              <Ionicons name="bulb" size={24} color="#F59E0B" />
+              <Text style={styles.recoveryPlanTipsTitle}>Recuerda</Text>
+              <Text style={styles.recoveryPlanTipsText}>
+                • Cada día cuenta. Celebra tu progreso.{'\n'}
+                • Cuando sientas un gatillo, contacta a tu red de apoyo.{'\n'}
+                • Tu "para qué" es más fuerte que cualquier craving.
+              </Text>
+            </View>
+
+            <View style={{ height: 40 }} />
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
