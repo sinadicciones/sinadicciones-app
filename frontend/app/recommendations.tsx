@@ -1129,4 +1129,51 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#10B981',
   },
+  // Tags sections (Gatillos y Factores Protectores)
+  tagsSection: {
+    marginHorizontal: 16,
+    marginBottom: 16,
+  },
+  tagsSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+    gap: 8,
+  },
+  tagsSectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  triggerTag: {
+    backgroundColor: '#EF444420',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#EF4444',
+  },
+  triggerTagText: {
+    color: '#EF4444',
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  protectorTag: {
+    backgroundColor: '#10B98120',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#10B981',
+  },
+  protectorTagText: {
+    color: '#10B981',
+    fontSize: 13,
+    fontWeight: '500',
+  },
 });
