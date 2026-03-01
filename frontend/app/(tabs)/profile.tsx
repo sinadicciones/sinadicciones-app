@@ -1133,7 +1133,7 @@ export default function ProfileScreen() {
               <View style={styles.expandableContent}>
                 <Text style={styles.subsectionTitle}>⚠️ Gatillos</Text>
                 <Text style={styles.subsectionDesc}>Personas, lugares, emociones que activan el deseo</Text>
-                {(formData.triggers || []).map((trigger: string, index: number) => (
+                {(formData.triggers || []).map((trigger, index) => (
                   <View key={index} style={styles.tagItem}>
                     <Text style={styles.tagText}>{translateItem(trigger)}</Text>
                     {editing && (
@@ -1156,7 +1156,7 @@ export default function ProfileScreen() {
 
                 <Text style={[styles.subsectionTitle, { marginTop: 20 }]}>🛡️ Factores Protectores</Text>
                 <Text style={styles.subsectionDesc}>Lo que te ayuda a mantenerte limpio</Text>
-                {(formData.protective_factors || []).map((factor: string, index: number) => (
+                {(formData.protective_factors || []).map((factor, index) => (
                   <View key={index} style={[styles.tagItem, styles.tagItemProtect]}>
                     <Text style={[styles.tagText, { color: '#047857' }]}>{translateItem(factor)}</Text>
                     {editing && (
@@ -1204,7 +1204,7 @@ export default function ProfileScreen() {
 
             {activeSection === 'emergency' && (
               <View style={styles.expandableContent}>
-                {(formData.emergency_contacts || []).map((contact: any, index: number) => (
+                {(formData.emergency_contacts || []).map((contact, index) => (
                   <View key={index} style={styles.contactCard}>
                     <TextInput
                       style={styles.input}
@@ -1600,7 +1600,7 @@ export default function ProfileScreen() {
               </View>
               <View style={styles.recoveryPlanTagsContainer}>
                 {(profile?.triggers || []).length > 0 ? (
-                  profile.triggers.map((trigger: string, index: number) => (
+                  profile.triggers.map((trigger, index) => (
                     <View key={index} style={[styles.recoveryPlanTag, styles.triggerTag]}>
                       <Text style={styles.triggerTagText}>{translateItem(trigger)}</Text>
                     </View>
@@ -1619,7 +1619,7 @@ export default function ProfileScreen() {
               </View>
               <View style={styles.recoveryPlanTagsContainer}>
                 {(profile?.protective_factors || []).length > 0 ? (
-                  profile.protective_factors.map((factor: string, index: number) => (
+                  profile.protective_factors.map((factor, index) => (
                     <View key={index} style={[styles.recoveryPlanTag, styles.protectorTag]}>
                       <Text style={styles.protectorTagText}>{translateItem(factor)}</Text>
                     </View>
@@ -1638,7 +1638,7 @@ export default function ProfileScreen() {
                   <Text style={styles.recoveryPlanSectionTitle}>Mi Red de Apoyo</Text>
                 </View>
                 <View style={styles.recoveryPlanTagsContainer}>
-                  {profile.support_network.map((person: string, index: number) => (
+                  {profile.support_network.map((person, index) => (
                     <View key={index} style={[styles.recoveryPlanTag, styles.supportTag]}>
                       <Ionicons name="person" size={14} color="#8B5CF6" />
                       <Text style={styles.supportTagText}>{person}</Text>
