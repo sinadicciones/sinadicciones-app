@@ -933,4 +933,98 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
   },
+  // Estilos para fotos de Mi Para Qué
+  whyPhotosContainer: {
+    marginTop: 16,
+  },
+  whyPhoto: {
+    width: 100,
+    height: 100,
+    borderRadius: 12,
+    marginRight: 10,
+  },
+  // Estilos para Contactos de Emergencia
+  emergencySection: {
+    backgroundColor: '#FEF2F2',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#FECACA',
+  },
+  emergencyHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  emergencyTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#991B1B',
+    marginLeft: 8,
+  },
+  emergencyContact: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#FFFFFF',
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 8,
+  },
+  emergencyContactInfo: {
+    flex: 1,
+  },
+  emergencyContactName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+  emergencyContactRelation: {
+    fontSize: 13,
+    color: '#6B7280',
+  },
+  emergencyCallBtn: {
+    backgroundColor: '#EF4444',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  // Estilos para Red de Apoyo
+  supportSection: {
+    backgroundColor: '#F5F3FF',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#DDD6FE',
+  },
+  supportHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  supportTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#5B21B6',
+    marginLeft: 8,
+  },
+  supportList: {
+    gap: 8,
+  },
+  supportPerson: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    padding: 10,
+    borderRadius: 8,
+  },
+  supportPersonName: {
+    fontSize: 14,
+    color: '#374151',
+    marginLeft: 8,
+  },
 });
