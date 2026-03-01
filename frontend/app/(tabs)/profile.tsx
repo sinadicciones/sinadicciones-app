@@ -1049,7 +1049,7 @@ export default function ProfileScreen() {
                 <Text style={styles.subsectionDesc}>Personas, lugares, emociones que activan el deseo</Text>
                 {(formData.triggers || []).map((trigger: string, index: number) => (
                   <View key={index} style={styles.tagItem}>
-                    <Text style={styles.tagText}>{trigger}</Text>
+                    <Text style={styles.tagText}>{translateItem(trigger)}</Text>
                     {editing && (
                       <TouchableOpacity onPress={() => removeItemFromList('triggers', index)}>
                         <Ionicons name="close-circle" size={20} color="#EF4444" />
@@ -1072,7 +1072,7 @@ export default function ProfileScreen() {
                 <Text style={styles.subsectionDesc}>Lo que te ayuda a mantenerte limpio</Text>
                 {(formData.protective_factors || []).map((factor: string, index: number) => (
                   <View key={index} style={[styles.tagItem, styles.tagItemProtect]}>
-                    <Text style={[styles.tagText, { color: '#047857' }]}>{factor}</Text>
+                    <Text style={[styles.tagText, { color: '#047857' }]}>{translateItem(factor)}</Text>
                     {editing && (
                       <TouchableOpacity onPress={() => removeItemFromList('protective_factors', index)}>
                         <Ionicons name="close-circle" size={20} color="#10B981" />
