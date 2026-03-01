@@ -271,6 +271,40 @@ export default function RecommendationsScreen() {
           </View>
         </View>
 
+        {/* Mis Gatillos como Tags */}
+        {triggers.length > 0 && (
+          <View style={styles.tagsSection}>
+            <View style={styles.tagsSectionHeader}>
+              <Ionicons name="alert-circle" size={20} color="#EF4444" />
+              <Text style={styles.tagsSectionTitle}>Mis Gatillos</Text>
+            </View>
+            <View style={styles.tagsContainer}>
+              {triggers.map((trigger: string, index: number) => (
+                <View key={index} style={styles.triggerTag}>
+                  <Text style={styles.triggerTagText}>{trigger}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {/* Mis Factores Protectores como Tags */}
+        {protectiveFactors.length > 0 && (
+          <View style={styles.tagsSection}>
+            <View style={styles.tagsSectionHeader}>
+              <Ionicons name="shield-checkmark" size={20} color="#10B981" />
+              <Text style={styles.tagsSectionTitle}>Mis Factores Protectores</Text>
+            </View>
+            <View style={styles.tagsContainer}>
+              {protectiveFactors.map((factor: string, index: number) => (
+                <View key={index} style={styles.protectorTag}>
+                  <Text style={styles.protectorTagText}>{factor}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
         {/* Mi Para Qué - Recordatorio */}
         {myWhy && (
           <View style={styles.whyCard}>
