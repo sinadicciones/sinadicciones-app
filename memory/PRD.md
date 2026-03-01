@@ -1,155 +1,68 @@
-# SinAdicciones App - Product Requirements Document
+# SinAdicciones App - PRD
 
 ## Overview
-SinAdicciones es una aplicación móvil de apoyo a personas en recuperación de adicciones. Proporciona seguimiento de hábitos, registro emocional, análisis con IA, y herramientas para profesionales y familiares.
+Aplicación de apoyo para personas en recuperación de adicciones.
 
 ## Tech Stack
-- **Frontend**: React Native + Expo (Expo Router)
-- **Backend**: FastAPI (Python)
-- **Database**: MongoDB
-- **Deployment**: Railway (producción), Expo EAS (builds móviles)
-- **AI**: OpenAI GPT-4o via emergentintegrations para Nelson (terapeuta IA)
-
-## Core Features
-
-### Para Pacientes
-- Dashboard personalizado con días limpios y estadísticas
-- Registro y seguimiento de hábitos diarios
-- Registro de estado emocional con escala 1-10 y etiquetas
-- Análisis de IA para hábitos y emociones
-- **Nelson - Terapeuta IA 24/7**
-- Perfil completo con secciones expandibles
-- Reportar recaídas
-- **Metas SMART Semanales con análisis mensual**
-
-### Nelson - Terapeuta IA
-- Chat conversacional 24/7
-- Personalizado con datos del usuario (hábitos, emociones, perfil)
-- Modos: Normal, Crisis, Ansiedad, Craving, Tristeza
-- Prompts personalizados por rol (paciente, reto, profesional, familiar)
-- Herramientas de crisis (respiración, grounding, timer, contactos)
-- Detección automática de palabras de crisis
-- Notifica al terapeuta vinculado en caso de crisis
-
-### Para Profesionales
-- Panel de gestión de pacientes
-- Sistema de alertas inteligentes
-- Vinculación con pacientes
-- Alertas de crisis de Nelson
-
-### Para Familiares
-- Contenido educativo
-- Seguimiento de familiar (con permiso)
+- Frontend: React Native + Expo Router
+- Backend: FastAPI + MongoDB
+- AI: OpenAI GPT-4o via emergentintegrations
 
 ## Test Credentials
-- **Paciente Demo**: paciente@sinadicciones.org / demo123
-- **Profesional Demo**: profesional@sinadicciones.org / demopassword
-- **Familiar Demo**: familiar@sinadicciones.org / demo123
-- **Admin**: contacto@sinadicciones.cl / Jodo1000
+- Paciente: paciente@sinadicciones.org / demo123
+- Profesional: profesional@sinadicciones.org / demopassword
+- Familiar: familiar@sinadicciones.org / demo123
 
-## Implemented Features (Mar 2026)
+## Completed Features (Mar 2026)
 
-### Metas SMART Semanales
-- [x] Creación de metas con `target_days` (días objetivo por semana)
-- [x] Seguimiento diario con círculos L-M-X-J-V-S-D
-- [x] Toggle de días completados/no completados
-- [x] Progreso calculado automáticamente
-- [x] Historial semanal (`week_history`)
-- [x] Reset automático de semana
-- [x] Análisis mensual con estadísticas de rendimiento
-- [x] **FIX: useFocusEffect para recargar datos al volver a la pantalla**
+### Backend (100% Tested)
+- ✅ Autenticación (login/registro)
+- ✅ Registros emocionales (CRUD + estadísticas)
+- ✅ Nelson IA (chat + detección de crisis)
+- ✅ Panel de Profesional (pacientes + alertas)
+- ✅ Hábitos (CRUD)
+- ✅ Metas SMART semanales
+- ✅ Vinculación Paciente-Profesional
 
-### UI/UX
-- [x] Tema oscuro global
-- [x] Menú inferior negro con acento amarillo
-- [x] Headers con gradientes por sección
-- [x] Secciones expandibles en perfil
-- [x] KeyboardAvoidingView en modales
-- [x] **CSS global inyectado en _layout.tsx para TextInput en web**
-- [x] **Estilos de inputs en index.tsx actualizados para modo oscuro**
-- [x] Nelson chat con herramientas de crisis
+### Frontend
+- ✅ Pantalla de inicio con modo oscuro
+- ✅ Metas SMART con seguimiento diario (useFocusEffect para refresh)
+- ✅ Hábitos recomendados inteligentes (filtro de existentes)
+- ✅ Plan de Recuperación unificado
+- ✅ CSS global inyectado para TextInput
 
-### Backend
-- [x] Endpoints de autenticación (100% funcionando)
-- [x] CRUD de hábitos con historial
-- [x] CRUD de registros emocionales
-- [x] Estadísticas y análisis con IA
-- [x] Sistema de roles
-- [x] Vinculación paciente-profesional
-- [x] Nelson API con contexto de usuario usando emergentintegrations
-- [x] Detección de crisis y notificaciones
-- [x] Endpoint /api/ai/status para verificar configuración
+## Fixed Issues (This Session)
+1. **Caché de Metro** - Limpiado para corregir URL incorrecto de backend
+2. **useFocusEffect** - Añadido a goals.tsx y [area].tsx para refresh automático
+3. **CSS global** - Inyectado en _layout.tsx para normalizar inputs
 
-## API Endpoints Testing (Mar 2026)
-Backend testing completado: **100% (24/24 tests pasaron)**
+## Known Limitations
+- TextInput en React Native Web mantiene estilos del browser (inputs blancos)
+- En la app móvil compilada, los inputs se verán correctamente
 
-### Endpoints Verificados
-- POST /api/auth/login ✓
-- GET /api/emotional-logs ✓
-- POST /api/emotional-logs ✓
-- POST /api/nelson/chat ✓
-- GET /api/professional/patients ✓
-- GET /api/professional/alerts ✓
-- GET /api/habits ✓
-- GET /api/profile ✓
-- GET /api/purpose/goals ✓
-
-## versionCode History
-- v22: Plugin expo-notifications añadido, fix análisis IA, sistema Metas SMART semanales
-- v19: Fix bugs educación
-- v18: Límites de tema para Nelson + Dashboard de Propósito
-- v17: Corrección de bugs
-- v14: Agregado Nelson (terapeuta IA)
-
-## Architecture
-
-### File Structure
+## API Endpoints Clave
 ```
-/app
-├── backend/
-│   ├── server.py          # Main FastAPI (6900+ líneas)
-│   └── tests/
-│       └── test_main_endpoints.py
-├── frontend/
-│   ├── app.config.js      # versionCode = 22
-│   ├── app/
-│   │   ├── _layout.tsx    # CSS global para modo oscuro
-│   │   ├── (tabs)/
-│   │   ├── index.tsx      # Pantalla login con inputs oscuros
-│   │   └── purpose/
-│   │       ├── goals.tsx  # Metas SMART con useFocusEffect
-│   │       └── [area].tsx # Área específica con useFocusEffect
-│   ├── components/
-│   └── utils/
-└── memory/
-    └── PRD.md
+POST /api/auth/login
+GET /api/profile
+GET /api/habits
+POST /api/habits
+GET /api/emotional-logs
+POST /api/emotional-logs
+POST /api/nelson/chat
+GET /api/professional/patients
+GET /api/professional/alerts
+GET /api/therapists/search-patient?email=
+POST /api/professional/link-patient
+GET /api/purpose/goals
+POST /api/purpose/goals
+PUT /api/goals/{id}/progress
 ```
 
 ## Pending Tasks
+- [ ] Verificar notificaciones push (v22) en dispositivo físico
+- [ ] Refactorización de server.py (6900+ líneas)
+- [ ] Refactorización de profile.tsx (2500+ líneas)
 
-### P0 - Crítico
-- [ ] Verificar UI modo oscuro en pantallas internas (home, habits, emotions, profile)
-- [ ] Verificar notificaciones push en dispositivo físico (v22)
-
-### P1 - Alta prioridad  
-- [ ] Implementar lógica de hábitos recomendados inteligentes (no repetir existentes)
-- [ ] Verificar flujo completo de vinculación Paciente-Profesional
-
-### P2 - Refactorización
-- [ ] Dividir server.py en FastAPI Routers (6900+ líneas)
-- [ ] Descomponer profile.tsx en componentes (2500+ líneas)
-
-### P3 - Futuro
-- [ ] Diario de voz para Nelson
-- [ ] Unificar Hábitos y Metas
-- [ ] Compartir resúmenes de IA con el terapeuta
-
-## Known Issues
-- TextInput en React Native Web puede tener comportamiento inconsistente con estilos
-- El CSS global inyectado ayuda pero no resuelve completamente el problema en todos los navegadores
-
-## Build & Deploy Notes
-1. "Save to GitHub" en Emergent
-2. `git pull origin main`
-3. `eas build --platform android`
-4. Subir AAB a Google Play Console
+## Build Notes
+- versionCode actual: 22
+- El usuario debe compilar con `eas build --platform android` para probar cambios en móvil
