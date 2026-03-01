@@ -60,6 +60,13 @@ export default function AllGoals() {
     loadGoals();
   }, []);
 
+  // Recargar metas cuando la pantalla obtiene el foco (al volver de otra pantalla)
+  useFocusEffect(
+    useCallback(() => {
+      loadGoals();
+    }, [])
+  );
+
   const loadGoals = async () => {
     try {
       const response = await authenticatedFetch(`${BACKEND_URL}/api/purpose/goals`);
