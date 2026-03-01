@@ -250,6 +250,7 @@ export default function AllGoals() {
 
                 {(areaGoals as any[]).map((goal: any) => (
                   <View key={goal.goal_id} style={styles.goalCard}>
+                    {/* Title row */}
                     <View style={styles.goalHeader}>
                       <View style={styles.goalStatus}>
                         <Ionicons
@@ -275,9 +276,9 @@ export default function AllGoals() {
                       </View>
                     </View>
                     
-                    {/* Weekly Day Circles - Row below title */}
+                    {/* Weekly Day Circles - Full width row */}
                     <View style={styles.weekSection}>
-                      <Text style={styles.weekLabel}>Esta semana ({goal.target_days || 5} días):</Text>
+                      <Text style={styles.weekLabel}>Esta semana ({goal.target_days || 5} días meta):</Text>
                       <View style={styles.weekDaysRow}>
                         {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map((day, index) => {
                           const dayLabels = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
