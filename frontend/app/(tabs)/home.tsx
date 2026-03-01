@@ -1199,6 +1199,59 @@ export default function HomeScreen() {
         visible={showNotifications} 
         onClose={() => setShowNotifications(false)} 
       />
+
+      {/* Modal de Estrategias para Gatillos */}
+      <Modal
+        visible={showTriggerModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowTriggerModal(false)}
+      >
+        <View style={styles.triggerModalOverlay}>
+          <View style={styles.triggerModalContent}>
+            <View style={styles.triggerModalHeader}>
+              <View style={styles.triggerModalTitleRow}>
+                {selectedTrigger && (
+                  <View style={[styles.triggerModalIcon, { backgroundColor: `${selectedTrigger.color}20` }]}>
+                    <Ionicons name={selectedTrigger.icon as any} size={28} color={selectedTrigger.color} />
+                  </View>
+                )}
+                <Text style={styles.triggerModalTitle}>{selectedTrigger?.name}</Text>
+              </View>
+              <TouchableOpacity onPress={() => setShowTriggerModal(false)}>
+                <Ionicons name="close" size={28} color="#9CA3AF" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.triggerModalBody} showsVerticalScrollIndicator={false}>
+              <Text style={styles.triggerModalSubtitle}>Estrategias recomendadas:</Text>
+              
+              {selectedTrigger?.tips?.map((tip: string, index: number) => (
+                <View key={index} style={styles.triggerTipItem}>
+                  <View style={[styles.triggerTipNumber, { backgroundColor: selectedTrigger.color }]}>
+                    <Text style={styles.triggerTipNumberText}>{index + 1}</Text>
+                  </View>
+                  <Text style={styles.triggerTipText}>{tip}</Text>
+                </View>
+              ))}
+
+              <View style={styles.triggerModalReminder}>
+                <Ionicons name="bulb" size={20} color="#F59E0B" />
+                <Text style={styles.triggerModalReminderText}>
+                  Recuerda: Identificar el gatillo es el primer paso. Practicar estas estrategias te ayudará a superarlo.
+                </Text>
+              </View>
+            </ScrollView>
+
+            <TouchableOpacity 
+              style={[styles.triggerModalBtn, { backgroundColor: selectedTrigger?.color || '#10B981' }]}
+              onPress={() => setShowTriggerModal(false)}
+            >
+              <Text style={styles.triggerModalBtnText}>Entendido</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
