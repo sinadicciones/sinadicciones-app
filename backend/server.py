@@ -2593,6 +2593,138 @@ async def delete_purpose_goal(goal_id: str, current_user: User = Depends(get_cur
     
     return {"success": True}
 
+
+@app.get("/api/purpose/goals/monthly-analysis")
+async def get_goals_monthly_analysis(
+    month: Optional[int] = None,
+    year: Optional[int] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get monthly analysis of goal progress across all weeks"""
+    today = datetime.now(timezone.utc)
+    target_month = month or today.month
+    target_year = year or today.year
+    
+    # Get all goals for user
+    goals = await db.purpose_goals.find(
+        {"user_id": current_user.user_id, "status": {"$ne": "deleted"}},
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Calculate month boundaries
+    first_day_of_month = datetime(target_year, target_month, 1, tzinfo=timezone.utc)
+    if target_month == 12:
+        last_day_of_month = datetime(target_year + 1, 1, 1, tzinfo=timezone.utc) - timedelta(days=1)
+    else:
+        last_day_of_month = datetime(target_year, target_month + 1, 1, tzinfo=timezone.utc) - timedelta(days=1)
+    
+    month_names = ["", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+    
+    # Analyze each goal
+    goals_analysis = []
+    total_weeks_achieved = 0
+    total_weeks_in_month = 0
+    total_days_completed = 0
+    total_target_days = 0
+    
+    for goal in goals:
+        week_history = goal.get("week_history", [])
+        current_week = goal.get("current_week", "")
+        weekly_progress = goal.get("weekly_progress", {})
+        target_days = goal.get("target_days", 5)
+        
+        # Filter weeks that belong to target month
+        weeks_in_month = []
+        
+        for week in week_history:
+            week_start = week.get("week_start", "")
+            if week_start:
+                try:
+                    week_date = datetime.strptime(week_start, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+                    if first_day_of_month <= week_date <= last_day_of_month:
+                        weeks_in_month.append(week)
+                except:
+                    pass
+        
+        # Include current week if it's in the target month
+        if current_week:
+            try:
+                current_week_date = datetime.strptime(current_week, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+                if first_day_of_month <= current_week_date <= last_day_of_month:
+                    current_completed = sum(1 for v in weekly_progress.values() if v)
+                    weeks_in_month.append({
+                        "week_start": current_week,
+                        "completed_days": current_completed,
+                        "target_days": target_days,
+                        "achieved": current_completed >= target_days,
+                        "is_current": True
+                    })
+            except:
+                pass
+        
+        # Calculate goal stats for month
+        weeks_achieved = sum(1 for w in weeks_in_month if w.get("achieved", False))
+        total_completed = sum(w.get("completed_days", 0) for w in weeks_in_month)
+        total_target = len(weeks_in_month) * target_days
+        
+        achievement_rate = (weeks_achieved / len(weeks_in_month) * 100) if weeks_in_month else 0
+        
+        goals_analysis.append({
+            "goal_id": goal.get("goal_id"),
+            "title": goal.get("title"),
+            "area": goal.get("area"),
+            "target_days": target_days,
+            "weeks_in_month": len(weeks_in_month),
+            "weeks_achieved": weeks_achieved,
+            "total_days_completed": total_completed,
+            "total_days_target": total_target,
+            "achievement_rate": round(achievement_rate, 1),
+            "week_details": weeks_in_month
+        })
+        
+        total_weeks_achieved += weeks_achieved
+        total_weeks_in_month += len(weeks_in_month)
+        total_days_completed += total_completed
+        total_target_days += total_target
+    
+    # Overall stats
+    overall_week_rate = (total_weeks_achieved / total_weeks_in_month * 100) if total_weeks_in_month > 0 else 0
+    overall_day_rate = (total_days_completed / total_target_days * 100) if total_target_days > 0 else 0
+    
+    # Determine performance level
+    if overall_week_rate >= 80:
+        performance_level = "excelente"
+        performance_message = "¡Increíble mes! Estás superando tus metas consistentemente."
+    elif overall_week_rate >= 60:
+        performance_level = "bueno"
+        performance_message = "Buen progreso este mes. Sigue así y llegarás más lejos."
+    elif overall_week_rate >= 40:
+        performance_level = "regular"
+        performance_message = "Has logrado algunas metas. Identifica qué te está frenando."
+    else:
+        performance_level = "necesita_atencion"
+        performance_message = "Este mes fue difícil. Considera ajustar tus metas para que sean más alcanzables."
+    
+    return {
+        "success": True,
+        "month": target_month,
+        "year": target_year,
+        "month_name": month_names[target_month],
+        "summary": {
+            "total_goals": len(goals_analysis),
+            "total_weeks": total_weeks_in_month,
+            "weeks_achieved": total_weeks_achieved,
+            "week_achievement_rate": round(overall_week_rate, 1),
+            "total_days_completed": total_days_completed,
+            "total_days_target": total_target_days,
+            "day_completion_rate": round(overall_day_rate, 1),
+            "performance_level": performance_level,
+            "performance_message": performance_message
+        },
+        "goals": goals_analysis
+    }
+
 @app.get("/api/purpose/checkins")
 async def get_weekly_checkins(current_user: User = Depends(get_current_user)):
     checkins = await db.weekly_checkins.find(

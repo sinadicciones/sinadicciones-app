@@ -49,7 +49,7 @@ export default function AllGoals() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showGuideModal, setShowGuideModal] = useState(false);
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
-  const [newGoal, setNewGoal] = useState({ title: '', description: '' });
+  const [newGoal, setNewGoal] = useState<{ title: string; description: string; target_days?: number }>({ title: '', description: '', target_days: 5 });
 
   useEffect(() => {
     loadGoals();
