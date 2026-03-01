@@ -359,7 +359,7 @@ export default function ProfileScreen() {
     const currentList = formData[field] || [];
     setFormData({
       ...formData,
-      [field]: currentList.filter((_: any, i: number) => i !== index),
+      [field]: currentList.filter((_, i) => i !== index),
     });
   };
 
@@ -374,17 +374,17 @@ export default function ProfileScreen() {
     });
   };
 
-  const updateEmergencyContact = (index: number, field: string, value: string) => {
+  const updateEmergencyContact = (index, field, value) => {
     const contacts = [...(formData.emergency_contacts || [])];
     contacts[index] = { ...contacts[index], [field]: value };
     setFormData({ ...formData, emergency_contacts: contacts });
   };
 
-  const removeEmergencyContact = (index: number) => {
+  const removeEmergencyContact = (index) => {
     const contacts = formData.emergency_contacts || [];
     setFormData({
       ...formData,
-      emergency_contacts: contacts.filter((_: any, i: number) => i !== index),
+      emergency_contacts: contacts.filter((_, i) => i !== index),
     });
   };
 
