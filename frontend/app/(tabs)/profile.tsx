@@ -102,7 +102,6 @@ export default function ProfileScreen() {
   });
   const [savingNotifications, setSavingNotifications] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const [showRecoveryPlanModal, setShowRecoveryPlanModal] = useState(false);
 
   useEffect(() => {
     loadProfile();
