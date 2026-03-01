@@ -5329,70 +5329,191 @@ async def nelson_chat(
             "crisis_detected": False
         }
 
-async def get_nelson_user_context(user_id: str) -> str:
-    """Get user context for Nelson to personalize responses"""
+async def get_nelson_user_context(user_id: str) -> tuple[str, str]:
+    """Get comprehensive user context for Nelson to personalize responses and analyze patterns"""
     try:
         # Get profile
         profile = await db.profiles.find_one({"user_id": user_id}, {"_id": 0})
+        user_role = profile.get("role", "patient") if profile else "patient"
         
-        # Get recent habits
-        habits = await db.habits.find(
-            {"user_id": user_id, "is_active": True}
-        ).to_list(10)
-        
-        # Get today's habit completions
-        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-        today_logs = await db.habit_logs.find(
-            {"user_id": user_id, "date": today}
-        ).to_list(100)
-        completed_today = sum(1 for log in today_logs if log.get("completed"))
-        
-        # Get recent emotional logs
-        week_ago = (datetime.now(timezone.utc) - timedelta(days=7)).strftime("%Y-%m-%d")
-        recent_emotions = await db.emotional_logs.find(
-            {"user_id": user_id, "date": {"$gte": week_ago}}
-        ).sort("date", -1).to_list(7)
-        
-        avg_mood = 0
-        if recent_emotions:
-            moods = [e.get("mood") or e.get("mood_scale", 5) for e in recent_emotions]
-            avg_mood = sum(moods) / len(moods)
+        # Get role-specific context
+        role_context = ROLE_CONTEXTS.get(user_role, ROLE_CONTEXTS["patient"])
         
         # Get user info
-        user = await db.users.find_one({"user_id": user_id}, {"_id": 0, "name": 1})
+        user = await db.users.find_one({"user_id": user_id}, {"_id": 0, "name": 1, "email": 1})
         
-        # Build context
+        # Get ALL habits
+        habits = await db.habits.find({"user_id": user_id, "is_active": True}).to_list(20)
+        habit_names = [h.get("name", "Sin nombre") for h in habits]
+        
+        # Get habit logs for the last 30 days
+        thirty_days_ago = (datetime.now(timezone.utc) - timedelta(days=30)).strftime("%Y-%m-%d")
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        
+        habit_logs = await db.habit_logs.find({
+            "user_id": user_id,
+            "date": {"$gte": thirty_days_ago}
+        }).to_list(1000)
+        
+        # Calculate habit statistics
+        total_possible = len(habits) * 30
+        total_completed = sum(1 for log in habit_logs if log.get("completed"))
+        habit_completion_rate = (total_completed / total_possible * 100) if total_possible > 0 else 0
+        
+        # Get today's completions
+        today_logs = [log for log in habit_logs if log.get("date") == today]
+        completed_today = sum(1 for log in today_logs if log.get("completed"))
+        
+        # Analyze habit patterns by day of week
+        habit_by_day = {}
+        for log in habit_logs:
+            if log.get("completed"):
+                try:
+                    log_date = datetime.strptime(log["date"], "%Y-%m-%d")
+                    day_name = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"][log_date.weekday()]
+                    habit_by_day[day_name] = habit_by_day.get(day_name, 0) + 1
+                except:
+                    pass
+        
+        best_habit_day = max(habit_by_day, key=habit_by_day.get) if habit_by_day else "No hay datos"
+        worst_habit_day = min(habit_by_day, key=habit_by_day.get) if habit_by_day else "No hay datos"
+        
+        # Get ALL emotional logs for the last 30 days
+        emotional_logs = await db.emotional_logs.find({
+            "user_id": user_id,
+            "date": {"$gte": thirty_days_ago}
+        }).sort("date", -1).to_list(100)
+        
+        # Calculate emotional statistics
+        moods = [e.get("mood") or e.get("mood_scale", 5) for e in emotional_logs]
+        avg_mood = sum(moods) / len(moods) if moods else 0
+        max_mood = max(moods) if moods else 0
+        min_mood = min(moods) if moods else 0
+        
+        # Analyze mood trends
+        mood_trend = "estable"
+        if len(moods) >= 7:
+            recent_avg = sum(moods[:7]) / 7
+            older_avg = sum(moods[7:14]) / 7 if len(moods) >= 14 else recent_avg
+            if recent_avg > older_avg + 0.5:
+                mood_trend = "mejorando"
+            elif recent_avg < older_avg - 0.5:
+                mood_trend = "empeorando"
+        
+        # Get most common emotions/tags
+        all_tags = []
+        for log in emotional_logs:
+            tags = log.get("tags") or log.get("emotions", [])
+            all_tags.extend(tags)
+        
+        tag_counts = {}
+        for tag in all_tags:
+            tag_counts[tag] = tag_counts.get(tag, 0) + 1
+        
+        top_emotions = sorted(tag_counts.items(), key=lambda x: x[1], reverse=True)[:5]
+        
+        # Analyze mood by day of week
+        mood_by_day = {}
+        mood_count_by_day = {}
+        for log in emotional_logs:
+            try:
+                log_date = datetime.strptime(log["date"], "%Y-%m-%d")
+                day_name = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"][log_date.weekday()]
+                mood_value = log.get("mood") or log.get("mood_scale", 5)
+                mood_by_day[day_name] = mood_by_day.get(day_name, 0) + mood_value
+                mood_count_by_day[day_name] = mood_count_by_day.get(day_name, 0) + 1
+            except:
+                pass
+        
+        avg_mood_by_day = {day: mood_by_day[day] / mood_count_by_day[day] for day in mood_by_day}
+        best_mood_day = max(avg_mood_by_day, key=avg_mood_by_day.get) if avg_mood_by_day else "No hay datos"
+        worst_mood_day = min(avg_mood_by_day, key=avg_mood_by_day.get) if avg_mood_by_day else "No hay datos"
+        
+        # Get recent notes from emotional logs
+        recent_notes = [log.get("note", "") for log in emotional_logs[:5] if log.get("note")]
+        
+        # Build comprehensive context
         context_parts = []
         
+        # Basic info
+        context_parts.append("=== INFORMACIÓN BÁSICA ===")
         if user and user.get("name"):
-            context_parts.append(f"Nombre del usuario: {user['name']}")
+            context_parts.append(f"Nombre: {user['name']}")
+        context_parts.append(f"Rol en la plataforma: {user_role}")
         
+        # Profile info
         if profile:
+            context_parts.append("\n=== PERFIL DE RECUPERACIÓN ===")
             if profile.get("addiction_type"):
                 context_parts.append(f"Tipo de adicción: {profile['addiction_type']}")
+            if profile.get("secondary_addictions"):
+                context_parts.append(f"Adicciones secundarias: {', '.join(profile['secondary_addictions'])}")
             if profile.get("clean_date"):
                 try:
                     clean_date = datetime.fromisoformat(profile["clean_date"].replace("Z", "+00:00"))
                     days_clean = (datetime.now(timezone.utc) - clean_date).days
                     if days_clean >= 0:
-                        context_parts.append(f"Días en recuperación: {days_clean}")
+                        context_parts.append(f"Días en recuperación: {days_clean} días")
                 except:
                     pass
             if profile.get("triggers"):
-                context_parts.append(f"Gatillos conocidos: {', '.join(profile['triggers'][:5])}")
+                context_parts.append(f"Gatillos identificados: {', '.join(profile['triggers'])}")
+            if profile.get("protective_factors"):
+                context_parts.append(f"Factores protectores: {', '.join(profile['protective_factors'])}")
             if profile.get("my_why"):
-                context_parts.append(f"Su motivación (para qué): {profile['my_why'][:200]}")
+                context_parts.append(f"Su 'Para Qué' (motivación): {profile['my_why']}")
+            if profile.get("life_story"):
+                context_parts.append(f"Historia de vida: {profile['life_story'][:300]}...")
         
+        # Habits analysis
+        context_parts.append("\n=== ANÁLISIS DE HÁBITOS (últimos 30 días) ===")
+        context_parts.append(f"Hábitos activos: {', '.join(habit_names) if habit_names else 'Ninguno'}")
         context_parts.append(f"Hábitos completados hoy: {completed_today} de {len(habits)}")
+        context_parts.append(f"Tasa de cumplimiento (30 días): {habit_completion_rate:.1f}%")
+        context_parts.append(f"Mejor día para hábitos: {best_habit_day}")
+        context_parts.append(f"Día más difícil para hábitos: {worst_habit_day}")
         
-        if avg_mood > 0:
-            context_parts.append(f"Estado de ánimo promedio esta semana: {avg_mood:.1f}/10")
+        # Emotional analysis
+        context_parts.append("\n=== ANÁLISIS EMOCIONAL (últimos 30 días) ===")
+        context_parts.append(f"Registros emocionales: {len(emotional_logs)}")
+        context_parts.append(f"Estado de ánimo promedio: {avg_mood:.1f}/10")
+        context_parts.append(f"Mejor momento: {max_mood}/10")
+        context_parts.append(f"Peor momento: {min_mood}/10")
+        context_parts.append(f"Tendencia actual: {mood_trend}")
+        context_parts.append(f"Mejor día anímicamente: {best_mood_day}")
+        context_parts.append(f"Día más difícil anímicamente: {worst_mood_day}")
+        if top_emotions:
+            emotions_str = ", ".join([f"{e[0]} ({e[1]} veces)" for e in top_emotions])
+            context_parts.append(f"Emociones más frecuentes: {emotions_str}")
         
-        return "\n".join(context_parts) if context_parts else "Usuario nuevo sin historial aún."
+        # Recent notes
+        if recent_notes:
+            context_parts.append("\n=== NOTAS RECIENTES DEL USUARIO ===")
+            for i, note in enumerate(recent_notes, 1):
+                context_parts.append(f"{i}. \"{note}\"")
+        
+        # Patterns and insights
+        context_parts.append("\n=== PATRONES DETECTADOS ===")
+        if habit_completion_rate < 30:
+            context_parts.append("- Baja adherencia a hábitos, puede necesitar ajustar metas o motivación")
+        elif habit_completion_rate > 70:
+            context_parts.append("- Excelente adherencia a hábitos, celebrar este logro")
+        
+        if mood_trend == "empeorando":
+            context_parts.append("- El ánimo ha bajado esta semana, preguntar qué está pasando")
+        elif mood_trend == "mejorando":
+            context_parts.append("- El ánimo está mejorando, reconocer el progreso")
+        
+        if best_habit_day == worst_mood_day:
+            context_parts.append(f"- Curiosamente, {best_habit_day} es su mejor día para hábitos pero peor anímicamente")
+        
+        full_context = "\n".join(context_parts)
+        
+        return full_context, role_context
         
     except Exception as e:
         print(f"Error getting Nelson context: {e}")
-        return "No se pudo obtener contexto del usuario."
+        return "No se pudo obtener contexto del usuario.", ROLE_CONTEXTS["patient"]
 
 @app.get("/api/nelson/conversation")
 async def get_nelson_conversation(current_user: User = Depends(get_current_user)):
