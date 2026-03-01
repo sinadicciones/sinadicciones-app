@@ -2594,9 +2594,7 @@ IMPORTANTE:
         
         ai_response = response.choices[0].message.content
         
-        # Parse JSON response
-        import json
-        # Clean response if needed
+        # Clean response if needed (remove markdown code blocks)
         if ai_response.startswith("```json"):
             ai_response = ai_response[7:]
         if ai_response.startswith("```"):
