@@ -478,8 +478,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   goalCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: '#1A1A1A',
     padding: 16,
     borderRadius: 12,
