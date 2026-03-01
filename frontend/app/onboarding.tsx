@@ -137,6 +137,7 @@ export default function OnboardingScreen() {
   
   // Step 6: Mi Para Qué
   const [myWhy, setMyWhy] = useState('');
+  const [myWhyPhotos, setMyWhyPhotos] = useState<string[]>([]);
   
   // Step 7: Estado emocional inicial (NUEVO)
   const [initialMood, setInitialMood] = useState(5);
