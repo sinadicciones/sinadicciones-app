@@ -1703,4 +1703,82 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
   },
+  // Estilos para sección de Gatillos
+  triggersSection: {
+    backgroundColor: '#1F2937',
+    borderRadius: 16,
+    padding: 16,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(251, 191, 36, 0.3)',
+  },
+  triggersSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  triggersWarningIcon: {
+    fontSize: 20,
+    marginRight: 8,
+  },
+  triggersSectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#FBBF24',
+  },
+  triggersSubtitle: {
+    fontSize: 13,
+    color: '#9CA3AF',
+    marginBottom: 16,
+  },
+  triggersList: {
+    gap: 10,
+  },
+  triggerItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 12,
+    padding: 12,
+  },
+  triggerIconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  triggerContent: {
+    flex: 1,
+  },
+  triggerName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginBottom: 2,
+  },
+  triggerStrategy: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    lineHeight: 16,
+  },
+  viewFullPlanBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 16,
+    paddingVertical: 12,
+    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.3)',
+  },
+  viewFullPlanText: {
+    color: '#10B981',
+    fontSize: 14,
+    fontWeight: '600',
+    marginRight: 6,
+  },
 });
