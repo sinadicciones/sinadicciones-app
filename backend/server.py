@@ -3875,6 +3875,18 @@ class AnalysisPeriod(str, Enum):
     week = "week"
     month = "month"
 
+@app.get("/api/ai/status")
+async def get_ai_status():
+    """Check if AI is properly configured"""
+    client = await get_openai_client()
+    api_key = os.getenv("OPENAI_API_KEY") or os.getenv("EMERGENT_LLM_KEY")
+    return {
+        "ai_configured": client is not None,
+        "api_key_present": api_key is not None,
+        "api_key_prefix": api_key[:10] + "..." if api_key else None
+    }
+
+
 @app.get("/api/wellness/analysis/{period}")
 async def get_wellness_analysis(
     period: AnalysisPeriod,
