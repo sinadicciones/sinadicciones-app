@@ -26,34 +26,39 @@ const BACKEND_URL = getBackendURL();
 
 // Mapeo de traducciones para gatillos y factores protectores
 const TRANSLATIONS: Record<string, string> = {
-  // Gatillos
+  // Gatillos (de onboarding-active.tsx)
   'stress': 'Estrés',
   'anxiety': 'Ansiedad',
   'boredom': 'Aburrimiento',
+  'social': 'Presión social',
   'social_pressure': 'Presión social',
   'loneliness': 'Soledad',
   'celebration': 'Celebraciones',
+  'sadness': 'Tristeza',
   'anger': 'Enojo/Frustración',
+  'pain': 'Dolor físico',
+  'insomnia': 'Insomnio',
   'depression': 'Depresión',
   'fatigue': 'Cansancio',
   'conflict': 'Conflictos',
-  // Factores protectores
+  // Factores protectores (de onboarding-active.tsx)
+  'family': 'Familia',
+  'friends': 'Amigos que apoyan',
+  'work': 'Trabajo/Estudios',
+  'hobbies': 'Pasatiempos',
+  'sports': 'Deporte/Ejercicio',
+  'spirituality': 'Espiritualidad/Fe',
+  'therapy': 'Terapia/Profesional',
+  'pets': 'Mascotas',
+  'nature': 'Naturaleza',
+  'music': 'Música/Arte',
+  // Extras para compatibilidad
   'exercise': 'Ejercicio',
   'meditation': 'Meditación',
-  'hobbies': 'Pasatiempos',
   'support_group': 'Grupo de apoyo',
-  'spirituality': 'Espiritualidad',
-  'therapy': 'Terapia',
-  'music': 'Música',
-  'nature': 'Naturaleza',
-  'pets': 'Mascotas',
-  'family': 'Familia',
-  'friends': 'Amigos',
-  'work': 'Trabajo',
   'art': 'Arte',
   'reading': 'Lectura',
   'cooking': 'Cocina',
-  'sports': 'Deportes',
 };
 
 // Función para traducir
