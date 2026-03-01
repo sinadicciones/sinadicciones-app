@@ -5699,6 +5699,43 @@ async def get_nelson_user_context(user_id: str) -> tuple[str, str]:
             for i, note in enumerate(recent_notes, 1):
                 context_parts.append(f"{i}. \"{note}\"")
         
+        # Get purpose analysis if available
+        purpose_analysis = await db.purpose_analyses.find_one(
+            {"user_id": user_id},
+            {"_id": 0}
+        )
+        
+        if purpose_analysis and purpose_analysis.get("analysis"):
+            analysis = purpose_analysis["analysis"]
+            context_parts.append("\n=== ANÁLISIS DE PROPÓSITO DE VIDA ===")
+            if analysis.get("purpose_statement"):
+                context_parts.append(f"Declaración de propósito: {analysis['purpose_statement']}")
+            if analysis.get("core_identity"):
+                context_parts.append(f"Identidad esencial: {analysis['core_identity'][:200]}...")
+            if analysis.get("affirmation"):
+                context_parts.append(f"Afirmación personal: {analysis['affirmation']}")
+            if analysis.get("key_insights"):
+                context_parts.append("Insights clave: " + "; ".join(analysis["key_insights"][:3]))
+            if analysis.get("how_recovery_connects"):
+                context_parts.append(f"Conexión con recuperación: {analysis['how_recovery_connects']}")
+        
+        # Also get purpose test results for values/strengths
+        purpose_test = await db.purpose_tests.find_one(
+            {"user_id": user_id},
+            {"_id": 0, "profile": 1}
+        )
+        
+        if purpose_test and purpose_test.get("profile"):
+            profile_data = purpose_test["profile"]
+            if not purpose_analysis:  # Only add if we don't have full analysis
+                context_parts.append("\n=== PERFIL DE PROPÓSITO ===")
+            if profile_data.get("purpose_type"):
+                context_parts.append(f"Tipo de propósito: {profile_data['purpose_type']}")
+            if profile_data.get("top_values"):
+                context_parts.append(f"Valores principales: {', '.join(profile_data['top_values'])}")
+            if profile_data.get("top_strengths"):
+                context_parts.append(f"Fortalezas: {', '.join(profile_data['top_strengths'])}")
+        
         # Patterns and insights
         context_parts.append("\n=== PATRONES DETECTADOS ===")
         if habit_completion_rate < 30:
