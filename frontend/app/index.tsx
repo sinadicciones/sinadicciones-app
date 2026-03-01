@@ -358,7 +358,7 @@ export default function WelcomeScreen() {
                     <View style={styles.inputContainer}>
                       <Ionicons name="person" size={20} color="#9CA3AF" style={styles.inputIcon} />
                       <TextInput
-                        style={styles.input}
+                        style={[styles.input, { backgroundColor: 'transparent', color: '#FFFFFF' }]}
                         placeholder="Tu nombre"
                         placeholderTextColor="#9CA3AF"
                         value={name}
