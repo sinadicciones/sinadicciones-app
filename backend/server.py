@@ -6036,7 +6036,7 @@ async def get_nelson_user_context(user_id: str) -> tuple[str, str]:
     """Get comprehensive user context for Nelson to personalize responses and analyze patterns"""
     try:
         # Get profile
-        profile = await db.profiles.find_one({"user_id": user_id}, {"_id": 0})
+        profile = await db.user_profiles.find_one({"user_id": user_id}, {"_id": 0})
         user_role = profile.get("role", "patient") if profile else "patient"
         
         # Get role-specific context
