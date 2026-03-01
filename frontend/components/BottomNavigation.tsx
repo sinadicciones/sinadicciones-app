@@ -8,6 +8,7 @@ const TABS = [
   { name: 'habits', label: 'Hábitos', icon: 'checkbox', route: '/(tabs)/habits' },
   { name: 'emotional', label: 'Emocional', icon: 'heart', route: '/(tabs)/emotional' },
   { name: 'purpose', label: 'Propósito', icon: 'star', route: '/(tabs)/purpose' },
+  { name: 'nelson', label: 'Nelson', icon: 'chatbubble-ellipses', route: '/(tabs)/nelson' },
   { name: 'centers', label: 'Centros', icon: 'search', route: '/(tabs)/centers' },
   { name: 'profile', label: 'Perfil', icon: 'person', route: '/(tabs)/profile' },
 ];
