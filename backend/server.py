@@ -2416,8 +2416,9 @@ async def create_purpose_goal(goal_data: dict, current_user: User = Depends(get_
 
 
 @app.post("/api/purpose/goals/{goal_id}/toggle-day")
-async def toggle_goal_day(goal_id: str, day: str, current_user: User = Depends(get_current_user)):
+async def toggle_goal_day(goal_id: str, body: dict, current_user: User = Depends(get_current_user)):
     """Toggle a specific day as completed/not completed for a weekly goal"""
+    day = body.get("day")
     valid_days = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
     if day not in valid_days:
         raise HTTPException(status_code=400, detail=f"Invalid day. Must be one of: {valid_days}")
