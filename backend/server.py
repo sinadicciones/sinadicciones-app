@@ -6031,6 +6031,121 @@ async def send_test_notification(current_user: User = Depends(get_current_user))
         raise HTTPException(status_code=500, detail="Error enviando notificación")
 
 
+# ============== DEMO USER SETUP ==============
+
+@app.post("/api/admin/setup-demo-user")
+async def setup_demo_user():
+    """Create or update the demo user with all necessary data. 
+    This endpoint can be called to initialize demo data in any environment."""
+    
+    import hashlib
+    
+    demo_email = "demo@sinadicciones.org"
+    demo_password = "demopassword"
+    demo_user_id = "user_demo_carlos"
+    
+    # Hash password
+    password_hash = hashlib.sha256(demo_password.encode()).hexdigest()
+    
+    # Create/update user
+    await db.users.update_one(
+        {"email": demo_email},
+        {
+            "$set": {
+                "user_id": demo_user_id,
+                "email": demo_email,
+                "name": "Carlos Demo",
+                "password_hash": password_hash,
+                "created_at": datetime.now(timezone.utc)
+            }
+        },
+        upsert=True
+    )
+    
+    # Create/update profile
+    await db.profiles.update_one(
+        {"user_id": demo_user_id},
+        {
+            "$set": {
+                "user_id": demo_user_id,
+                "name": "Carlos Demo",
+                "email": demo_email,
+                "role": "patient",
+                "addiction_type": "Alcohol",
+                "recovery_start_date": (datetime.now(timezone.utc) - timedelta(days=45)).isoformat(),
+                "days_clean": 45,
+                "my_why": "Por mi familia, especialmente mis hijos. Quiero ser el padre que ellos merecen y estar presente en sus vidas.",
+                "triggers": ["stress", "loneliness", "celebration", "boredom"],
+                "protective_factors": ["family", "friends", "sports", "spirituality"],
+                "support_network": ["Mi esposa María", "Padrino AA - Roberto", "Terapeuta Dr. García"],
+                "onboarding_completed": True,
+                "updated_at": datetime.now(timezone.utc)
+            }
+        },
+        upsert=True
+    )
+    
+    # Create purpose test data
+    await db.purpose_tests.update_one(
+        {"user_id": demo_user_id},
+        {
+            "$set": {
+                "test_id": str(uuid.uuid4()),
+                "user_id": demo_user_id,
+                "completed_at": datetime.now(timezone.utc),
+                "answers": {
+                    "values": ["Familia", "Salud", "Honestidad", "Crecimiento", "Paz interior"],
+                    "happyBefore": "Me hacía feliz pasar tiempo con mi familia, jugar fútbol con mis amigos y sentir que tenía el control de mi vida.",
+                    "qualities": ["Leal", "Trabajador", "Empático", "Persistente"],
+                    "strengths": ["Escuchar a los demás", "Resolver problemas", "Motivar a otros"],
+                    "peopleAsk": "La gente me pide consejos cuando tienen problemas personales.",
+                    "enjoyFree": "Ayudaría a otras personas que están pasando por lo mismo que yo pasé.",
+                    "futureVision": "Me veo sano, con mi familia unida, trabajando en algo que me apasione.",
+                    "whatTheySay": "Que fui alguien que superó sus demonios y fue un buen padre.",
+                    "noFailure": "Abriría un centro de rehabilitación.",
+                    "worldProblem": "El estigma hacia las personas con adicciones.",
+                    "helpWho": "A personas como yo, especialmente padres de familia.",
+                    "legacy": "Que la recuperación es posible, que nunca es tarde para cambiar."
+                },
+                "profile": {
+                    "purpose_type": "Sanador",
+                    "top_values": ["Familia", "Salud", "Honestidad"],
+                    "top_strengths": ["Escuchar a los demás", "Motivar a otros", "Resolver problemas"]
+                }
+            }
+        },
+        upsert=True
+    )
+    
+    # Create some demo habits
+    demo_habits = [
+        {"habit_id": f"habit_demo_1", "name": "Meditación 10 min", "color": "#10B981", "frequency": "daily", "is_active": True},
+        {"habit_id": f"habit_demo_2", "name": "Ejercicio", "color": "#EF4444", "frequency": "daily", "is_active": True},
+        {"habit_id": f"habit_demo_3", "name": "Lectura AA", "color": "#3B82F6", "frequency": "daily", "is_active": True},
+        {"habit_id": f"habit_demo_4", "name": "Llamar a padrino", "color": "#8B5CF6", "frequency": "daily", "is_active": True},
+    ]
+    
+    for habit in demo_habits:
+        await db.habits.update_one(
+            {"user_id": demo_user_id, "habit_id": habit["habit_id"]},
+            {
+                "$set": {
+                    "user_id": demo_user_id,
+                    **habit,
+                    "created_at": datetime.now(timezone.utc)
+                }
+            },
+            upsert=True
+        )
+    
+    return {
+        "success": True,
+        "message": "Usuario demo creado/actualizado exitosamente",
+        "user_id": demo_user_id,
+        "email": demo_email
+    }
+
+
 
 
 if __name__ == "__main__":
