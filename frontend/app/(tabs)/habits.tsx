@@ -553,10 +553,13 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   input: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#1A1A1A',
     padding: 16,
     borderRadius: 12,
     fontSize: 16,
+    color: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#2D2D2D',
     marginBottom: 24,
   },
   colorLabel: {

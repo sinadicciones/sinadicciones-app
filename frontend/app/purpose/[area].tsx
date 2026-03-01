@@ -581,6 +581,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
+    color: '#FFFFFF',
     marginBottom: 16,
   },
   inputMultiline: {
