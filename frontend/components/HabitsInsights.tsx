@@ -620,17 +620,53 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   chartHeader: {
-    marginBottom: 12,
+    marginBottom: 8,
   },
   chartTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#1F2937',
   },
+  chartSubtitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 4,
+  },
   chartSubtitle: {
     fontSize: 12,
     color: '#6B7280',
-    marginTop: 2,
+  },
+  chartSpacer: {
+    height: 12,
+  },
+  periodBadge: {
+    backgroundColor: '#10B98120',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  periodBadgeText: {
+    fontSize: 11,
+    color: '#10B981',
+    fontWeight: '600',
+  },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  periodBadgeSmall: {
+    backgroundColor: '#3B82F620',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+  },
+  periodBadgeSmallText: {
+    fontSize: 10,
+    color: '#3B82F6',
+    fontWeight: '600',
   },
   miniBarChart: {
     flexDirection: 'row',
