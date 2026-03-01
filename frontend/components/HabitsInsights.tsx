@@ -586,7 +586,7 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     borderRadius: 12,
     padding: 12,
     alignItems: 'center',
@@ -594,11 +594,11 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   statLabel: {
     fontSize: 11,
-    color: '#6B7280',
+    color: '#9CA3AF',
     marginTop: 4,
   },
   streakContainer: {
