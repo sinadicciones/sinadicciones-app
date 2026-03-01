@@ -5940,36 +5940,6 @@ async def update_notification_settings(
     
     return {"success": True, "message": "Configuración actualizada"}
 
-@app.post("/api/notifications/register-token")
-async def register_push_token(
-    request: RegisterPushTokenRequest,
-    current_user: User = Depends(get_current_user)
-):
-    """Register user's push notification token"""
-    await db.push_tokens.update_one(
-        {"user_id": current_user.user_id},
-        {
-            "$set": {
-                "push_token": request.push_token,
-                "device_type": request.device_type,
-                "updated_at": datetime.now(timezone.utc)
-            },
-            "$setOnInsert": {
-                "user_id": current_user.user_id,
-                "created_at": datetime.now(timezone.utc)
-            }
-        },
-        upsert=True
-    )
-    
-    return {"success": True, "message": "Token registrado"}
-
-@app.delete("/api/notifications/unregister")
-async def unregister_push_token(current_user: User = Depends(get_current_user)):
-    """Unregister user's push notification token"""
-    await db.push_tokens.delete_one({"user_id": current_user.user_id})
-    return {"success": True, "message": "Token eliminado"}
-
 @app.get("/api/notifications/today")
 async def get_today_notification(current_user: User = Depends(get_current_user)):
     """Get today's motivational message and pending reminders"""
