@@ -197,6 +197,8 @@ export default function HomeScreen() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [expandedEducation, setExpandedEducation] = useState<string | null>(null);
   const [education, setEducation] = useState<any>(null);
+  const [selectedTrigger, setSelectedTrigger] = useState<any>(null);
+  const [showTriggerModal, setShowTriggerModal] = useState(false);
 
   useEffect(() => {
     loadData();
