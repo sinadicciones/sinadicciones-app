@@ -466,6 +466,26 @@ export default function AllGoals() {
                 numberOfLines={3}
               />
 
+              <Text style={styles.inputLabel}>3. ¿Cuántos días por semana?</Text>
+              <View style={styles.daysSelector}>
+                {[1, 2, 3, 4, 5, 6, 7].map((num) => (
+                  <TouchableOpacity
+                    key={num}
+                    style={[
+                      styles.dayOption,
+                      (newGoal.target_days || 5) === num && styles.dayOptionSelected
+                    ]}
+                    onPress={() => setNewGoal({ ...newGoal, target_days: num })}
+                  >
+                    <Text style={[
+                      styles.dayOptionText,
+                      (newGoal.target_days || 5) === num && styles.dayOptionTextSelected
+                    ]}>{num}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <Text style={styles.daysHint}>días por semana</Text>
+
               <View style={styles.smartReminder}>
                 <Ionicons name="information-circle" size={20} color="#3B82F6" />
                 <Text style={styles.smartReminderText}>
