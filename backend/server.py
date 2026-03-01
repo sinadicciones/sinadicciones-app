@@ -2585,18 +2585,15 @@ IMPORTANTE:
 - Usa un tono cálido y esperanzador
 - Responde SOLO con el JSON, sin texto adicional"""
 
-        # Use async call since OpenAI client is AsyncOpenAI
-        response = await openai_client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": "Eres un experto en psicología positiva y propósito de vida, especializado en ayudar a personas en recuperación de adicciones a encontrar significado y dirección."},
-                {"role": "user", "content": analysis_prompt}
-            ],
-            temperature=0.7,
-            max_tokens=1500
-        )
+        # Use emergentintegrations library for OpenAI
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"purpose-analysis-{current_user.user_id}",
+            system_message="Eres un experto en psicología positiva y propósito de vida, especializado en ayudar a personas en recuperación de adicciones a encontrar significado y dirección. Responde SIEMPRE en formato JSON válido."
+        ).with_model("openai", "gpt-4o")
         
-        ai_response = response.choices[0].message.content
+        user_message = UserMessage(text=analysis_prompt)
+        ai_response = await chat.send_message(user_message)
         
         # Clean response if needed (remove markdown code blocks)
         if ai_response.startswith("```json"):
