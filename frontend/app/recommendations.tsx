@@ -1092,11 +1092,11 @@ const styles = StyleSheet.create({
   tipText: {
     flex: 1,
     fontSize: 15,
-    color: '#374151',
+    color: '#E5E5E5',
     lineHeight: 22,
   },
   modalHabit: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#0D0D0D',
     padding: 16,
     borderRadius: 12,
     marginTop: 16,
@@ -1104,7 +1104,7 @@ const styles = StyleSheet.create({
   modalHabitTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#6B7280',
+    color: '#9CA3AF',
     marginBottom: 12,
   },
   modalHabitCard: {
