@@ -720,6 +720,9 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#E5E7EB',
   },
+  keyboardAvoidingView: {
+    width: '100%',
+  },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
