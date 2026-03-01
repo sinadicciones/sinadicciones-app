@@ -2382,6 +2382,11 @@ async def get_purpose_goals(current_user: User = Depends(get_current_user)):
 async def create_purpose_goal(goal_data: dict, current_user: User = Depends(get_current_user)):
     goal_id = f"goal_{uuid.uuid4().hex[:12]}"
     
+    # Calculate current week start (Monday)
+    today = datetime.now(timezone.utc)
+    days_since_monday = today.weekday()
+    week_start = (today - timedelta(days=days_since_monday)).strftime("%Y-%m-%d")
+    
     goal = {
         "goal_id": goal_id,
         "user_id": current_user.user_id,
@@ -2392,6 +2397,15 @@ async def create_purpose_goal(goal_data: dict, current_user: User = Depends(get_
         "status": "active",
         "progress": 0,
         "steps": goal_data.get("steps", []),
+        # New weekly tracking fields
+        "frequency": goal_data.get("frequency", "weekly"),  # weekly, monthly, one_time
+        "target_days": goal_data.get("target_days", 5),  # days per week to complete
+        "current_week": week_start,
+        "weekly_progress": {  # Days completed this week
+            "mon": False, "tue": False, "wed": False, 
+            "thu": False, "fri": False, "sat": False, "sun": False
+        },
+        "week_history": [],  # Historical weekly completions
         "created_at": datetime.now(timezone.utc),
         "updated_at": datetime.now(timezone.utc)
     }
@@ -2399,6 +2413,159 @@ async def create_purpose_goal(goal_data: dict, current_user: User = Depends(get_
     await db.purpose_goals.insert_one(goal)
     
     return {"success": True, "goal_id": goal_id}
+
+
+@app.post("/api/purpose/goals/{goal_id}/toggle-day")
+async def toggle_goal_day(goal_id: str, day: str, current_user: User = Depends(get_current_user)):
+    """Toggle a specific day as completed/not completed for a weekly goal"""
+    valid_days = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+    if day not in valid_days:
+        raise HTTPException(status_code=400, detail=f"Invalid day. Must be one of: {valid_days}")
+    
+    # Get goal
+    goal = await db.purpose_goals.find_one(
+        {"goal_id": goal_id, "user_id": current_user.user_id},
+        {"_id": 0}
+    )
+    
+    if not goal:
+        raise HTTPException(status_code=404, detail="Goal not found")
+    
+    # Check and update week if needed
+    today = datetime.now(timezone.utc)
+    days_since_monday = today.weekday()
+    current_week_start = (today - timedelta(days=days_since_monday)).strftime("%Y-%m-%d")
+    
+    weekly_progress = goal.get("weekly_progress", {
+        "mon": False, "tue": False, "wed": False,
+        "thu": False, "fri": False, "sat": False, "sun": False
+    })
+    
+    # If it's a new week, archive old progress and reset
+    if goal.get("current_week") != current_week_start:
+        week_history = goal.get("week_history", [])
+        old_progress = goal.get("weekly_progress", {})
+        completed_days = sum(1 for v in old_progress.values() if v)
+        
+        week_history.append({
+            "week_start": goal.get("current_week"),
+            "completed_days": completed_days,
+            "target_days": goal.get("target_days", 5),
+            "achieved": completed_days >= goal.get("target_days", 5)
+        })
+        
+        # Reset progress for new week
+        weekly_progress = {
+            "mon": False, "tue": False, "wed": False,
+            "thu": False, "fri": False, "sat": False, "sun": False
+        }
+        
+        await db.purpose_goals.update_one(
+            {"goal_id": goal_id},
+            {
+                "$set": {
+                    "current_week": current_week_start,
+                    "weekly_progress": weekly_progress,
+                    "week_history": week_history,
+                    "updated_at": datetime.now(timezone.utc)
+                }
+            }
+        )
+    
+    # Toggle the day
+    weekly_progress[day] = not weekly_progress.get(day, False)
+    
+    # Calculate progress percentage
+    target_days = goal.get("target_days", 5)
+    completed_days = sum(1 for v in weekly_progress.values() if v)
+    progress = min(100, int((completed_days / target_days) * 100))
+    
+    await db.purpose_goals.update_one(
+        {"goal_id": goal_id},
+        {
+            "$set": {
+                "weekly_progress": weekly_progress,
+                "progress": progress,
+                "updated_at": datetime.now(timezone.utc)
+            }
+        }
+    )
+    
+    return {
+        "success": True,
+        "day": day,
+        "completed": weekly_progress[day],
+        "weekly_progress": weekly_progress,
+        "completed_days": completed_days,
+        "target_days": target_days,
+        "progress": progress
+    }
+
+
+@app.get("/api/purpose/goals/suggested")
+async def get_suggested_goals(current_user: User = Depends(get_current_user)):
+    """Get suggested goals based on user's purpose type and profile"""
+    
+    # Get user's purpose test
+    test = await db.purpose_tests.find_one(
+        {"user_id": current_user.user_id},
+        {"_id": 0}
+    )
+    
+    purpose_type = test.get("profile", {}).get("purpose_type", "Buscador") if test else "Buscador"
+    
+    # Get user profile
+    profile = await db.user_profiles.find_one(
+        {"user_id": current_user.user_id},
+        {"_id": 0}
+    )
+    
+    # Suggested goals by purpose type
+    suggestions_by_type = {
+        "Sanador": [
+            {"area": "personal", "title": "Practicar meditación", "target_days": 5, "description": "Meditar 10 minutos para cultivar paz interior"},
+            {"area": "relationships", "title": "Escuchar activamente a alguien", "target_days": 3, "description": "Dedicar tiempo a escuchar sin juzgar"},
+            {"area": "health", "title": "Ejercicio consciente", "target_days": 4, "description": "Yoga, caminata o ejercicio suave"},
+        ],
+        "Creador": [
+            {"area": "work", "title": "Trabajar en proyecto creativo", "target_days": 5, "description": "Dedicar tiempo a crear algo nuevo"},
+            {"area": "personal", "title": "Aprender algo nuevo", "target_days": 3, "description": "Explorar nuevas habilidades o conocimientos"},
+            {"area": "spiritual", "title": "Escribir ideas o reflexiones", "target_days": 4, "description": "Journaling creativo o lluvia de ideas"},
+        ],
+        "Protector": [
+            {"area": "relationships", "title": "Ayudar a un familiar", "target_days": 3, "description": "Estar presente para quien lo necesite"},
+            {"area": "health", "title": "Fortalecer mi cuerpo", "target_days": 4, "description": "Ejercicio para mantenerme fuerte"},
+            {"area": "work", "title": "Organizar mis finanzas", "target_days": 2, "description": "Revisar gastos y planificar"},
+        ],
+        "Líder": [
+            {"area": "work", "title": "Desarrollar un proyecto", "target_days": 5, "description": "Avanzar en mis metas profesionales"},
+            {"area": "relationships", "title": "Mentoría o apoyo a otros", "target_days": 2, "description": "Compartir experiencia con alguien"},
+            {"area": "personal", "title": "Lectura de desarrollo", "target_days": 4, "description": "Leer sobre liderazgo o crecimiento"},
+        ],
+        "Buscador": [
+            {"area": "spiritual", "title": "Tiempo de reflexión", "target_days": 4, "description": "Meditar sobre mi propósito y dirección"},
+            {"area": "personal", "title": "Explorar nuevas actividades", "target_days": 3, "description": "Probar cosas nuevas para descubrirme"},
+            {"area": "health", "title": "Cuidar mi cuerpo", "target_days": 5, "description": "Ejercicio, alimentación, descanso"},
+        ],
+    }
+    
+    # Get base suggestions for purpose type
+    base_suggestions = suggestions_by_type.get(purpose_type, suggestions_by_type["Buscador"])
+    
+    # Add recovery-specific suggestions
+    recovery_suggestions = [
+        {"area": "health", "title": "Asistir a grupo de apoyo", "target_days": 2, "description": "AA, NA, o grupo de recuperación"},
+        {"area": "spiritual", "title": "Practicar gratitud", "target_days": 5, "description": "Escribir 3 cosas por las que estoy agradecido"},
+        {"area": "relationships", "title": "Contactar a mi padrino/madrina", "target_days": 3, "description": "Mantener comunicación con mi red de apoyo"},
+    ]
+    
+    all_suggestions = base_suggestions + recovery_suggestions
+    
+    return {
+        "success": True,
+        "purpose_type": purpose_type,
+        "suggestions": all_suggestions
+    }
 
 @app.put("/api/purpose/goals/{goal_id}")
 async def update_purpose_goal(goal_id: str, goal_data: dict, current_user: User = Depends(get_current_user)):
