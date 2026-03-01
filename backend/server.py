@@ -5955,19 +5955,23 @@ async def nelson_chat(
                 5. Pregunta si puede llamar a alguien de confianza ahora mismo"""
             })
         
-        # Call OpenAI
-        client = await get_openai_client()
-        if not client:
-            return {"response": "Lo siento, estoy teniendo problemas técnicos. Si es una emergencia, por favor llama a tu línea de crisis local.", "crisis_detected": crisis_detected}
+        # Call OpenAI using emergentintegrations
+        from emergentintegrations.llm.chat import Chat
         
-        response = await client.chat.completions.create(
-            model="gpt-4o",
-            messages=openai_messages,
-            temperature=0.7,
-            max_tokens=500
-        )
+        # Convert messages to the format expected by emergentintegrations
+        chat = Chat(api_key=os.getenv("EMERGENT_LLM_KEY")).with_model("openai", "gpt-4o")
         
-        nelson_response = response.choices[0].message.content
+        # Build the conversation
+        full_prompt = f"{system_prompt}\n\nConversación anterior:\n"
+        for msg in messages_history[-5:]:
+            role_label = "Usuario" if msg["role"] == "user" else "Nelson"
+            full_prompt += f"{role_label}: {msg['content']}\n"
+        full_prompt += f"\nUsuario: {user_message}\n\nNelson:"
+        
+        if crisis_detected:
+            full_prompt += "\n\n[ALERTA CRISIS: Responde con máxima empatía y ofrece recursos de ayuda inmediata]"
+        
+        nelson_response = chat.message(full_prompt)
         
         # Determine mode
         mode = "crisis" if crisis_detected else "normal"
