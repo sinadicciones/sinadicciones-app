@@ -1275,4 +1275,55 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 'bold',
   },
+  // Photo styles for Mi Para Qué
+  photoSectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#374151',
+    marginTop: 24,
+    marginBottom: 4,
+  },
+  photoHelperText: {
+    fontSize: 13,
+    color: '#9CA3AF',
+    marginBottom: 12,
+  },
+  photosGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  photoContainer: {
+    position: 'relative',
+    width: 80,
+    height: 80,
+  },
+  photoThumb: {
+    width: 80,
+    height: 80,
+    borderRadius: 12,
+  },
+  removePhotoBtn: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+  },
+  addPhotoBtn: {
+    width: 80,
+    height: 80,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    borderStyle: 'dashed',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F9FAFB',
+  },
+  addPhotoText: {
+    fontSize: 11,
+    color: '#9CA3AF',
+    marginTop: 2,
+  },
 });
