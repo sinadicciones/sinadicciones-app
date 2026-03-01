@@ -1,149 +1,181 @@
-<analysis>**original_problem_statement:** El usuario solicitó inicialmente una serie de mejoras de UI y la implementación de un sistema de notificaciones y vinculación de perfiles. El enfoque luego cambió a solucionar problemas de despliegue en producción (Railway) y  en Google Play.
+<analysis>**original_problem_statement:**
+El usuario solicitó inicialmente una serie de mejoras de UI y la implementación de un sistema de notificaciones. El enfoque luego cambió a solucionar bugs críticos, mejorar funcionalidades existentes y añadir nuevas características.
 
-Recientemente, el usuario solicitó un rediseño completo a un tema oscuro y la creación de una nueva funcionalidad de IA llamada TerapeutIA (Nelson). Tras la implementación, se reportaron varios bugs: un crash en Manejo de craving, inconsistencias en el menú, mal contraste de texto en un test, y un fallo en el login que enviaba a los usuarios a la pantalla de onboarding incorrectamente. Los últimos bugs reportados son que el teclado oculta el campo de texto en el chat de Nelson y que algunos datos del perfil se muestran en inglés.
+Las solicitudes más recientes y el estado del proyecto son:
+-   **Bugs Críticos (Solucionados):** Se reportaron y solucionaron múltiples bugs que rompían la aplicación, incluyendo un crash en la pantalla de Perfil, un problema con el teclado en el chat de IA, un error en el análisis de IA de Propósito y un menú de navegación inconsistente. También se arreglaron crashes en la sección Educación y Recursos.
+-   **Gestión de Datos (Solucionado):** Se solucionaron problemas con los datos del usuario de demostración en producción mediante la creación de un nuevo usuario () y la vinculación con el profesional de demostración.
+-   **Nuevas Funcionalidades (Implementadas):** Se creó un perfil de administrador especial (), se añadió la capacidad de subir hasta 5 fotos en la sección Mi para qué del onboarding, se reorganizó la pantalla de inicio para destacar las Estrategias para Gatillos y se unificó el Plan de Recuperación.
+-   **Notificaciones Push (Pendiente de Verificación):** El sistema de notificaciones no funcionaba. Se aplicó un fix (añadir el plugin  y actualizar la versión a 22), pero se requiere que el usuario compile y pruebe la nueva versión en un dispositivo físico.
+-   **Metas SMART (En Progreso):** El usuario solicitó una revisión completa de la sección Propósito, específicamente para que las Metas SMART funcionen como objetivos semanales con seguimiento diario (en lugar de metas de una sola vez).
 
 **User's preferred language**: Spanish. The next agent MUST respond in Spanish.
 
 **what currently exists?**
-- Una aplicación full-stack con Expo (React Native) para el frontend y FastAPI para el backend.
-- El backend está desplegado en producción en **Railway**, conectado a una base de datos MongoDB de producción.
-- El frontend tiene un tema oscuro global implementado y funcionalidades clave como Perfil de Usuario, Hábitos, Emociones, y el nuevo asistente de IA Nelson.
-- La clave de API de OpenAI del usuario está configurada y funcionando en producción (Railway).
-- Existe un usuario de prueba ( / ) con datos históricos tanto en la base de datos de producción como en la de preview, lo que facilita las pruebas.
-- La versión de código actual () está en .
+-   Una aplicación full-stack con Expo (React Native) y FastAPI, desplegada en Railway.
+-   Un tema oscuro global, la IA Nelson y un dashboard de Propósito de Vida.
+-   Usuarios de prueba funcionales para paciente (), profesional () y administrador ().
+-   El backend para notificaciones push está completo, incluyendo endpoints para pruebas y recordatorios programados. El usuario ha configurado un cron job externo.
+-   La app tiene un indicador de versión visible en la pantalla de inicio/login. La última versión configurada es la .
+-   La pantalla de onboarding permite subir fotos para la sección Mi para qué.
+-   La pantalla de inicio muestra una sección de Estrategias para tus Gatillos y se ha unificado el Plan de Recuperación.
+-   El backend para el análisis de IA de propósito () ha sido corregido.
+-   La base de código sufre de un débito técnico considerable, con archivos monolíticos como  y .
 
 **Last working item**:
--   **Last item agent was working:** El agente estaba implementando correcciones para dos bugs críticos reportados por el usuario:
-    1.  **Teclado Oculta Input en Nelson:** En la pantalla del chat de IA, el teclado cubría el campo de texto. El agente implementó  en  para solucionar esto.
-    2.  **Textos en Inglés en el Perfil:** Los Gatillos y Factores Protectores se mostraban en inglés. El agente agregó un mapa de traducción en  para mostrar las etiquetas en español.
+-   **Last item agent was working:** El agente estaba trabajando en dos frentes simultáneamente:
+    1.  **Bug Fix:** Corrigió el endpoint  en , que fallaba en producción porque consultaba la colección  en lugar de .
+    2.  **Feature Overhaul:** Comenzó la implementación de la nueva lógica para las Metas SMART. Esto implicó modificar el modelo de datos en el backend para soportar seguimiento semanal (, ) y empezar a rediseñar la interfaz en  para mostrar círculos de progreso diario. También se inició la lógica para sugerir metas.
 -   **Status:** IN PROGRESS
 -   **Agent Testing Done:** N
--   **Which testing method agent to use?** Frontend testing agent. Es crucial verificar que (1) el campo de texto de Nelson permanezca visible con el teclado abierto y (2) los textos de Gatillos/Protectores en el perfil aparezcan en español.
+-   **Which testing method agent to use?** both. El backend requerirá pruebas con  para los nuevos endpoints de metas, y el frontend necesitará un  una vez que la UI esté completa.
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   Issue 1: (P0) El teclado oculta el campo de texto en el chat de Nelson.
--   Issue 2: (P0) Los Gatillos y Factores Protectores en el perfil se muestran en inglés.
--   Issue 3: (P1) La aplicación crashea al entrar en la sección Manejo de craving.
--   Issue 4: (P1) El menú de navegación inferior es inconsistente en la sección Propósito.
--   Issue 5: (P1) El texto es ilegible por falta de contraste en el Test de propósito.
+-   Issue 1: (P1) Las notificaciones push no se reciben en el dispositivo del usuario.
+-   Issue 2: (P0) Error de análisis de IA en producción.
 
 **Issues Detail**:
--   **Issue 1: Teclado oculta input en Nelson**
-    -   **Attempted fixes:** Se envolvió la pantalla en un  en .
+-   **Issue 1: Las notificaciones push no se reciben en el dispositivo del usuario.**
+    -   **Attempted fixes:** Se diagnosticó que el token del dispositivo no se estaba registrando en el servidor. La causa raíz identificada fue la falta del plugin  en . El agente lo agregó y actualizó el  a  para que el usuario pueda generar un nuevo build.
     -   **Next debug checklist:**
-        1.  Probar la pantalla de Nelson en el preview.
-        2.  Abrir el teclado y verificar que el campo de texto se desplaza hacia arriba y permanece visible.
-        3.  Si falla, ajustar las propiedades de  (ej. , ).
-    -   **Why fix this issue and what will be achieved with the fix?** La funcionalidad principal del chat es actualmente inutilizable.
-    -   **Status:** IN PROGRESS
-    -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** Frontend.
+        1.  Instruir al usuario para que guarde los cambios en GitHub y espere el despliegue en Railway.
+        2.  Guiar al usuario para que compile e instale la **versión 22** de la app en su dispositivo físico.
+        3.  Pedirle que inicie sesión para que la app intente registrar el token.
+        4.  Verificar si el token se registró usando el endpoint de debug: .
+        5.  Si el token se registra (), enviar una notificación de prueba.
+    -   **Why fix this issue and what will be achieved with the fix?** Es una funcionalidad clave de engagement que actualmente no funciona.
+    -   **Status:** USER VERIFICATION PENDING
+    -   **Is recurring issue?** Y
+    -   **Should Test frontend/backend/both after fix?** Both.
 
--   **Issue 2: Textos del perfil en inglés**
-    -   **Attempted fixes:** Se implementó un diccionario de traducción en  que mapea los uid=0(root) gid=0(root) groups=0(root) en inglés (ej. boredom) a etiquetas en español (ej. Aburrimiento).
+-   **Issue 2: Error de análisis de IA en producción en la sección Propósito.**
+    -   **Attempted fixes:** El agente identificó que el endpoint  en  usaba la colección incorrecta (). Se aplicó un  para cambiarla a .
     -   **Next debug checklist:**
-        1.  Acceder al perfil del usuario de prueba.
-        2.  Verificar que las listas de Gatillos y Factores Protectores se muestren completamente en español.
-    -   **Why fix this issue and what will be achieved with the fix?** Mejora la consistencia y la experiencia de usuario para una app en español.
-    -   **Status:** IN PROGRESS
+        1.  Confirmar con el usuario que ha desplegado los últimos cambios en Railway.
+        2.  Pedir al usuario que pruebe la funcionalidad de nuevo en la aplicación.
+    -   **Why fix this issue and what will be achieved with the fix?** Repara una funcionalidad importante que está rota en el entorno de producción.
+    -   **Status:** IN PROGRESS (Fix aplicado, pendiente de despliegue y verificación).
     -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** Frontend.
-
--   **Issue 3, 4, 5: Bugs en la sección Propósito (Crash, Menú, Contraste)**
-    -   **Attempted fixes:** El agente ya escribió el código para solucionar estos tres problemas (añadiendo protección contra , unificando el estilo del menú y cambiando el color del texto).
-    -   **Next debug checklist:** Realizar una prueba de regresión completa en toda la sección de Propósito una vez que se despliegue la nueva versión.
-    -   **Why fix this issue and what will be achieved with the fix?** Hará que una sección importante de la app sea funcional y visualmente coherente.
-    -   **Status:** IN PROGRESS (Las correcciones están implementadas pero no verificadas por el usuario).
-    -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** Frontend.
+    -   **Should Test frontend/backend/both after fix?** Both.
 
 **In progress Task List**:
--   **Task 1: Desplegar la versión con las correcciones de bugs**
-    -   **Where to resume:** Las correcciones de código ya están hechas. El siguiente paso es probarlas en el entorno de preview y luego guiar al usuario para generar un nuevo build (versionCode 16 o superior) y subirlo a producción.
-    -   **What will be achieved with this?** Una versión estable de la aplicación con todos los bugs recientes solucionados.
+-   **Task 1: Implementar el nuevo sistema de Metas SMART semanales (P0).**
+    -   **Where to resume:**
+        1.  **Backend ():** Revisar y completar las modificaciones al modelo . Implementar el endpoint para marcar un día como completado (). Crear la lógica o el cron job para reiniciar el progreso de las metas cada semana.
+        2.  **Frontend ():** Completar el rediseño de la UI para mostrar las metas semanales con los círculos de progreso diario. Implementar la lógica para que al tocar un círculo se llame al endpoint del backend y se actualice el estado visualmente.
+        3.  **Frontend/Backend:** Implementar la funcionalidad de Metas Sugeridas basada en el Tipo de Propósito del usuario, tanto en el backend para generar las sugerencias como en el frontend para mostrarlas.
+    -   **What will be achieved with this?** Las Metas SMART funcionarán como objetivos semanales con seguimiento diario, alineándose con la visión del usuario y separándolas de los hábitos diarios.
     -   **Status:** IN PROGRESS
-    -   **Should Test frontend/backend/both after fix?** Frontend.
+    -   **Should Test frontend/backend/both after fix?** Both.
+    -   **Blocked on something:** Nada.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks**:
-    -   (P1) **Rediseño de Hábitos y Emociones (Estilo Daily Planner)**: Implementar la vista de calendario, selectores de semana/mes y estadísticas avanzadas en las pantallas de análisis de hábitos y emociones.
-    -   (P2) **Dashboard de Propósito de Vida con IA**: Crear un nuevo dashboard que analice las respuestas del test de propósito y ofrezca sugerencias generadas por IA.
+    -   (P1) **Verificar sistema de Notificaciones Push de extremo a extremo:** Una vez que el usuario confirme que el token se registra, probar todos los escenarios (recordatorios diarios del cron job, alertas de terapeuta, etc.).
+    -   (P2) **Verificar funcionalidades del perfil Profesional:** Revisar la UI de búsqueda de pacientes y el dashboard completo del profesional.
 -   **Future Tasks**:
-    -   (P3) Implementar notificaciones push.
-    -   (P4) Permitir que el usuario comparta resúmenes o conversaciones de IA con su terapeuta vinculado.
-    -   (P5) Añadir una función de diario de voz para interactuar con Nelson.
+    -   (P2) **Refactorización de archivos monolíticos:** Priorizar la división de  (usando FastAPI Routers) y  (en componentes React) para mejorar la mantenibilidad.
+    -   (P3) **Diario de voz para Nelson:** Permitir la interacción por voz con la IA.
+    -   (P4) **Unificar Hábitos y Metas:** Explorar la fusión de ambas secciones en una sola vista de Compromisos.
+    -   (P4) **Compartir resúmenes de IA con el terapeuta.**
 
 **Completed work in this session**
--   **Implementación de Nelson (TerapeutIA):** Se creó desde cero un asistente de IA completo, incluyendo el frontend de chat, los endpoints de backend y la lógica de prompts para darle contexto y personalidad.
--   **Mejora de la IA de Nelson:** Se refactorizó el backend para que Nelson tenga acceso al historial de hábitos, emociones y datos del perfil del usuario, permitiendo respuestas mucho más personalizadas y contextuales.
--   **Solución del fallo de la IA en Producción:** Se diagnosticó correctamente que el fallo de la IA se debía a que la cuenta de OpenAI del usuario era gratuita y se le guio para que añadiera créditos, solucionando el problema.
--   **Corrección del Flujo de Login:** Se arregló un bug crítico que redirigía a los usuarios existentes al onboarding, causado por una URL de backend antigua y hardcodeada.
--   **Población de Datos de Prueba:** Se creó y ejecutó un script para poblar la base de datos de preview con 90 días de datos, lo que mejoró drásticamente la eficacia de las pruebas.
--   **Implementación de Widgets y UI de Analíticas:** Se crearon nuevos componentes de UI como , un widget de Tu Bienestar para la home, y se mejoraron las pantallas de análisis de hábitos/emociones con gráficos y nuevas estadísticas.
--   **Corrección de Regresión Mayor:** Se estabilizó la aplicación y se restauró la funcionalidad en las pantallas de Perfil, Hábitos y Emociones que se había perdido en un intento de rediseño anterior.
+-   Se solucionaron múltiples bugs críticos (crash en Perfil, teclado en Nelson, errores en Educación y Recursos).
+-   Se creó un nuevo usuario demo de paciente () y se vinculó con el profesional para resolver conflictos de datos.
+-   Se creó un perfil de administrador especial ().
+-   Se implementó la subida de hasta 5 fotos en la sección Mi para qué del onboarding.
+-   Se rediseñó la pantalla de inicio para incluir una sección de Estrategias para Gatillos.
+-   Se unificaron las secciones de Recomendaciones y Plan de Recuperación.
+-   Se añadió un indicador de versión visible en la UI y se actualizó el  a .
+-   Se corrigió el bug del endpoint de análisis de IA.
+-   Se identificó el problema de las notificaciones y se aplicó un fix pendiente de verificación (añadir plugin ).
+
+**Earlier issues found/mentioned but not fixed**
+-   Ninguno.
+
+**Known issue recurrence from previous fork**
+-   **Issue recurrence in previous fork:** Bug del teclado que ocultaba el input en el chat de Nelson.
+-   **Recurrence count:** 2+
+-   **Status:** RESOLVED. El agente aplicó un fix más robusto envolviendo todo el contenido con .
 
 **Code Architecture**
-
+expo-notifications
 
 **Key Technical Concepts**
--   **AI Integration**: Uso de  con prompts de sistema avanzados en  para crear un asistente de IA (Nelson) con personalidad y acceso a datos de usuario para respuestas contextuales.
--   **Frontend**: React Native con Expo Router. Uso de  para solucionar problemas de UI con el teclado.
--   **Backend**: FastAPI, con endpoints que consultan múltiples colecciones de MongoDB para construir un contexto de usuario completo para la IA.
--   **Deployment**: Flujo de trabajo establecido de  ->  local -> An Expo user account is required to proceed.
+-   Expo React Native (Frontend), FastAPI (Backend), MongoDB (DB).
+-   **Despliegue:** Railway.
+-   **IA:**  para llamadas a OpenAI (Nelson, Análisis de Propósito).
+-   **Notificaciones Push:** A través de Expo. El sistema está implementado pero la registración de tokens estaba fallando.
+-   **Refactorización de Metas SMART:** El trabajo actual consiste en cambiar el modelo de datos y la UI para que las metas sean semanales con seguimiento diario.
 
-Log in to EAS with email or username (exit and run eas login --help to see other login options)
-Input is required, but stdin is not readable. Failed to display prompt: Email or username para Android, y despliegue del backend en Railway.
+**key DB schema**
+-   : Almacena datos de perfil. Se añadieron  y .
+-   : Almacena metas SMART. **El esquema está siendo modificado** para añadir campos como , , y .
+-   : Almacena los tokens de Expo Push por usuario.
+
+**changes in tech stack**
+-   Ninguno.
 
 **All files of reference**
--   : Contiene la corrección para el bug del teclado.
--   : Contiene la corrección para el bug de traducción.
--   : Contiene la lógica principal de la IA Nelson.
--   : Archivo de configuración principal donde se encuentra el .
+-    (para la lógica de metas y el fix de IA)
+-    (para la UI de metas)
+-    (para la configuración de notificaciones)
+-    (donde se registra el token de notificación)
+
+**Areas that need refactoring**:
+-   **CRÍTICO:** . Su tamaño hace que el mantenimiento y la adición de nuevas características sean extremadamente difíciles y propensos a errores. Debe dividirse en Routers de FastAPI.
+-   **CRÍTICO:** . Es un archivo de más de 2500 líneas que debe ser descompuesto en componentes más pequeños y manejables.
+
+**key api endpoints**
+-   : (Corregido) Genera el análisis de IA.
+-   : (Siendo modificado) Crea una nueva meta SMART.
+-   : (Nuevo/En progreso) Endpoint para marcar un día como completado en una meta semanal.
+-   : (Nuevo) Endpoint de debug para verificar si un usuario tiene un token push registrado.
+-   : Crea el perfil de administrador.
 
 **Critical Info for New Agent**
--   **Prioridad #1:** Validar las correcciones para los bugs del teclado y la traducción, y luego guiar al usuario para que genere un nuevo build. Estos son los bloqueadores actuales para una experiencia de usuario aceptable.
--   **La IA Nelson es una característica central.** El usuario valora mucho su funcionalidad. Revisa la lógica en  (especialmente ) para entender cómo funciona.
--   **El flujo de despliegue requiere instrucciones claras.** Recuerda siempre guiar al usuario a través del ciclo: **1. Save to GitHub**, **2. **, **3. An Expo user account is required to proceed.
-
-Log in to EAS with email or username (exit and run eas login --help to see other login options)
-Input is required, but stdin is not readable. Failed to display prompt: Email or username**. Siempre confirma el nuevo .
--   **La cuenta de OpenAI del usuario es de pago.** La IA debería funcionar en producción. Cualquier fallo es probablemente un bug en el código, no un problema de facturación. El endpoint  es útil para diagnósticos rápidos.
+-   Tu prioridad es **finalizar la revisión de las Metas SMART**. Esto incluye completar la lógica del backend (reset semanal, endpoint de actualización) y la UI del frontend (círculos de progreso, metas sugeridas).
+-   La segunda prioridad es guiar al usuario para que **pruebe el fix de las Notificaciones Push**. Necesita compilar e instalar la **versión 22** en un dispositivo físico. Prepárate para depurar si el problema persiste.
+-   El error del análisis de IA en producción ha sido corregido en el código. **Confirma con el usuario que ha desplegado los cambios** antes de marcarlo como resuelto.
+-   El débito técnico es alto. Una vez que las tareas actuales estén completas, es crucial proponer un plan de refactorización al usuario para  y .
 
 **documents and test reports created in this job**
--   
--   
--   
+-    (actualizado varias veces)
 -   
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User**: Envía captura de pantalla mostrando los textos en inglés en el perfil. (IN PROGRESS)
-2.  **User**: Reporta que en el perfil algunos textos se traducen a inglés y que en el chat de Nelson el teclado tapa lo que se escribe. (IN PROGRESS)
-3.  **User**: Solicita que Nelson sea coherente con el perfil del usuario (reto, profesional, etc.) y pueda analizar patrones de hábitos y emociones. (DONE)
-4.  **User**: Confirma que Nelson funciona después de agregar créditos a su cuenta de OpenAI. (DONE)
-5.  **User**: Pregunta si la app se actualiza automáticamente después de agregar créditos. (ADDRESSED)
-6.  **User**: Pregunta a qué página de OpenAI debe ir, sospechando que su cuenta gratuita es el problema. (ADDRESSED)
-7.  **User**: Reporta que la IA no funciona en producción, aunque el endpoint de status dice . (ADDRESSED)
-8.  **User**: Proporciona el enlace del build de la versión 14. (DONE)
-9.  **User**: Solicita agregar inmediatamente la nueva sección de IA TerapeutIA (Nelson) y proporciona requisitos detallados. (DONE)
-10. **User**: Reporta múltiples bugs en la versión 13 de producción. (IN PROGRESS)
+1.  **User (P):** Aprueba el plan de Metas SMART semanales y reporta que el análisis de IA en producción no funciona. (IN PROGRESS)
+2.  **User:** Define su visión para las Metas SMART: semanales con seguimiento diario, separadas de los hábitos. (IN PROGRESS)
+3.  **User:** Pide una explicación detallada de cómo funciona la sección Propósito y un plan para mejorarla. (IN PROGRESS)
+4.  **User:** Pide fusionar Recomendaciones en Mi Plan de Recuperación y añadir una sección de Estrategias para Gatillos en la pantalla de inicio para todos los perfiles relevantes. (DONE)
+5.  **User:** Confirma que el plan propuesto es correcto y debe aplicarse a todos los perfiles de usuario. (DONE)
+6.  **User:** Pide resetear su perfil de administrador para probar de nuevo el onboarding. (DONE)
+7.  **User:** Reporta que no vio la opción de subir fotos en el onboarding. (ADDRESSED)
+8.  **User:** Pide revisar los cambios en el preview antes de generar un build. (DONE)
+9.  **User:** Define los detalles para su perfil de administrador y solicita la funcionalidad de subir hasta 5 fotos en Mi para qué. (DONE)
+10. **User:** Pide un plan para crear su perfil de administrador personal. (DONE)
 
 **Project Health Check:**
--   **Broken:** La funcionalidad de chat con Nelson es difícil de usar debido al bug del teclado. La presentación de datos en el perfil es incorrecta (textos en inglés).
--   **Mocked:** N/A.
+-   **Broken:**
+    -   Las notificaciones push probablemente sigan rotas hasta que el usuario pruebe la v22 con el fix del plugin.
+-   **Mocked:** N/A
 
 **3rd Party Integrations**
--   **OpenAI GPT-4o**: Integrado en el backend para potenciar a Nelson y los análisis de hábitos/emociones. Requiere la clave  en Railway.
--   **Railway**: Plataforma de hosting para el backend y la base de datos de producción.
--   **Google Play Console**: Plataforma para la distribución de la app Android.
--   **Expo (EAS)**: Servicio utilizado para compilar la aplicación React Native.
+-   **OpenAI GPT-4o:** Usado vía  para la IA Nelson y el análisis de propósito.
+-   **Railway:** Plataforma de hosting para el backend y la base de datos.
+-   **Expo (EAS):** Servicio de build para la app React Native.
+-   **cron-job.org:** Servicio externo que el usuario configuró para llamar al endpoint de recordatorios.
 
 **Testing status**
--   **Testing agent used after significant changes:** YES
--   **Troubleshoot agent used after agent stuck in loop:** NO
--   **Test files created:** []
--   **Known regressions:** Ninguna regresión mayor activa. Los problemas actuales son bugs en funcionalidades nuevas o existentes.
+-   **Testing agent used after significant changes:** Sí, para identificar un bug de importación.
+-   **Troubleshoot agent used after agent stuck in loop:** No.
+-   **Test files created:** Ninguno.
+-   **Known regressions:** Las notificaciones push, que están pendientes de verificación tras un fix.
 
 **Credentials to test flow:**
--   **Email**: 
--   **Password**: </analysis>
+-   **Paciente Demo:**  / 
+-   **Profesional Demo:**  / 
+-   **Admin:**  / 
+
+**What agent forgot to execute**
+-   El agente planeó pero aún no ha implementado la lógica del backend para el reinicio semanal automático (cron job) de las Metas SMART. Esto debe ser parte de la finalización de la tarea en curso.</analysis>
