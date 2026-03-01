@@ -451,6 +451,40 @@ export default function PurposeDashboard() {
     loadData();
   };
 
+  const loadCachedAnalysis = async () => {
+    try {
+      const response = await authenticatedFetch(`${BACKEND_URL}/api/purpose/ai-analysis/cached`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.cached) {
+          setAiAnalysis(data.analysis);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load cached analysis:', error);
+    }
+  };
+
+  const generateAIAnalysis = async () => {
+    setLoadingAnalysis(true);
+    try {
+      const response = await authenticatedFetch(`${BACKEND_URL}/api/purpose/ai-analysis`);
+      if (response.ok) {
+        const data = await response.json();
+        setAiAnalysis(data.analysis);
+        setShowAnalysisModal(true);
+      } else {
+        const errorData = await response.json();
+        Alert.alert('Error', errorData.detail || 'No se pudo generar el análisis');
+      }
+    } catch (error) {
+      console.error('Failed to generate AI analysis:', error);
+      Alert.alert('Error', 'Error de conexión. Intenta de nuevo.');
+    } finally {
+      setLoadingAnalysis(false);
+    }
+  };
+
   const getPurposeInfo = () => {
     if (!stats?.purpose_type) return null;
     return PURPOSE_TYPES[stats.purpose_type] || PURPOSE_TYPES['Cuidador'];
