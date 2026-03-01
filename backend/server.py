@@ -2648,11 +2648,21 @@ async def get_goals_monthly_analysis(
                 except:
                     pass
         
-        # Include current week if it's in the target month
+        # Include current week if it overlaps with the target month
+        # A week overlaps if week_start or week_end falls within the month
         if current_week:
             try:
                 current_week_date = datetime.strptime(current_week, "%Y-%m-%d").replace(tzinfo=timezone.utc)
-                if first_day_of_month <= current_week_date <= last_day_of_month:
+                week_end = current_week_date + timedelta(days=6)
+                
+                # Check if week overlaps with target month
+                week_overlaps = (
+                    (first_day_of_month <= current_week_date <= last_day_of_month) or
+                    (first_day_of_month <= week_end <= last_day_of_month) or
+                    (current_week_date <= first_day_of_month and week_end >= last_day_of_month)
+                )
+                
+                if week_overlaps:
                     current_completed = sum(1 for v in weekly_progress.values() if v)
                     weeks_in_month.append({
                         "week_start": current_week,
