@@ -413,7 +413,7 @@ export default function NelsonChat() {
         style={styles.quickPromptsContainer}
         contentContainerStyle={styles.quickPromptsContent}
       >
-        {QUICK_PROMPTS.map((prompt) => (
+        {quickPrompts.map((prompt) => (
           <TouchableOpacity
             key={prompt.id}
             style={styles.quickPrompt}
