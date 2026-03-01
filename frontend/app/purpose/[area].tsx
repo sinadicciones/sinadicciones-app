@@ -643,4 +643,33 @@ const styles = StyleSheet.create({
     minWidth: 55,
     textAlign: 'right',
   },
+  // Days selector for modal
+  daysSelector: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 8,
+    gap: 6,
+  },
+  dayOption: {
+    flex: 1,
+    height: 44,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#374151',
+    backgroundColor: '#0D0D0D',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dayOptionText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#9CA3AF',
+  },
+  daysHint: {
+    fontSize: 13,
+    color: '#9CA3AF',
+    textAlign: 'center',
+    marginTop: 6,
+    marginBottom: 8,
+  },
 });
