@@ -82,9 +82,18 @@ SinAdicciones es una aplicación móvil de apoyo a personas en recuperación de 
 - GET /api/ai/status - Verificar configuración de IA
 
 ## versionCode History
+- v17: Corrección de bugs: KeyboardAvoidingView en Nelson, traducciones en perfil, protección contra crash en craving
+- v16: (pendiente de build)
 - v14: Agregado Nelson (terapeuta IA)
 - v13: Correcciones de UI y IA
 - v12: Corrección de URL de fallback
+
+## Bugs Corregidos (Mar 2026)
+- [x] Teclado oculta input en Nelson - KeyboardAvoidingView implementado
+- [x] Textos en inglés en Perfil - Diccionario de traducciones ampliado
+- [x] Crash en "Manejo de craving" - Protección contra undefined
+- [x] Menú inconsistente en Propósito - Estilo unificado
+- [x] Texto ilegible en Test de propósito - Contraste mejorado
 
 ## Architecture
 
