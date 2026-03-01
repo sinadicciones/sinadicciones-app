@@ -261,6 +261,60 @@ export default function RecommendationsScreen() {
             </View>
             <Text style={styles.whyText}>"{myWhy}"</Text>
             <Text style={styles.whyReminder}>Recuerda esto cuando la tentación llegue</Text>
+            
+            {/* Fotos de Mi Para Qué */}
+            {profile?.my_why_photos && profile.my_why_photos.length > 0 && (
+              <View style={styles.whyPhotosContainer}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  {profile.my_why_photos.map((photo: string, index: number) => (
+                    <Image key={index} source={{ uri: photo }} style={styles.whyPhoto} />
+                  ))}
+                </ScrollView>
+              </View>
+            )}
+          </View>
+        )}
+
+        {/* Contactos de Emergencia */}
+        {profile?.emergency_contacts && profile.emergency_contacts.length > 0 && (
+          <View style={styles.emergencySection}>
+            <View style={styles.emergencyHeader}>
+              <Ionicons name="call" size={22} color="#EF4444" />
+              <Text style={styles.emergencyTitle}>Contactos de Emergencia</Text>
+            </View>
+            {profile.emergency_contacts.map((contact: any, index: number) => (
+              <TouchableOpacity 
+                key={index} 
+                style={styles.emergencyContact}
+                onPress={() => Linking.openURL(`tel:${contact.phone}`)}
+              >
+                <View style={styles.emergencyContactInfo}>
+                  <Text style={styles.emergencyContactName}>{contact.name}</Text>
+                  <Text style={styles.emergencyContactRelation}>{contact.relationship || 'Contacto de apoyo'}</Text>
+                </View>
+                <View style={styles.emergencyCallBtn}>
+                  <Ionicons name="call" size={20} color="#FFFFFF" />
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        {/* Red de Apoyo */}
+        {profile?.support_network && profile.support_network.length > 0 && (
+          <View style={styles.supportSection}>
+            <View style={styles.supportHeader}>
+              <Ionicons name="people" size={22} color="#8B5CF6" />
+              <Text style={styles.supportTitle}>Tu Red de Apoyo</Text>
+            </View>
+            <View style={styles.supportList}>
+              {profile.support_network.map((person: string, index: number) => (
+                <View key={index} style={styles.supportPerson}>
+                  <Ionicons name="person-circle" size={24} color="#8B5CF6" />
+                  <Text style={styles.supportPersonName}>{person}</Text>
+                </View>
+              ))}
+            </View>
           </View>
         )}
 
