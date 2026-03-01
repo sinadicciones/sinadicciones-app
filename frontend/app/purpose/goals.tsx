@@ -48,6 +48,9 @@ export default function AllGoals() {
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showGuideModal, setShowGuideModal] = useState(false);
+  const [showMonthlyModal, setShowMonthlyModal] = useState(false);
+  const [monthlyAnalysis, setMonthlyAnalysis] = useState<any>(null);
+  const [loadingAnalysis, setLoadingAnalysis] = useState(false);
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
   const [newGoal, setNewGoal] = useState<{ title: string; description: string; target_days?: number }>({ title: '', description: '', target_days: 5 });
 
