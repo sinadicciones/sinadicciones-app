@@ -737,8 +737,8 @@ export default function PurposeDashboard() {
         )}
 
         {/* AI Analysis Section */}
-        {stats.test_completed && (
-          <View style={styles.aiAnalysisCard}>
+        {stats?.test_completed === true && (
+          <View style={styles.aiAnalysisCard} data-testid="ai-analysis-card">
             <View style={styles.aiAnalysisHeader}>
               <View style={styles.aiIconContainer}>
                 <Ionicons name="sparkles" size={24} color="#8B5CF6" />
@@ -770,6 +770,7 @@ export default function PurposeDashboard() {
                 <TouchableOpacity
                   style={styles.viewAnalysisButton}
                   onPress={() => setShowAnalysisModal(true)}
+                  data-testid="view-analysis-button"
                 >
                   <Text style={styles.viewAnalysisButtonText}>Ver análisis completo</Text>
                   <Ionicons name="arrow-forward" size={18} color="#8B5CF6" />
@@ -780,6 +781,7 @@ export default function PurposeDashboard() {
                 style={[styles.generateAnalysisButton, loadingAnalysis && styles.buttonDisabled]}
                 onPress={generateAIAnalysis}
                 disabled={loadingAnalysis}
+                data-testid="generate-analysis-button"
               >
                 {loadingAnalysis ? (
                   <>
