@@ -6144,6 +6144,147 @@ async def setup_demo_user():
     }
 
 
+@app.post("/api/admin/setup-paciente-demo")
+async def setup_paciente_demo():
+    """Create a fresh demo patient user with new credentials - no conflicts."""
+    
+    import hashlib
+    
+    demo_email = "paciente@sinadicciones.org"
+    demo_password = "demo123"
+    demo_user_id = "user_paciente_demo_2026"
+    
+    # Hash password
+    password_hash = hashlib.sha256(demo_password.encode()).hexdigest()
+    
+    # CLEANUP: Delete any existing data for this user
+    await db.users.delete_many({"email": demo_email})
+    await db.users.delete_many({"user_id": demo_user_id})
+    await db.profiles.delete_many({"email": demo_email})
+    await db.profiles.delete_many({"user_id": demo_user_id})
+    await db.habits.delete_many({"user_id": demo_user_id})
+    await db.habit_logs.delete_many({"user_id": demo_user_id})
+    await db.emotional_logs.delete_many({"user_id": demo_user_id})
+    await db.purpose_tests.delete_many({"user_id": demo_user_id})
+    
+    # Create fresh user
+    await db.users.insert_one({
+        "user_id": demo_user_id,
+        "email": demo_email,
+        "name": "Miguel Paciente Demo",
+        "password_hash": password_hash,
+        "created_at": datetime.now(timezone.utc)
+    })
+    
+    # Create complete profile (NO onboarding needed)
+    await db.profiles.insert_one({
+        "user_id": demo_user_id,
+        "name": "Miguel Paciente Demo",
+        "email": demo_email,
+        "role": "patient",
+        "addiction_type": "Alcohol",
+        "recovery_start_date": (datetime.now(timezone.utc) - timedelta(days=91)).isoformat(),
+        "days_clean": 91,
+        "clean_date": (datetime.now(timezone.utc) - timedelta(days=91)).strftime("%Y-%m-%d"),
+        "my_why": "Por mi familia, especialmente mis hijos. Quiero ser el padre que ellos merecen y estar presente en sus vidas. Quiero demostrarles que siempre se puede cambiar.",
+        "triggers": ["Estrés laboral", "Soledad", "Fiestas y celebraciones", "Discusiones familiares"],
+        "protective_factors": ["Mi familia", "Grupo de AA", "Ejercicio", "Mi terapeuta"],
+        "support_network": ["Mi esposa Ana", "Padrino AA - Roberto", "Dr. García (terapeuta)", "Mi hermano Juan"],
+        "emergency_contacts": [
+            {"name": "Ana (esposa)", "phone": "+52 555 123 4567", "relationship": "Esposa"},
+            {"name": "Roberto (padrino AA)", "phone": "+52 555 987 6543", "relationship": "Padrino"}
+        ],
+        "profile_completed": True,
+        "onboarding_completed": True,
+        "linked_therapist_id": "user_demo_profesional",
+        "updated_at": datetime.now(timezone.utc)
+    })
+    
+    # Create purpose test data (completed)
+    await db.purpose_tests.insert_one({
+        "test_id": f"purpose_{demo_user_id}",
+        "user_id": demo_user_id,
+        "completed_at": datetime.now(timezone.utc),
+        "answers": {
+            "values": ["Familia", "Salud", "Honestidad", "Crecimiento personal", "Paz interior"],
+            "happyBefore": "Me hacía feliz pasar tiempo con mi familia, jugar fútbol con mis amigos y sentir que tenía el control de mi vida.",
+            "qualities": ["Leal", "Trabajador", "Empático", "Persistente", "Honesto"],
+            "strengths": ["Escuchar a los demás", "Resolver problemas", "Motivar a otros"],
+            "peopleAsk": "La gente me pide consejos cuando tienen problemas personales o familiares.",
+            "enjoyFree": "Ayudaría a otras personas que están pasando por lo mismo que yo pasé.",
+            "futureVision": "Me veo sano, con mi familia unida, trabajando en algo que me apasione y ayudando a otros.",
+            "whatTheySay": "Que fui alguien que superó sus demonios y fue un buen padre y esposo.",
+            "noFailure": "Abriría un centro de rehabilitación para ayudar a otros.",
+            "worldProblem": "El estigma hacia las personas con adicciones.",
+            "helpWho": "A personas como yo, especialmente padres de familia que luchan contra adicciones.",
+            "legacy": "Que la recuperación es posible, que nunca es tarde para cambiar."
+        },
+        "profile": {
+            "purpose_type": "Sanador",
+            "top_values": ["Familia", "Salud", "Honestidad"],
+            "top_strengths": ["Escuchar a los demás", "Motivar a otros", "Resolver problemas"]
+        }
+    })
+    
+    # Create demo habits
+    demo_habits = [
+        {"habit_id": f"habit_paciente_1", "name": "Meditación 10 min", "color": "#10B981", "frequency": "daily", "is_active": True},
+        {"habit_id": f"habit_paciente_2", "name": "Ejercicio 30 min", "color": "#EF4444", "frequency": "daily", "is_active": True},
+        {"habit_id": f"habit_paciente_3", "name": "Lectura de reflexión", "color": "#3B82F6", "frequency": "daily", "is_active": True},
+        {"habit_id": f"habit_paciente_4", "name": "Llamar a padrino", "color": "#8B5CF6", "frequency": "daily", "is_active": True},
+        {"habit_id": f"habit_paciente_5", "name": "Reunión AA", "color": "#F59E0B", "frequency": "daily", "is_active": True},
+    ]
+    
+    for habit in demo_habits:
+        await db.habits.insert_one({
+            "user_id": demo_user_id,
+            **habit,
+            "created_at": datetime.now(timezone.utc)
+        })
+    
+    # Create 90 days of emotional logs history
+    for i in range(90):
+        log_date = (datetime.now(timezone.utc) - timedelta(days=i)).strftime("%Y-%m-%d")
+        mood = 5 + (i % 5)  # Varies between 5-9
+        tags = ["Calma", "Esperanza"] if mood >= 7 else ["Ansiedad", "Cansancio"]
+        
+        await db.emotional_logs.insert_one({
+            "log_id": f"elog_paciente_{i}",
+            "user_id": demo_user_id,
+            "mood_scale": mood,
+            "note": f"Día {91-i} de recuperación" if i < 7 else None,
+            "tags": tags,
+            "date": log_date,
+            "logged_at": datetime.now(timezone.utc) - timedelta(days=i)
+        })
+    
+    # Create habit logs for last 60 days
+    for i in range(60):
+        log_date = (datetime.now(timezone.utc) - timedelta(days=i)).strftime("%Y-%m-%d")
+        for habit in demo_habits[:3]:  # Log first 3 habits
+            if i % 3 != 0:  # Skip some days to make it realistic
+                await db.habit_logs.insert_one({
+                    "log_id": f"hlog_{habit['habit_id']}_{i}",
+                    "habit_id": habit["habit_id"],
+                    "user_id": demo_user_id,
+                    "completed": True,
+                    "date": log_date,
+                    "logged_at": datetime.now(timezone.utc) - timedelta(days=i)
+                })
+    
+    return {
+        "success": True,
+        "message": "Usuario paciente demo creado exitosamente",
+        "user_id": demo_user_id,
+        "email": demo_email,
+        "password": demo_password,
+        "credentials": {
+            "email": "paciente@sinadicciones.org",
+            "password": "demo123"
+        }
+    }
+
+
 @app.post("/api/admin/setup-demo-professional")
 async def setup_demo_professional():
     """Create or update the demo professional user with all necessary data."""
