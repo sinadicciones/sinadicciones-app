@@ -182,7 +182,7 @@ export default function ProfileScreen() {
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = 'image/*';
-      input.onchange = async (e: any) => {
+      input.onchange = async (e) => {
         const file = e.target?.files?.[0];
         if (file) {
           // Validar tamaño (max 5MB)
@@ -193,7 +193,7 @@ export default function ProfileScreen() {
           
           const reader = new FileReader();
           reader.onloadend = async () => {
-            const base64Image = reader.result as string;
+            const base64Image = reader.result;
             console.log('Image loaded, uploading...');
             await uploadProfilePhoto(base64Image);
           };
