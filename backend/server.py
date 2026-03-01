@@ -3828,19 +3828,36 @@ from openai import AsyncOpenAI
 # For production: Use OPENAI_API_KEY
 # For development with Emergent: Use EMERGENT_LLM_KEY
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or os.getenv("EMERGENT_LLM_KEY")
+print(f"OpenAI API Key configured: {'Yes' if OPENAI_API_KEY else 'No'}")
 
 # Initialize OpenAI client
 openai_client = None
 if OPENAI_API_KEY:
     openai_client = AsyncOpenAI(api_key=OPENAI_API_KEY)
+    print("OpenAI client initialized successfully")
+else:
+    print("WARNING: No OpenAI API key found. AI features will be disabled.")
+
+async def get_openai_client():
+    """Get or create OpenAI client"""
+    global openai_client, OPENAI_API_KEY
+    if openai_client is None:
+        # Try to get the key again (in case it was set after startup)
+        OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or os.getenv("EMERGENT_LLM_KEY")
+        if OPENAI_API_KEY:
+            openai_client = AsyncOpenAI(api_key=OPENAI_API_KEY)
+            print("OpenAI client initialized on demand")
+    return openai_client
 
 async def generate_ai_response(system_message: str, user_prompt: str) -> str:
     """Generate AI response using OpenAI GPT-4"""
-    if not openai_client:
-        return '{"error": "AI no configurada"}'
+    client = await get_openai_client()
+    if not client:
+        print("ERROR: OpenAI client not available")
+        return '{"error": "AI no configurada. Por favor configure OPENAI_API_KEY."}'
     
     try:
-        response = await openai_client.chat.completions.create(
+        response = await client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {"role": "system", "content": system_message},
@@ -3852,7 +3869,7 @@ async def generate_ai_response(system_message: str, user_prompt: str) -> str:
         return response.choices[0].message.content
     except Exception as e:
         print(f"Error calling OpenAI: {e}")
-        return '{"error": "Error generando análisis"}'
+        return f'{{"error": "Error generando análisis: {str(e)}"}}'
 
 class AnalysisPeriod(str, Enum):
     week = "week"
