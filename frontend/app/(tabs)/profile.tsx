@@ -182,8 +182,9 @@ export default function ProfileScreen() {
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = 'image/*';
-      input.onchange = async (e) => {
-        const file = e.target?.files?.[0];
+      input.onchange = async (e: Event) => {
+        const target = e.target as HTMLInputElement;
+        const file = target.files?.[0];
         if (file) {
           // Validar tamaño (max 5MB)
           if (file.size > 5 * 1024 * 1024) {
