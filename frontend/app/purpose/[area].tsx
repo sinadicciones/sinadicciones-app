@@ -320,7 +320,7 @@ export default function AreaDetail() {
 
             <Text style={styles.inputLabel}>Título *</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { color: '#FFFFFF' }]}
               placeholder="Ej: Hacer ejercicio 3 veces por semana"
               placeholderTextColor="#9CA3AF"
               value={newGoal.title}
@@ -329,7 +329,7 @@ export default function AreaDetail() {
 
             <Text style={styles.inputLabel}>Descripción (opcional)</Text>
             <TextInput
-              style={[styles.input, styles.inputMultiline]}
+              style={[styles.input, styles.inputMultiline, { color: '#FFFFFF' }]}
               placeholder="Describe tu objetivo con más detalle..."
               placeholderTextColor="#9CA3AF"
               value={newGoal.description}
