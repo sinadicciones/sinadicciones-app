@@ -1045,4 +1045,54 @@ const styles = StyleSheet.create({
     color: '#374151',
     marginLeft: 8,
   },
+  // Tu Reto section styles
+  retoSection: {
+    backgroundColor: '#1A1A1A',
+    margin: 16,
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#2D2D2D',
+  },
+  retoHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    gap: 8,
+  },
+  retoTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  retoCards: {
+    gap: 12,
+  },
+  retoCard: {
+    backgroundColor: '#0D0D0D',
+    padding: 14,
+    borderRadius: 12,
+  },
+  retoCardHighlight: {
+    backgroundColor: '#10B98115',
+    padding: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#10B981',
+  },
+  retoCardLabel: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    marginBottom: 4,
+  },
+  retoCardValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  retoCardValueBig: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#10B981',
+  },
 });
