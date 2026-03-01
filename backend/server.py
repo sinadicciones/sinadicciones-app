@@ -6214,7 +6214,19 @@ async def setup_demo_professional():
         upsert=True
     )
     
-    # Link professional with patient demo
+    # Link professional with patient demo - Update patient's profile
+    await db.user_profiles.update_one(
+        {"user_id": patient_demo_id},
+        {
+            "$set": {
+                "linked_therapist_id": demo_user_id,
+                "updated_at": datetime.now(timezone.utc)
+            }
+        },
+        upsert=True
+    )
+    
+    # Also keep the therapist_patients collection for additional data
     await db.therapist_patients.update_one(
         {"therapist_id": demo_user_id, "patient_id": patient_demo_id},
         {
