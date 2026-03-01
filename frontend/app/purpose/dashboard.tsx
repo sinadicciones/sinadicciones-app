@@ -1026,6 +1026,144 @@ export default function PurposeDashboard() {
         </View>
       </Modal>
 
+      {/* AI Analysis Full Modal */}
+      <Modal
+        visible={showAnalysisModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowAnalysisModal(false)}
+      >
+        <SafeAreaView style={styles.analysisModalContainer}>
+          <View style={styles.analysisModalHeader}>
+            <TouchableOpacity onPress={() => setShowAnalysisModal(false)}>
+              <Ionicons name="close" size={28} color="#FFFFFF" />
+            </TouchableOpacity>
+            <Text style={styles.analysisModalTitle}>Tu Análisis de Propósito</Text>
+            <View style={{ width: 28 }} />
+          </View>
+          
+          <ScrollView style={styles.analysisModalContent} showsVerticalScrollIndicator={false}>
+            {aiAnalysis && (
+              <>
+                {/* Purpose Statement */}
+                <View style={styles.analysisSection}>
+                  <View style={styles.analysisSectionHeader}>
+                    <Ionicons name="star" size={20} color="#F59E0B" />
+                    <Text style={styles.analysisSectionTitle}>Tu Declaración de Propósito</Text>
+                  </View>
+                  <Text style={styles.purposeStatementFull}>"{aiAnalysis.purpose_statement}"</Text>
+                </View>
+                
+                {/* Core Identity */}
+                <View style={styles.analysisSection}>
+                  <View style={styles.analysisSectionHeader}>
+                    <Ionicons name="person" size={20} color="#8B5CF6" />
+                    <Text style={styles.analysisSectionTitle}>Tu Identidad Esencial</Text>
+                  </View>
+                  <Text style={styles.analysisSectionText}>{aiAnalysis.core_identity}</Text>
+                </View>
+                
+                {/* Key Insights */}
+                <View style={styles.analysisSection}>
+                  <View style={styles.analysisSectionHeader}>
+                    <Ionicons name="bulb" size={20} color="#10B981" />
+                    <Text style={styles.analysisSectionTitle}>Insights Clave</Text>
+                  </View>
+                  {aiAnalysis.key_insights?.map((insight: string, index: number) => (
+                    <View key={index} style={styles.insightItem}>
+                      <View style={styles.insightBullet} />
+                      <Text style={styles.insightText}>{insight}</Text>
+                    </View>
+                  ))}
+                </View>
+                
+                {/* Recovery Connection */}
+                <View style={styles.analysisSection}>
+                  <View style={styles.analysisSectionHeader}>
+                    <Ionicons name="heart" size={20} color="#EC4899" />
+                    <Text style={styles.analysisSectionTitle}>Conexión con tu Recuperación</Text>
+                  </View>
+                  <Text style={styles.analysisSectionText}>{aiAnalysis.how_recovery_connects}</Text>
+                </View>
+                
+                {/* Daily Affirmation */}
+                <LinearGradient
+                  colors={['#8B5CF6', '#6366F1']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.affirmationCard}
+                >
+                  <Ionicons name="sparkles" size={24} color="#FFFFFF" />
+                  <Text style={styles.affirmationCardLabel}>Tu Afirmación Diaria</Text>
+                  <Text style={styles.affirmationCardText}>"{aiAnalysis.affirmation}"</Text>
+                </LinearGradient>
+                
+                {/* Recommended Actions */}
+                <View style={styles.analysisSection}>
+                  <View style={styles.analysisSectionHeader}>
+                    <Ionicons name="checkmark-circle" size={20} color="#F59E0B" />
+                    <Text style={styles.analysisSectionTitle}>Acciones Recomendadas</Text>
+                  </View>
+                  {aiAnalysis.recommended_actions?.map((action: string, index: number) => (
+                    <View key={index} style={styles.actionItem}>
+                      <View style={styles.actionNumber}>
+                        <Text style={styles.actionNumberText}>{index + 1}</Text>
+                      </View>
+                      <Text style={styles.actionText}>{action}</Text>
+                    </View>
+                  ))}
+                </View>
+                
+                {/* Growth Opportunities */}
+                <View style={styles.analysisSection}>
+                  <View style={styles.analysisSectionHeader}>
+                    <Ionicons name="trending-up" size={20} color="#06B6D4" />
+                    <Text style={styles.analysisSectionTitle}>Oportunidades de Crecimiento</Text>
+                  </View>
+                  {aiAnalysis.growth_opportunities?.map((opportunity: string, index: number) => (
+                    <View key={index} style={styles.insightItem}>
+                      <View style={[styles.insightBullet, { backgroundColor: '#06B6D4' }]} />
+                      <Text style={styles.insightText}>{opportunity}</Text>
+                    </View>
+                  ))}
+                </View>
+                
+                {/* Warning Areas */}
+                {aiAnalysis.warning_areas?.length > 0 && (
+                  <View style={[styles.analysisSection, styles.warningSection]}>
+                    <View style={styles.analysisSectionHeader}>
+                      <Ionicons name="alert-circle" size={20} color="#EF4444" />
+                      <Text style={styles.analysisSectionTitle}>Áreas de Precaución</Text>
+                    </View>
+                    {aiAnalysis.warning_areas?.map((warning: string, index: number) => (
+                      <View key={index} style={styles.insightItem}>
+                        <View style={[styles.insightBullet, { backgroundColor: '#EF4444' }]} />
+                        <Text style={styles.insightText}>{warning}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+                
+                {/* Regenerate Button */}
+                <TouchableOpacity
+                  style={[styles.regenerateButton, loadingAnalysis && styles.buttonDisabled]}
+                  onPress={() => {
+                    setShowAnalysisModal(false);
+                    generateAIAnalysis();
+                  }}
+                  disabled={loadingAnalysis}
+                >
+                  <Ionicons name="refresh" size={20} color="#8B5CF6" />
+                  <Text style={styles.regenerateButtonText}>Regenerar Análisis</Text>
+                </TouchableOpacity>
+                
+                <View style={{ height: 40 }} />
+              </>
+            )}
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
+
       <BottomNavigation />
     </SafeAreaView>
   );
