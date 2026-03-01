@@ -1374,6 +1374,162 @@ export default function ProfileScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Modal de Configuración de Notificaciones */}
+      <Modal
+        visible={showNotificationsModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowNotificationsModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Configurar notificaciones</Text>
+              <TouchableOpacity onPress={() => setShowNotificationsModal(false)}>
+                <Ionicons name="close" size={24} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.notifDescription}>
+              Recibe recordatorios y mensajes motivacionales para mantener tu progreso.
+            </Text>
+
+            {/* Hora preferida */}
+            <View style={styles.notifTimeSection}>
+              <View style={styles.notifTimeRow}>
+                <Ionicons name="time-outline" size={22} color="#8B5CF6" />
+                <Text style={styles.notifTimeLabel}>Hora de notificaciones</Text>
+              </View>
+              <TouchableOpacity 
+                style={styles.notifTimeButton}
+                onPress={() => setShowTimePicker(true)}
+              >
+                <Text style={styles.notifTimeValue}>{notificationSettings.preferred_time}</Text>
+                <Ionicons name="chevron-down" size={18} color="#A1A1AA" />
+              </TouchableOpacity>
+              {showTimePicker && Platform.OS !== 'web' && (
+                <DateTimePicker
+                  value={new Date(`2024-01-01T${notificationSettings.preferred_time}:00`)}
+                  mode="time"
+                  is24Hour={true}
+                  onChange={(event, selectedDate) => {
+                    setShowTimePicker(false);
+                    if (selectedDate) {
+                      const hours = selectedDate.getHours().toString().padStart(2, '0');
+                      const mins = selectedDate.getMinutes().toString().padStart(2, '0');
+                      setNotificationSettings(prev => ({
+                        ...prev,
+                        preferred_time: `${hours}:${mins}`
+                      }));
+                    }
+                  }}
+                />
+              )}
+              {showTimePicker && Platform.OS === 'web' && (
+                <View style={styles.webTimePickerContainer}>
+                  <input
+                    type="time"
+                    value={notificationSettings.preferred_time}
+                    onChange={(e) => {
+                      setNotificationSettings(prev => ({
+                        ...prev,
+                        preferred_time: e.target.value
+                      }));
+                      setShowTimePicker(false);
+                    }}
+                    style={{
+                      padding: 12,
+                      fontSize: 16,
+                      borderRadius: 8,
+                      border: '1px solid #3F3F46',
+                      backgroundColor: '#1A1A1A',
+                      color: '#FFFFFF'
+                    }}
+                  />
+                </View>
+              )}
+            </View>
+
+            {/* Opciones de notificaciones */}
+            <View style={styles.notifOptionsContainer}>
+              <TouchableOpacity 
+                style={styles.notifOption}
+                onPress={() => toggleNotificationSetting('motivational')}
+              >
+                <View style={styles.notifOptionLeft}>
+                  <Ionicons name="sunny-outline" size={22} color="#F59E0B" />
+                  <View style={styles.notifOptionText}>
+                    <Text style={styles.notifOptionTitle}>Mensajes motivacionales</Text>
+                    <Text style={styles.notifOptionDesc}>Frases de ánimo para empezar el día</Text>
+                  </View>
+                </View>
+                <View style={[styles.notifToggle, notificationSettings.motivational && styles.notifToggleActive]}>
+                  <View style={[styles.notifToggleCircle, notificationSettings.motivational && styles.notifToggleCircleActive]} />
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={styles.notifOption}
+                onPress={() => toggleNotificationSetting('habit_reminders')}
+              >
+                <View style={styles.notifOptionLeft}>
+                  <Ionicons name="checkbox-outline" size={22} color="#10B981" />
+                  <View style={styles.notifOptionText}>
+                    <Text style={styles.notifOptionTitle}>Recordatorio de hábitos</Text>
+                    <Text style={styles.notifOptionDesc}>Completa tus hábitos del día</Text>
+                  </View>
+                </View>
+                <View style={[styles.notifToggle, notificationSettings.habit_reminders && styles.notifToggleActive]}>
+                  <View style={[styles.notifToggleCircle, notificationSettings.habit_reminders && styles.notifToggleCircleActive]} />
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={styles.notifOption}
+                onPress={() => toggleNotificationSetting('emotion_reminders')}
+              >
+                <View style={styles.notifOptionLeft}>
+                  <Ionicons name="heart-outline" size={22} color="#EC4899" />
+                  <View style={styles.notifOptionText}>
+                    <Text style={styles.notifOptionTitle}>Registro emocional</Text>
+                    <Text style={styles.notifOptionDesc}>¿Cómo te sientes hoy?</Text>
+                  </View>
+                </View>
+                <View style={[styles.notifToggle, notificationSettings.emotion_reminders && styles.notifToggleActive]}>
+                  <View style={[styles.notifToggleCircle, notificationSettings.emotion_reminders && styles.notifToggleCircleActive]} />
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={styles.notifOption}
+                onPress={() => toggleNotificationSetting('goal_reminders')}
+              >
+                <View style={styles.notifOptionLeft}>
+                  <Ionicons name="flag-outline" size={22} color="#8B5CF6" />
+                  <View style={styles.notifOptionText}>
+                    <Text style={styles.notifOptionTitle}>Metas y retos</Text>
+                    <Text style={styles.notifOptionDesc}>Progreso en tus objetivos</Text>
+                  </View>
+                </View>
+                <View style={[styles.notifToggle, notificationSettings.goal_reminders && styles.notifToggleActive]}>
+                  <View style={[styles.notifToggleCircle, notificationSettings.goal_reminders && styles.notifToggleCircleActive]} />
+                </View>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity 
+              style={[styles.savePasswordButton, savingNotifications && styles.savePasswordButtonDisabled]}
+              onPress={saveNotificationSettings}
+              disabled={savingNotifications}
+            >
+              <Text style={styles.savePasswordButtonText}>
+                {savingNotifications ? 'Guardando...' : 'Guardar configuración'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
