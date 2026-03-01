@@ -559,6 +559,27 @@ export default function ProfileScreen() {
                 style={[styles.accountButton, styles.relapseButton]}
                 onPress={() => router.push('/report-relapse')}
               >
+                <Ionicons name="warning" size={20} color="#EF4444" />
+                <Text style={[styles.accountButtonText, { color: '#EF4444' }]}>
+                  Reportar Recaída
+                </Text>
+                <Ionicons name="chevron-forward" size={20} color="#EF4444" />
+              </TouchableOpacity>
+            )}
+            
+            {/* Botón Ver Plan de Recuperación (solo pacientes y reto) */}
+            {(profile?.role === 'patient' || profile?.role === 'active_user') && (
+              <TouchableOpacity 
+                style={[styles.accountButton, styles.recoveryPlanButton]}
+                onPress={() => setShowRecoveryPlanModal(true)}
+              >
+                <Ionicons name="map" size={20} color="#10B981" />
+                <Text style={[styles.accountButtonText, { color: '#10B981' }]}>
+                  Ver mi Plan de Recuperación
+                </Text>
+                <Ionicons name="chevron-forward" size={20} color="#10B981" />
+              </TouchableOpacity>
+            )}
                 <Ionicons name="warning" size={20} color="#DC2626" />
                 <Text style={[styles.accountButtonText, { color: '#DC2626' }]}>
                   Reportar Recaída
