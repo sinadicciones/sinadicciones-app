@@ -48,8 +48,11 @@ export default function ProfessionalOnboardingScreen() {
   const [licenseNumber, setLicenseNumber] = useState('');
   const [institution, setInstitution] = useState('');
   const [bio, setBio] = useState('');
+  const [whatsapp, setWhatsapp] = useState('');
+  const [consultationFee, setConsultationFee] = useState('');
+  const [acceptsPatients, setAcceptsPatients] = useState(true);
 
-  const totalSteps = 3;
+  const totalSteps = 4;
 
   const handleNext = () => {
     if (step === 1 && !professionalType) {
