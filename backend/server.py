@@ -737,10 +737,13 @@ async def get_patient_detail(patient_id: str, current_user: User = Depends(get_c
         raise HTTPException(status_code=403, detail="Solo profesionales pueden ver pacientes")
     
     # Check if patient is linked to this professional
-    patient_profile = await db.user_profiles.find_one({
-        "user_id": patient_id,
-        "linked_therapist_id": current_user.user_id
-    })
+    patient_profile = await db.user_profiles.find_one(
+        {
+            "user_id": patient_id,
+            "linked_therapist_id": current_user.user_id
+        },
+        {"_id": 0}
+    )
     
     if not patient_profile:
         raise HTTPException(status_code=404, detail="Paciente no encontrado o no vinculado")
