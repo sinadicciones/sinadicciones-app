@@ -1181,7 +1181,7 @@ const styles = StyleSheet.create({
   },
   emergencyContactRelation: {
     fontSize: 13,
-    color: '#6B7280',
+    color: '#9CA3AF',
   },
   emergencyCallBtn: {
     backgroundColor: '#EF4444',
@@ -1193,12 +1193,12 @@ const styles = StyleSheet.create({
   },
   // Estilos para Red de Apoyo
   supportSection: {
-    backgroundColor: '#F5F3FF',
+    backgroundColor: '#1A1A1A',
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#DDD6FE',
+    borderColor: '#8B5CF640',
   },
   supportHeader: {
     flexDirection: 'row',
@@ -1208,7 +1208,7 @@ const styles = StyleSheet.create({
   supportTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#5B21B6',
+    color: '#8B5CF6',
     marginLeft: 8,
   },
   supportList: {
@@ -1217,13 +1217,13 @@ const styles = StyleSheet.create({
   supportPerson: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#0D0D0D',
     padding: 10,
     borderRadius: 8,
   },
   supportPersonName: {
     fontSize: 14,
-    color: '#374151',
+    color: '#E5E5E5',
     marginLeft: 8,
   },
   // Tu Reto section styles
