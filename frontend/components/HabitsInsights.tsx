@@ -613,7 +613,7 @@ const styles = StyleSheet.create({
     color: '#1F2937',
   },
   chartCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     marginHorizontal: 16,
     marginBottom: 16,
     borderRadius: 16,
@@ -625,7 +625,7 @@ const styles = StyleSheet.create({
   chartTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   chartSubtitleRow: {
     flexDirection: 'row',
