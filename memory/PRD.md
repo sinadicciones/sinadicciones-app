@@ -116,9 +116,20 @@ SinAdicciones es una aplicación móvil de apoyo a personas en recuperación de 
   - Configuración de hora preferida (default 9:00 AM)
   - Panel de administración en Perfil
 
-## API Endpoints Nuevos - Propósito IA
+## API Endpoints Nuevos
+
+### Propósito con IA
 - GET /api/purpose/ai-analysis - Genera análisis de IA del propósito
 - GET /api/purpose/ai-analysis/cached - Obtiene análisis cacheado
+
+### Notificaciones
+- GET /api/notifications/settings - Configuración de notificaciones
+- PUT /api/notifications/settings - Actualizar configuración
+- GET /api/notifications/today - Mensaje motivacional y estado del día
+- POST /api/notifications/send-test - Enviar notificación de prueba
+
+### Admin
+- POST /api/admin/setup-demo-user - Crear/actualizar usuario demo en cualquier ambiente
 
 ## Architecture
 
