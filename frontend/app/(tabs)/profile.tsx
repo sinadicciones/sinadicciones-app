@@ -24,6 +24,43 @@ import * as ImagePicker from 'expo-image-picker';
 
 const BACKEND_URL = getBackendURL();
 
+// Mapeo de traducciones para gatillos y factores protectores
+const TRANSLATIONS: Record<string, string> = {
+  // Gatillos
+  'stress': 'Estrés',
+  'anxiety': 'Ansiedad',
+  'boredom': 'Aburrimiento',
+  'social_pressure': 'Presión social',
+  'loneliness': 'Soledad',
+  'celebration': 'Celebraciones',
+  'anger': 'Enojo/Frustración',
+  'depression': 'Depresión',
+  'fatigue': 'Cansancio',
+  'conflict': 'Conflictos',
+  // Factores protectores
+  'exercise': 'Ejercicio',
+  'meditation': 'Meditación',
+  'hobbies': 'Pasatiempos',
+  'support_group': 'Grupo de apoyo',
+  'spirituality': 'Espiritualidad',
+  'therapy': 'Terapia',
+  'music': 'Música',
+  'nature': 'Naturaleza',
+  'pets': 'Mascotas',
+  'family': 'Familia',
+  'friends': 'Amigos',
+  'work': 'Trabajo',
+  'art': 'Arte',
+  'reading': 'Lectura',
+  'cooking': 'Cocina',
+  'sports': 'Deportes',
+};
+
+// Función para traducir
+const translateItem = (item: string): string => {
+  return TRANSLATIONS[item.toLowerCase()] || item;
+};
+
 export default function ProfileScreen() {
   const router = useRouter();
   const { user, logout } = useAuth();
