@@ -166,7 +166,11 @@ export default function AllGoals() {
               disabled={loadingAnalysis}
               data-testid="monthly-analysis-btn"
             >
-              <Ionicons name="calendar" size={18} color="#F59E0B" />
+              {loadingAnalysis ? (
+                <ActivityIndicator size="small" color="#F59E0B" />
+              ) : (
+                <Ionicons name="calendar" size={18} color="#F59E0B" />
+              )}
               <Text style={styles.monthlyButtonText}>Mensual</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.infoButton} onPress={() => setShowInfoModal(true)}>
