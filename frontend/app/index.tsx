@@ -172,6 +172,7 @@ export default function WelcomeScreen() {
             <View style={styles.header}>
               <Text style={styles.title}>Sinadicciones.org</Text>
               <Text style={styles.subtitle}>Tu primer paso en tu recuperación</Text>
+              <Text style={styles.versionBadge}>v21</Text>
             </View>
 
             {!showEmailForm ? (
