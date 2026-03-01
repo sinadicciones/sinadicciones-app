@@ -595,37 +595,69 @@ export default function RecommendationsScreen() {
 
         {/* Recursos Profesionales */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>🏥 Recursos Profesionales</Text>
+          <Text style={styles.sectionTitle}>🏥 Recursos de Ayuda</Text>
           
           <TouchableOpacity style={styles.resourceCard} onPress={openSinAdicciones}>
-            <LinearGradient
-              colors={['#10B981', '#059669']}
-              style={styles.resourceGradient}
-            >
-              <Ionicons name="globe" size={32} color="#FFFFFF" />
-              <View style={styles.resourceContent}>
-                <Text style={styles.resourceTitle}>SinAdicciones.cl</Text>
-                <Text style={styles.resourceDesc}>Directorio de centros de rehabilitación en Chile</Text>
+            <View style={styles.resourceCardDark}>
+              <View style={styles.resourceIconContainer}>
+                <Ionicons name="globe" size={24} color="#10B981" />
               </View>
-              <Ionicons name="open-outline" size={24} color="#FFFFFF" />
-            </LinearGradient>
+              <View style={styles.resourceContent}>
+                <Text style={styles.resourceTitleDark}>SinAdicciones.org</Text>
+                <Text style={styles.resourceDescDark}>Portal de información y recursos</Text>
+              </View>
+              <Ionicons name="open-outline" size={20} color="#9CA3AF" />
+            </View>
           </TouchableOpacity>
 
           <TouchableOpacity 
             style={styles.resourceCard} 
             onPress={() => router.push('/(tabs)/centers')}
           >
-            <LinearGradient
-              colors={['#3B82F6', '#2563EB']}
-              style={styles.resourceGradient}
-            >
-              <Ionicons name="location" size={32} color="#FFFFFF" />
-              <View style={styles.resourceContent}>
-                <Text style={styles.resourceTitle}>Centros Cercanos</Text>
-                <Text style={styles.resourceDesc}>Encuentra ayuda profesional cerca de ti</Text>
+            <View style={styles.resourceCardDark}>
+              <View style={[styles.resourceIconContainer, { backgroundColor: '#3B82F620' }]}>
+                <Ionicons name="location" size={24} color="#3B82F6" />
               </View>
-              <Ionicons name="chevron-forward" size={24} color="#FFFFFF" />
-            </LinearGradient>
+              <View style={styles.resourceContent}>
+                <Text style={styles.resourceTitleDark}>Buscar Centros</Text>
+                <Text style={styles.resourceDescDark}>Encuentra centros de rehabilitación cerca</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.resourceCard} 
+            onPress={() => router.push('/(tabs)/centers')}
+          >
+            <View style={styles.resourceCardDark}>
+              <View style={[styles.resourceIconContainer, { backgroundColor: '#8B5CF620' }]}>
+                <Ionicons name="person" size={24} color="#8B5CF6" />
+              </View>
+              <View style={styles.resourceContent}>
+                <Text style={styles.resourceTitleDark}>Buscar Terapeuta</Text>
+                <Text style={styles.resourceDescDark}>Conecta con profesionales especializados</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.resourceCard} 
+            onPress={() => Linking.openURL('tel:1412')}
+          >
+            <View style={[styles.resourceCardDark, styles.resourceCardHighlight]}>
+              <View style={[styles.resourceIconContainer, { backgroundColor: '#EF444420' }]}>
+                <Ionicons name="call" size={24} color="#EF4444" />
+              </View>
+              <View style={styles.resourceContent}>
+                <Text style={styles.resourceTitleDark}>SENDA - Fono Drogas</Text>
+                <Text style={styles.resourceDescDark}>Línea de ayuda 24/7: 1412</Text>
+              </View>
+              <View style={styles.callBtnSmall}>
+                <Ionicons name="call" size={16} color="#FFFFFF" />
+              </View>
+            </View>
           </TouchableOpacity>
         </View>
 
