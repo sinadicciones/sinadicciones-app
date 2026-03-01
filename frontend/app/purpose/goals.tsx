@@ -1090,4 +1090,39 @@ const styles = StyleSheet.create({
     color: '#92400E',
     lineHeight: 20,
   },
+  // Weekly day circles styles
+  goalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  goalTarget: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    fontWeight: '500',
+  },
+  weekDaysContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 12,
+    marginBottom: 8,
+    paddingHorizontal: 4,
+  },
+  dayCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 2,
+    borderColor: '#374151',
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dayLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#9CA3AF',
+  },
+  dayLabelCompleted: {
+    color: '#FFFFFF',
+  },
 });
