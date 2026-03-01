@@ -634,14 +634,6 @@ export default function ProfileScreen() {
                 {editing ? 'Guardar' : 'Editar Perfil'}
               </Text>
             </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.actionButton, styles.recommendationsButton]}
-              onPress={() => router.push('/recommendations')}
-            >
-              <Ionicons name="bulb" size={20} color="#FFFFFF" />
-              <Text style={styles.actionButtonText}>Recomendaciones</Text>
-            </TouchableOpacity>
           </View>
         </View>
 
