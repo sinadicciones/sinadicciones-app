@@ -6177,7 +6177,7 @@ async def setup_paciente_demo():
     })
     
     # Create complete profile (NO onboarding needed)
-    await db.profiles.insert_one({
+    await db.user_profiles.insert_one({
         "user_id": demo_user_id,
         "name": "Miguel Paciente Demo",
         "email": demo_email,
