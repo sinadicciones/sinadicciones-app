@@ -45,6 +45,13 @@ export default function AreaDetail() {
     loadGoals();
   }, [area]);
 
+  // Recargar metas cuando la pantalla obtiene el foco
+  useFocusEffect(
+    useCallback(() => {
+      loadGoals();
+    }, [area])
+  );
+
   const loadGoals = async () => {
     try {
       const response = await authenticatedFetch(`${BACKEND_URL}/api/purpose/goals`);
