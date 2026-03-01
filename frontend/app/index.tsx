@@ -177,6 +177,17 @@ export default function WelcomeScreen() {
 
             {!showEmailForm ? (
               <>
+                {/* Nelson AI - Featured for all */}
+                <View style={styles.nelsonFeature}>
+                  <View style={styles.nelsonIconContainer}>
+                    <Ionicons name="chatbubble-ellipses" size={28} color="#FFFFFF" />
+                  </View>
+                  <View style={styles.nelsonTextContainer}>
+                    <Text style={styles.nelsonTitle}>Nelson - Tu Terapeuta IA 24/7</Text>
+                    <Text style={styles.nelsonText}>Apoyo emocional y guía personalizada cuando lo necesites, disponible las 24 horas</Text>
+                  </View>
+                </View>
+
                 {/* For Recovery - Patient */}
                 <View style={styles.sectionHeader}>
                   <Ionicons name="heart" size={18} color="#10B981" />
