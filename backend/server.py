@@ -6576,6 +6576,136 @@ async def setup_demo_professional():
     }
 
 
+@app.post("/api/admin/setup-admin-user")
+async def setup_admin_user():
+    """Create the admin user profile - Eres lo que repites"""
+    
+    import hashlib
+    from datetime import datetime, timezone, timedelta
+    
+    admin_email = "contacto@sinadicciones.cl"
+    admin_password = "Jodo1000"
+    admin_user_id = "user_admin_sinadicciones"
+    
+    # Hash password
+    password_hash = hashlib.sha256(admin_password.encode()).hexdigest()
+    
+    # Calculate days since recovery start (May 17, 2025)
+    recovery_start = datetime(2025, 5, 17, tzinfo=timezone.utc)
+    days_clean = (datetime.now(timezone.utc) - recovery_start).days
+    
+    # Create/update user
+    await db.users.update_one(
+        {"email": admin_email},
+        {
+            "$set": {
+                "user_id": admin_user_id,
+                "email": admin_email,
+                "name": "Eres lo que repites",
+                "password_hash": password_hash,
+                "is_admin": True,
+                "created_at": datetime.now(timezone.utc)
+            }
+        },
+        upsert=True
+    )
+    
+    # Create/update admin profile - minimal, user will do onboarding
+    await db.user_profiles.update_one(
+        {"user_id": admin_user_id},
+        {
+            "$set": {
+                "user_id": admin_user_id,
+                "name": "Eres lo que repites",
+                "email": admin_email,
+                "role": "patient",
+                "is_admin": True,
+                "recovery_start_date": recovery_start.isoformat(),
+                "clean_date": "2025-05-17",
+                "days_clean": days_clean,
+                "profile_completed": False,  # Will complete via onboarding
+                "onboarding_completed": False,
+                "my_why_photos": [],  # Array for up to 5 photos
+                "updated_at": datetime.now(timezone.utc)
+            }
+        },
+        upsert=True
+    )
+    
+    return {
+        "success": True,
+        "message": "Usuario admin creado exitosamente",
+        "user_id": admin_user_id,
+        "email": admin_email,
+        "days_clean": days_clean,
+        "note": "Completa el onboarding para configurar tu perfil"
+    }
+
+
+@app.get("/api/admin/stats")
+async def get_admin_stats(current_user: User = Depends(get_current_user)):
+    """Get global app statistics - Admin only"""
+    # Verify admin
+    profile = await db.user_profiles.find_one({"user_id": current_user.user_id})
+    if not profile or not profile.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Solo administradores")
+    
+    # Get counts
+    total_users = await db.users.count_documents({})
+    total_patients = await db.user_profiles.count_documents({"role": "patient"})
+    total_professionals = await db.user_profiles.count_documents({"role": "professional"})
+    total_active_users = await db.user_profiles.count_documents({"role": "active_user"})
+    total_family = await db.user_profiles.count_documents({"role": "family"})
+    
+    # Emotional logs in last 7 days
+    week_ago = datetime.now(timezone.utc) - timedelta(days=7)
+    recent_emotional_logs = await db.emotional_logs.count_documents({
+        "logged_at": {"$gte": week_ago}
+    })
+    
+    # Habits logged in last 7 days
+    recent_habit_logs = await db.habit_logs.count_documents({
+        "logged_at": {"$gte": week_ago}
+    })
+    
+    # Push tokens registered
+    push_tokens = await db.push_tokens.count_documents({})
+    
+    return {
+        "success": True,
+        "stats": {
+            "total_users": total_users,
+            "by_role": {
+                "patients": total_patients,
+                "professionals": total_professionals,
+                "active_users": total_active_users,
+                "family": total_family
+            },
+            "activity_last_7_days": {
+                "emotional_logs": recent_emotional_logs,
+                "habit_logs": recent_habit_logs
+            },
+            "push_tokens_registered": push_tokens
+        }
+    }
+
+
+@app.get("/api/admin/users")
+async def get_admin_users(current_user: User = Depends(get_current_user)):
+    """Get all users list - Admin only (no sensitive data)"""
+    # Verify admin
+    profile = await db.user_profiles.find_one({"user_id": current_user.user_id})
+    if not profile or not profile.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Solo administradores")
+    
+    users = await db.user_profiles.find(
+        {},
+        {"_id": 0, "user_id": 1, "name": 1, "email": 1, "role": 1, "days_clean": 1, "created_at": 1, "onboarding_completed": 1}
+    ).to_list(500)
+    
+    return {"success": True, "users": users, "total": len(users)}
+
+
 
 
 if __name__ == "__main__":
