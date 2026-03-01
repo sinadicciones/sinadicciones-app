@@ -24,7 +24,7 @@ export default {
       },
       edgeToEdgeEnabled: true,
       package: "cl.sinadicciones.app",
-      versionCode: 18,
+      versionCode: 19,
       permissions: [
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
