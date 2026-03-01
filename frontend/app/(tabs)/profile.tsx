@@ -89,6 +89,18 @@ export default function ProfileScreen() {
   // Estados para foto de perfil
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  
+  // Estados para notificaciones
+  const [showNotificationsModal, setShowNotificationsModal] = useState(false);
+  const [notificationSettings, setNotificationSettings] = useState({
+    motivational: true,
+    habit_reminders: true,
+    emotion_reminders: true,
+    goal_reminders: true,
+    preferred_time: '09:00'
+  });
+  const [savingNotifications, setSavingNotifications] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
 
   useEffect(() => {
     loadProfile();
