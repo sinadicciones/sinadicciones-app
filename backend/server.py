@@ -4965,6 +4965,158 @@ async def mark_all_notifications_read(current_user: User = Depends(get_current_u
     return {"success": True}
 
 
+# ============== NOTIFICACIONES PROGRAMADAS ==============
+
+@app.post("/api/notifications/test")
+async def send_test_notification(current_user: User = Depends(get_current_user)):
+    """Enviar notificación de prueba al usuario actual"""
+    notification_id = await notify_user(
+        user_id=current_user.user_id,
+        title="🧪 Notificación de Prueba",
+        body="¡Las notificaciones push están funcionando correctamente!",
+        notification_type="test",
+        data={"test": True}
+    )
+    return {
+        "success": True,
+        "message": "Notificación de prueba enviada",
+        "notification_id": notification_id
+    }
+
+
+@app.post("/api/notifications/send-reminders")
+async def send_scheduled_reminders(hour: int = 9):
+    """
+    Endpoint para enviar recordatorios programados.
+    Llamar desde un cron job externo o scheduler.
+    Ejemplo: curl -X POST "URL/api/notifications/send-reminders?hour=9"
+    """
+    import random
+    
+    sent_count = 0
+    errors = []
+    
+    # Mensajes motivacionales
+    motivational_messages = [
+        ("💪 ¡Tú puedes!", "Cada día que eliges tu recuperación es una victoria. Sigue adelante."),
+        ("🌟 Recuerda tu propósito", "Hoy es un buen día para recordar por qué empezaste este camino."),
+        ("🙏 Un día a la vez", "No te preocupes por el mañana. Enfócate en hoy."),
+        ("❤️ Eres valioso/a", "Tu vida importa. Tu recuperación importa. Tú importas."),
+        ("🌈 La esperanza es real", "Miles de personas han logrado la recuperación. Tú también puedes."),
+        ("🔥 Mantén el fuego", "Tu fortaleza interior es más grande que cualquier obstáculo."),
+        ("🌱 Creciendo cada día", "Cada pequeño paso cuenta. Estás avanzando."),
+    ]
+    
+    # Buscar usuarios con notificaciones habilitadas para esta hora
+    users_settings = await db.notification_settings.find({
+        "preferred_time": f"{hour:02d}:00"
+    }).to_list(1000)
+    
+    # Si no hay configuraciones específicas, buscar tokens de usuarios activos
+    if not users_settings:
+        tokens = await db.push_tokens.find({}).to_list(1000)
+        user_ids = [t["user_id"] for t in tokens]
+    else:
+        user_ids = [s["user_id"] for s in users_settings]
+    
+    for user_id in user_ids:
+        try:
+            # Obtener configuración del usuario
+            settings = await db.notification_settings.find_one({"user_id": user_id})
+            if not settings:
+                settings = {
+                    "motivational": True,
+                    "habit_reminders": True,
+                    "emotion_reminders": True
+                }
+            
+            # Enviar mensaje motivacional
+            if settings.get("motivational", True):
+                title, body = random.choice(motivational_messages)
+                await notify_user(user_id, title, body, "motivational")
+                sent_count += 1
+            
+            # Recordatorio de hábitos
+            if settings.get("habit_reminders", True):
+                habits = await db.habits.find({"user_id": user_id, "is_active": True}).to_list(10)
+                if habits:
+                    habit_names = [h["name"] for h in habits[:3]]
+                    await notify_user(
+                        user_id,
+                        "📋 Tus hábitos de hoy",
+                        f"Recuerda completar: {', '.join(habit_names)}",
+                        "habit_reminder",
+                        {"habits": [h["habit_id"] for h in habits[:3]]}
+                    )
+                    sent_count += 1
+            
+            # Recordatorio de emociones
+            if settings.get("emotion_reminders", True):
+                # Verificar si ya registró hoy
+                today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+                today_log = await db.emotional_logs.find_one({
+                    "user_id": user_id,
+                    "date": today
+                })
+                if not today_log:
+                    await notify_user(
+                        user_id,
+                        "💭 ¿Cómo te sientes hoy?",
+                        "Tómate un momento para registrar tus emociones.",
+                        "emotion_reminder"
+                    )
+                    sent_count += 1
+                    
+        except Exception as e:
+            errors.append({"user_id": user_id, "error": str(e)})
+    
+    return {
+        "success": True,
+        "sent_count": sent_count,
+        "users_processed": len(user_ids),
+        "errors": errors if errors else None
+    }
+
+
+@app.post("/api/professional/notify-patient")
+async def professional_notify_patient(
+    patient_id: str,
+    title: str,
+    message: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Permite al profesional enviar una notificación/alerta a su paciente"""
+    # Verificar que es profesional
+    profile = await db.user_profiles.find_one({"user_id": current_user.user_id})
+    if not profile or profile.get("role") != "professional":
+        raise HTTPException(status_code=403, detail="Solo profesionales pueden enviar alertas")
+    
+    # Verificar vinculación
+    patient_profile = await db.user_profiles.find_one({
+        "user_id": patient_id,
+        "linked_therapist_id": current_user.user_id
+    })
+    if not patient_profile:
+        raise HTTPException(status_code=404, detail="Paciente no vinculado")
+    
+    # Obtener nombre del profesional
+    prof_name = profile.get("name", "Tu terapeuta")
+    
+    notification_id = await notify_user(
+        user_id=patient_id,
+        title=f"📨 Mensaje de {prof_name}",
+        body=message,
+        notification_type="therapist_message",
+        data={"from_therapist": current_user.user_id, "custom_title": title}
+    )
+    
+    return {
+        "success": True,
+        "message": "Notificación enviada al paciente",
+        "notification_id": notification_id
+    }
+
+
 # ============== TAREAS CON NOTIFICACIONES ==============
 
 class CreateTaskWithNotificationRequest(BaseModel):
