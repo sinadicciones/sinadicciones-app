@@ -255,7 +255,7 @@ export default function ProfileScreen() {
     }
   };
 
-  const uploadProfilePhoto = async (base64Image: string) => {
+  const uploadProfilePhoto = async (base64Image) => {
     setUploadingPhoto(true);
     try {
       const response = await authenticatedFetch(`${BACKEND_URL}/api/profile/photo`, {
@@ -295,7 +295,7 @@ export default function ProfileScreen() {
     );
   };
 
-  const handleDateChange = (event: any, date?: Date) => {
+  const handleDateChange = (event, date) => {
     if (Platform.OS === 'web') {
       // En web, el evento tiene la fecha en event.target.value
       const dateValue = event?.target?.value || event;
@@ -345,7 +345,7 @@ export default function ProfileScreen() {
     }
   };
 
-  const addItemToList = (field: string, value: string) => {
+  const addItemToList = (field, value) => {
     if (!value.trim()) return;
     
     const currentList = formData[field] || [];
@@ -355,7 +355,7 @@ export default function ProfileScreen() {
     });
   };
 
-  const removeItemFromList = (field: string, index: number) => {
+  const removeItemFromList = (field, index) => {
     const currentList = formData[field] || [];
     setFormData({
       ...formData,
