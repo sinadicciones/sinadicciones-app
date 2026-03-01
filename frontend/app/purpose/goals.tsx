@@ -1145,4 +1145,40 @@ const styles = StyleSheet.create({
   dayLabelCompleted: {
     color: '#FFFFFF',
   },
+  // Days selector styles
+  daysSelector: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 8,
+    gap: 8,
+  },
+  dayOption: {
+    flex: 1,
+    height: 44,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#F9FAFB',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dayOptionSelected: {
+    borderColor: '#10B981',
+    backgroundColor: '#10B98115',
+  },
+  dayOptionText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#6B7280',
+  },
+  dayOptionTextSelected: {
+    color: '#10B981',
+  },
+  daysHint: {
+    fontSize: 13,
+    color: '#9CA3AF',
+    textAlign: 'center',
+    marginTop: 6,
+    marginBottom: 12,
+  },
 });
