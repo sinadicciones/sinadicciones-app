@@ -797,6 +797,77 @@ export default function HomeScreen() {
           </View>
         </View>
 
+        {/* Estrategias para tus Gatillos - Solo para patient y active_user */}
+        {profile && (profile.role === 'patient' || profile.role === 'active_user') && profile.triggers && profile.triggers.length > 0 && (
+          <View style={styles.triggersSection}>
+            <View style={styles.triggersSectionHeader}>
+              <Text style={styles.triggersWarningIcon}>⚠️</Text>
+              <Text style={styles.triggersSectionTitle}>Estrategias para tus Gatillos</Text>
+            </View>
+            <Text style={styles.triggersSubtitle}>
+              Has identificado {profile.triggers.length} gatillos. Aquí tienes estrategias específicas:
+            </Text>
+            
+            <View style={styles.triggersList}>
+              {profile.triggers.slice(0, 6).map((trigger: string, index: number) => {
+                const triggerStrategies: { [key: string]: { icon: string; color: string; strategy: string } } = {
+                  'Estrés': { icon: 'pulse', color: '#EF4444', strategy: 'Practica respiración diafragmática 4-7-8 cuando sientas tensión' },
+                  'Estrés laboral': { icon: 'pulse', color: '#EF4444', strategy: 'Practica respiración diafragmática 4-7-8 cuando sientas tensión' },
+                  'stress': { icon: 'pulse', color: '#EF4444', strategy: 'Practica respiración diafragmática 4-7-8 cuando sientas tensión' },
+                  'Soledad': { icon: 'people', color: '#8B5CF6', strategy: 'Llama a alguien de tu red de apoyo cuando te sientas solo/a' },
+                  'loneliness': { icon: 'people', color: '#8B5CF6', strategy: 'Llama a alguien de tu red de apoyo cuando te sientas solo/a' },
+                  'Ciertos lugares': { icon: 'location', color: '#06B6D4', strategy: 'Identifica y evita lugares asociados al consumo' },
+                  'places': { icon: 'location', color: '#06B6D4', strategy: 'Identifica y evita lugares asociados al consumo' },
+                  'Emociones negativas': { icon: 'heart-dislike', color: '#EC4899', strategy: 'Practica el reconocimiento y nombrado de emociones' },
+                  'emotions': { icon: 'heart-dislike', color: '#EC4899', strategy: 'Practica el reconocimiento y nombrado de emociones' },
+                  'Celebraciones': { icon: 'wine', color: '#A855F7', strategy: 'Planifica con anticipación eventos sociales' },
+                  'Fiestas y celebraciones': { icon: 'wine', color: '#A855F7', strategy: 'Planifica con anticipación eventos sociales' },
+                  'celebration': { icon: 'wine', color: '#A855F7', strategy: 'Planifica con anticipación eventos sociales' },
+                  'Aburrimiento': { icon: 'game-controller', color: '#22C55E', strategy: 'Desarrolla nuevos hobbies y pasatiempos' },
+                  'boredom': { icon: 'game-controller', color: '#22C55E', strategy: 'Desarrolla nuevos hobbies y pasatiempos' },
+                  'Personas del pasado': { icon: 'person-remove', color: '#F97316', strategy: 'Establece límites claros con personas que consumen' },
+                  'people': { icon: 'person-remove', color: '#F97316', strategy: 'Establece límites claros con personas que consumen' },
+                  'Discusiones familiares': { icon: 'chatbubbles', color: '#EF4444', strategy: 'Practica comunicación asertiva y toma pausas' },
+                  'Problemas financieros': { icon: 'cash', color: '#F59E0B', strategy: 'Crea un plan financiero y busca ayuda profesional' },
+                  'Insomnio': { icon: 'moon', color: '#6366F1', strategy: 'Establece una rutina de sueño saludable' },
+                  'Ansiedad': { icon: 'fitness', color: '#EC4899', strategy: 'Practica técnicas de grounding y mindfulness' },
+                };
+                
+                const triggerInfo = triggerStrategies[trigger] || { 
+                  icon: 'alert-circle', 
+                  color: '#6B7280', 
+                  strategy: 'Identifica patrones y desarrolla estrategias personalizadas' 
+                };
+                
+                return (
+                  <TouchableOpacity 
+                    key={index} 
+                    style={styles.triggerItem}
+                    onPress={() => router.push('/recommendations')}
+                  >
+                    <View style={[styles.triggerIconContainer, { backgroundColor: `${triggerInfo.color}20` }]}>
+                      <Ionicons name={triggerInfo.icon as any} size={22} color={triggerInfo.color} />
+                    </View>
+                    <View style={styles.triggerContent}>
+                      <Text style={styles.triggerName}>{trigger}</Text>
+                      <Text style={styles.triggerStrategy}>{triggerInfo.strategy}</Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+            
+            <TouchableOpacity 
+              style={styles.viewFullPlanBtn}
+              onPress={() => router.push('/recommendations')}
+            >
+              <Text style={styles.viewFullPlanText}>Ver Mi Plan de Recuperación Completo</Text>
+              <Ionicons name="arrow-forward" size={18} color="#10B981" />
+            </TouchableOpacity>
+          </View>
+        )}
+
         {/* Sección Educativa - Estilo Oscuro */}
         {education && (
           <View style={styles.educationSection}>
