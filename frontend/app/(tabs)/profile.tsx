@@ -69,12 +69,12 @@ const translateItem = (item) => {
 export default function ProfileScreen() {
   const router = useRouter();
   const { user, logout } = useAuth();
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState(null);
   const [editing, setEditing] = useState(false);
-  const [formData, setFormData] = useState<any>({});
+  const [formData, setFormData] = useState({});
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState(null);
   
   // Estados para cambio de contraseña
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -87,7 +87,7 @@ export default function ProfileScreen() {
   const [changingPassword, setChangingPassword] = useState(false);
   
   // Estados para foto de perfil
-  const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+  const [profilePhoto, setProfilePhoto] = useState(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   
   // Estados para notificaciones
