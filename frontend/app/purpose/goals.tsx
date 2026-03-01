@@ -986,7 +986,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   goalCard: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     backgroundColor: '#1A1A1A',
     marginHorizontal: 16,
     marginBottom: 8,
