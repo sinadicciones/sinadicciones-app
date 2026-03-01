@@ -5115,6 +5115,315 @@ async def report_relapse_with_notification(current_user: User = Depends(get_curr
 
 
 
+# ============== NELSON - AI THERAPIST ==============
+
+NELSON_SYSTEM_PROMPT = """Eres Nelson, un consejero y compañero de apoyo especializado en adicciones. Tu rol es:
+
+IDENTIDAD:
+- Te llamas Nelson
+- Eres cálido, empático y nunca juzgas
+- Hablas en español de forma cercana pero profesional
+- Usas el nombre del usuario cuando lo conoces
+
+LÍMITES IMPORTANTES:
+- SIEMPRE recuerda que eres un apoyo complementario, NO un reemplazo de profesionales
+- NO diagnostiques ni prescribas medicamentos
+- NO des consejos médicos específicos
+- Si detectas riesgo de vida, SIEMPRE recomienda buscar ayuda profesional inmediata
+
+TUS CAPACIDADES:
+- Escuchar activamente y validar emociones
+- Ofrecer técnicas de manejo de crisis (respiración, grounding, distracción)
+- Recordar el progreso del usuario y celebrar logros
+- Educar sobre el proceso de recuperación
+- Motivar y dar esperanza
+- Sugerir hablar con el terapeuta vinculado cuando sea apropiado
+
+CONTEXTO DEL USUARIO (usa esta información para personalizar):
+{user_context}
+
+REGLAS DE RESPUESTA:
+1. Respuestas breves y empáticas (máximo 3-4 oraciones por mensaje)
+2. Haz preguntas para profundizar
+3. Valida las emociones antes de dar consejos
+4. Si mencionan crisis, ofrece herramientas inmediatas
+5. Termina con una pregunta o invitación a continuar
+
+PALABRAS DE CRISIS que requieren respuesta especial:
+- suicidio, matarme, morir, no quiero vivir, hacerme daño
+- Si detectas estas palabras, responde con compasión, recuerda que no están solos,
+  y SIEMPRE recomienda llamar a una línea de crisis o ir a urgencias.
+"""
+
+CRISIS_KEYWORDS = [
+    "suicidio", "suicidarme", "matarme", "morir", "morirme",
+    "no quiero vivir", "acabar con todo", "hacerme daño",
+    "cortarme", "quitarme la vida", "ya no puedo más",
+    "no vale la pena", "mejor muerto"
+]
+
+class NelsonMessage(BaseModel):
+    message: str
+
+@app.post("/api/nelson/chat")
+async def nelson_chat(
+    request: NelsonMessage,
+    current_user: User = Depends(get_current_user)
+):
+    """Chat with Nelson - AI therapist assistant"""
+    try:
+        user_message = request.message.strip()
+        
+        # Check for crisis keywords
+        message_lower = user_message.lower()
+        crisis_detected = any(keyword in message_lower for keyword in CRISIS_KEYWORDS)
+        
+        # Get user context
+        user_context = await get_nelson_user_context(current_user.user_id)
+        
+        # Get conversation history
+        conversation = await db.nelson_conversations.find_one({"user_id": current_user.user_id})
+        messages_history = conversation.get("messages", [])[-10:] if conversation else []
+        
+        # Build messages for OpenAI
+        system_prompt = NELSON_SYSTEM_PROMPT.format(user_context=user_context)
+        
+        openai_messages = [{"role": "system", "content": system_prompt}]
+        
+        for msg in messages_history:
+            openai_messages.append({
+                "role": msg["role"],
+                "content": msg["content"]
+            })
+        
+        openai_messages.append({"role": "user", "content": user_message})
+        
+        # Add crisis context if detected
+        if crisis_detected:
+            openai_messages.append({
+                "role": "system",
+                "content": """ALERTA: El usuario ha mencionado palabras relacionadas con crisis.
+                Responde con máxima empatía. Valida su dolor. Recuérdale que no está solo.
+                Incluye en tu respuesta:
+                1. Que entiendes su dolor
+                2. Que hay ayuda disponible
+                3. Línea de crisis: 600 360 7777 (Chile) o el número local
+                4. Que puede ir a urgencias
+                5. Pregunta si puede llamar a alguien de confianza ahora mismo"""
+            })
+        
+        # Call OpenAI
+        client = await get_openai_client()
+        if not client:
+            return {"response": "Lo siento, estoy teniendo problemas técnicos. Si es una emergencia, por favor llama a tu línea de crisis local.", "crisis_detected": crisis_detected}
+        
+        response = await client.chat.completions.create(
+            model="gpt-4o",
+            messages=openai_messages,
+            temperature=0.7,
+            max_tokens=500
+        )
+        
+        nelson_response = response.choices[0].message.content
+        
+        # Determine mode
+        mode = "crisis" if crisis_detected else "normal"
+        if any(word in message_lower for word in ["ansiedad", "ansioso", "nervioso", "pánico"]):
+            mode = "anxiety"
+        elif any(word in message_lower for word in ["ganas", "consumir", "recaer", "craving"]):
+            mode = "craving"
+        elif any(word in message_lower for word in ["triste", "deprimido", "solo", "vacío"]):
+            mode = "sadness"
+        
+        # Save to conversation history
+        new_messages = [
+            {"role": "user", "content": user_message, "timestamp": datetime.utcnow().isoformat(), "mode": mode},
+            {"role": "assistant", "content": nelson_response, "timestamp": datetime.utcnow().isoformat(), "mode": mode}
+        ]
+        
+        await db.nelson_conversations.update_one(
+            {"user_id": current_user.user_id},
+            {
+                "$push": {"messages": {"$each": new_messages}},
+                "$set": {"updated_at": datetime.utcnow()}
+            },
+            upsert=True
+        )
+        
+        # If crisis detected, also log it for safety
+        if crisis_detected:
+            await db.crisis_logs.insert_one({
+                "user_id": current_user.user_id,
+                "message": user_message,
+                "timestamp": datetime.utcnow(),
+                "response_given": nelson_response
+            })
+            
+            # Notify linked therapist if exists
+            profile = await db.profiles.find_one({"user_id": current_user.user_id})
+            if profile and profile.get("linked_therapist_id"):
+                await notify_user(
+                    user_id=profile["linked_therapist_id"],
+                    title="⚠️ Alerta de Crisis",
+                    body=f"{current_user.name} puede estar en crisis. Revisa la conversación.",
+                    notification_type="crisis_alert",
+                    data={
+                        "patient_id": current_user.user_id,
+                        "patient_name": current_user.name,
+                        "action": "view_patient",
+                        "severity": "critical"
+                    }
+                )
+        
+        return {
+            "response": nelson_response,
+            "mode": mode,
+            "crisis_detected": crisis_detected
+        }
+        
+    except Exception as e:
+        print(f"Error in Nelson chat: {e}")
+        return {
+            "response": "Lo siento, tuve un problema. ¿Puedes intentar de nuevo? Si necesitas ayuda urgente, usa el botón rojo de Crisis.",
+            "mode": "error",
+            "crisis_detected": False
+        }
+
+async def get_nelson_user_context(user_id: str) -> str:
+    """Get user context for Nelson to personalize responses"""
+    try:
+        # Get profile
+        profile = await db.profiles.find_one({"user_id": user_id}, {"_id": 0})
+        
+        # Get recent habits
+        habits = await db.habits.find(
+            {"user_id": user_id, "is_active": True}
+        ).to_list(10)
+        
+        # Get today's habit completions
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        today_logs = await db.habit_logs.find(
+            {"user_id": user_id, "date": today}
+        ).to_list(100)
+        completed_today = sum(1 for log in today_logs if log.get("completed"))
+        
+        # Get recent emotional logs
+        week_ago = (datetime.now(timezone.utc) - timedelta(days=7)).strftime("%Y-%m-%d")
+        recent_emotions = await db.emotional_logs.find(
+            {"user_id": user_id, "date": {"$gte": week_ago}}
+        ).sort("date", -1).to_list(7)
+        
+        avg_mood = 0
+        if recent_emotions:
+            moods = [e.get("mood") or e.get("mood_scale", 5) for e in recent_emotions]
+            avg_mood = sum(moods) / len(moods)
+        
+        # Get user info
+        user = await db.users.find_one({"user_id": user_id}, {"_id": 0, "name": 1})
+        
+        # Build context
+        context_parts = []
+        
+        if user and user.get("name"):
+            context_parts.append(f"Nombre del usuario: {user['name']}")
+        
+        if profile:
+            if profile.get("addiction_type"):
+                context_parts.append(f"Tipo de adicción: {profile['addiction_type']}")
+            if profile.get("clean_date"):
+                try:
+                    clean_date = datetime.fromisoformat(profile["clean_date"].replace("Z", "+00:00"))
+                    days_clean = (datetime.now(timezone.utc) - clean_date).days
+                    if days_clean >= 0:
+                        context_parts.append(f"Días en recuperación: {days_clean}")
+                except:
+                    pass
+            if profile.get("triggers"):
+                context_parts.append(f"Gatillos conocidos: {', '.join(profile['triggers'][:5])}")
+            if profile.get("my_why"):
+                context_parts.append(f"Su motivación (para qué): {profile['my_why'][:200]}")
+        
+        context_parts.append(f"Hábitos completados hoy: {completed_today} de {len(habits)}")
+        
+        if avg_mood > 0:
+            context_parts.append(f"Estado de ánimo promedio esta semana: {avg_mood:.1f}/10")
+        
+        return "\n".join(context_parts) if context_parts else "Usuario nuevo sin historial aún."
+        
+    except Exception as e:
+        print(f"Error getting Nelson context: {e}")
+        return "No se pudo obtener contexto del usuario."
+
+@app.get("/api/nelson/conversation")
+async def get_nelson_conversation(current_user: User = Depends(get_current_user)):
+    """Get Nelson conversation history"""
+    try:
+        conversation = await db.nelson_conversations.find_one(
+            {"user_id": current_user.user_id},
+            {"_id": 0}
+        )
+        
+        if conversation and conversation.get("messages"):
+            # Return last 50 messages
+            return {"messages": conversation["messages"][-50:]}
+        
+        return {"messages": []}
+        
+    except Exception as e:
+        print(f"Error getting Nelson conversation: {e}")
+        return {"messages": []}
+
+@app.delete("/api/nelson/conversation")
+async def clear_nelson_conversation(current_user: User = Depends(get_current_user)):
+    """Clear Nelson conversation history"""
+    try:
+        await db.nelson_conversations.delete_one({"user_id": current_user.user_id})
+        return {"success": True}
+    except Exception as e:
+        print(f"Error clearing Nelson conversation: {e}")
+        return {"success": False}
+
+@app.get("/api/nelson/summary")
+async def get_nelson_summary(current_user: User = Depends(get_current_user)):
+    """Get AI summary of recent Nelson conversations"""
+    try:
+        conversation = await db.nelson_conversations.find_one({"user_id": current_user.user_id})
+        
+        if not conversation or not conversation.get("messages"):
+            return {"summary": "No hay conversaciones recientes para resumir."}
+        
+        # Get last 20 messages for summary
+        recent_messages = conversation["messages"][-20:]
+        
+        # Build conversation text
+        conv_text = "\n".join([
+            f"{msg['role'].upper()}: {msg['content']}" 
+            for msg in recent_messages
+        ])
+        
+        client = await get_openai_client()
+        if not client:
+            return {"summary": "No se pudo generar el resumen."}
+        
+        response = await client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "Eres un asistente que resume conversaciones terapéuticas. Genera un resumen breve (3-4 oraciones) de los temas principales, el estado emocional del usuario, y cualquier progreso o preocupación notable."},
+                {"role": "user", "content": f"Resume esta conversación:\n\n{conv_text}"}
+            ],
+            temperature=0.5,
+            max_tokens=200
+        )
+        
+        return {"summary": response.choices[0].message.content}
+        
+    except Exception as e:
+        print(f"Error generating Nelson summary: {e}")
+        return {"summary": "Error generando resumen."}
+
+
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
