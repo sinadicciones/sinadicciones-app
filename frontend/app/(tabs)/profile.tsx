@@ -2183,4 +2183,97 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#C4B5FD',
   },
+  // Estilos para el modal de notificaciones
+  notifDescription: {
+    fontSize: 14,
+    color: '#A1A1AA',
+    marginBottom: 20,
+    lineHeight: 20,
+  },
+  notifTimeSection: {
+    backgroundColor: '#1A1A1A',
+    padding: 14,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  notifTimeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 10,
+  },
+  notifTimeLabel: {
+    fontSize: 15,
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  notifTimeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#0D0D0D',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#3F3F46',
+  },
+  notifTimeValue: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  webTimePickerContainer: {
+    marginTop: 10,
+  },
+  notifOptionsContainer: {
+    marginBottom: 20,
+  },
+  notifOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#1A1A1A',
+    padding: 14,
+    borderRadius: 12,
+    marginBottom: 10,
+  },
+  notifOptionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    gap: 12,
+  },
+  notifOptionText: {
+    flex: 1,
+  },
+  notifOptionTitle: {
+    fontSize: 15,
+    color: '#FFFFFF',
+    fontWeight: '500',
+    marginBottom: 2,
+  },
+  notifOptionDesc: {
+    fontSize: 12,
+    color: '#A1A1AA',
+  },
+  notifToggle: {
+    width: 48,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: '#3F3F46',
+    padding: 2,
+    justifyContent: 'center',
+  },
+  notifToggleActive: {
+    backgroundColor: '#8B5CF6',
+  },
+  notifToggleCircle: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#FFFFFF',
+  },
+  notifToggleCircleActive: {
+    alignSelf: 'flex-end',
+  },
 });
