@@ -418,6 +418,10 @@ export default function WelcomeScreen() {
             <Text style={styles.privacy}>
               🔒 Tus datos están seguros y son privados
             </Text>
+
+            <View style={styles.versionContainer}>
+              <Text style={styles.versionText}>Versión 21</Text>
+            </View>
           </View>
         </ScrollView>
       </LinearGradient>
