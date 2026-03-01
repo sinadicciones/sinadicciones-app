@@ -581,20 +581,6 @@ export default function ProfileScreen() {
               </TouchableOpacity>
             )}
 
-            {/* Botón para reportar recaída (solo pacientes) */}
-            {profile?.role !== 'professional' && profile?.role !== 'admin' && (
-              <TouchableOpacity 
-                style={[styles.accountButton, styles.relapseButton]}
-                onPress={() => router.push('/report-relapse')}
-              >
-                <Ionicons name="warning" size={20} color="#DC2626" />
-                <Text style={[styles.accountButtonText, { color: '#DC2626' }]}>
-                  Reportar Recaída
-                </Text>
-                <Ionicons name="chevron-forward" size={20} color="#DC2626" />
-              </TouchableOpacity>
-            )}
-
             <TouchableOpacity 
               style={styles.accountButton}
               onPress={() => setShowNotificationsModal(true)}
