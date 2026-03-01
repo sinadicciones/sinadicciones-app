@@ -17,11 +17,12 @@ SinAdicciones es una aplicación móvil de apoyo a personas en recuperación de 
 - Registro y seguimiento de hábitos diarios
 - Registro de estado emocional con escala 1-10 y etiquetas
 - Análisis de IA para hábitos y emociones
-- **NUEVO: Nelson - Terapeuta IA 24/7**
+- **Nelson - Terapeuta IA 24/7**
 - Perfil completo con secciones expandibles
 - Reportar recaídas
+- **NUEVO: Metas SMART Semanales con análisis mensual**
 
-### Nelson - Terapeuta IA (NUEVO)
+### Nelson - Terapeuta IA
 - Chat conversacional 24/7
 - Personalizado con datos del usuario (hábitos, emociones, perfil)
 - Modos: Normal, Crisis, Ansiedad, Craving, Tristeza
@@ -44,7 +45,22 @@ SinAdicciones es una aplicación móvil de apoyo a personas en recuperación de 
 - Contenido educativo
 - Seguimiento de familiar (con permiso)
 
+## Test Credentials
+- **Paciente Demo**: paciente@sinadicciones.org / demo123
+- **Profesional Demo**: profesional@sinadicciones.org / demopassword
+- **Admin**: contacto@sinadicciones.cl / Jodo1000
+
 ## Implemented Features (Mar 2026)
+
+### Metas SMART Semanales (NUEVO - Mar 2026)
+- [x] Creación de metas con `target_days` (días objetivo por semana)
+- [x] Seguimiento diario con círculos L-M-X-J-V-S-D
+- [x] Toggle de días completados/no completados
+- [x] Progreso calculado automáticamente
+- [x] Historial semanal (`week_history`)
+- [x] Reset automático de semana
+- [x] **Análisis mensual** con estadísticas de rendimiento
+- [x] Niveles de rendimiento (excelente, bueno, regular, necesita_atención)
 
 ### UI/UX
 - [x] Tema oscuro global
@@ -66,13 +82,14 @@ SinAdicciones es una aplicación móvil de apoyo a personas en recuperación de 
 - [x] Detección de crisis y notificaciones
 - [x] Endpoint /api/ai/status para verificar configuración
 
-### Configuración
-- [x] app.config.js para gestión de variables de entorno
-- [x] OPENAI_API_KEY en Railway
-
-## Test Credentials
-- Email: demo@sinadicciones.org
-- Password: demopassword
+## API Endpoints - Metas SMART (NUEVO)
+- GET /api/purpose/goals - Listar metas del usuario
+- POST /api/purpose/goals - Crear nueva meta con target_days
+- POST /api/purpose/goals/{goal_id}/toggle-day - Marcar/desmarcar día
+- GET /api/purpose/goals/monthly-analysis - Análisis mensual de progreso
+- GET /api/purpose/goals/suggested - Metas sugeridas según perfil
+- PUT /api/purpose/goals/{goal_id} - Actualizar meta
+- DELETE /api/purpose/goals/{goal_id} - Eliminar meta
 
 ## API Endpoints - Nelson
 - POST /api/nelson/chat - Enviar mensaje
@@ -81,52 +98,11 @@ SinAdicciones es una aplicación móvil de apoyo a personas en recuperación de 
 - GET /api/nelson/summary - Resumen IA de conversaciones
 - GET /api/ai/status - Verificar configuración de IA
 
-## versionCode History
-- v19: Fix bugs educación (crash "Entender adicción", "Manejo craving" sin contenido), nuevos usuarios demo
-- v18: Límites de tema para Nelson + Dashboard de Propósito con análisis de IA
-- v17: Corrección de bugs: KeyboardAvoidingView en Nelson, traducciones en perfil, protección contra crash en craving
-- v16: (pendiente de build)
-- v14: Agregado Nelson (terapeuta IA)
-- v13: Correcciones de UI y IA
-- v12: Corrección de URL de fallback
-
-## Bugs Corregidos (Mar 2026)
-- [x] Teclado oculta input en Nelson - KeyboardAvoidingView implementado
-- [x] Textos en inglés en Perfil - Diccionario de traducciones ampliado
-- [x] Crash en "Manejo de craving" - Protección contra undefined
-- [x] Menú inconsistente en Propósito - Estilo unificado
-- [x] Texto ilegible en Test de propósito - Contraste mejorado
-- [x] **Crash en pantalla de Perfil** - Error de tipo en input.onchange (e.target.files) corregido
-- [x] **KeyboardAvoidingView mejorado en Nelson** - Reestructurado para envolver ScrollView+Input
-- [x] **BottomNavigation sin Nelson** - Añadido tab de Nelson al componente personalizado
-- [x] **Crash en "Entender la adicción"** - Frontend usaba `topics` pero backend devuelve `sections`
-- [x] **"Manejo de craving" sin contenido** - Frontend usaba `techniques` pero backend devuelve `sections`
-- [x] **"Qué Esperar" sin contenido** - Frontend usaba `what_to_expect.phases` pero backend devuelve `first_days.timeline`
-
-## Nuevas Funcionalidades (Mar 2026)
-- [x] **Límites de tema para Nelson**: Solo responde sobre adicciones, bienestar, motivación, familia
-- [x] **Dashboard de Propósito con IA**: Análisis completo del test de propósito
-- [x] **Caché de análisis**: El análisis se guarda para no regenerar
-- [x] **Nelson coherente con perfil**: Prompts mejorados según rol (paciente, reto, profesional, familia)
-- [x] **Nelson con contexto de propósito**: Accede al análisis de IA para respuestas más personalizadas
-- [x] **Sistema de Notificaciones Push**: Configuración en Perfil
-- [x] **Hábitos con sugerencias preestablecidas**: Según tipo de adicción y perfil
-- [x] **"Ver mi Plan de Recuperación"**: Modal en Perfil con gatillos, protectores, red de apoyo
-- [x] **Onboarding Profesional mejorado**: 
-  - Paso 4 con WhatsApp, valor consulta, disponibilidad
-  - Toggle para aceptar nuevos pacientes
-- [x] **Usuario Demo Profesional**:
-  - Email: profesional@sinadicciones.org
-  - Password: demopassword
-  - Vinculado automáticamente con paciente demo (Carlos)
-
-## API Endpoints Nuevos
-
-### Propósito con IA
+## API Endpoints - Propósito con IA
 - GET /api/purpose/ai-analysis - Genera análisis de IA del propósito
 - GET /api/purpose/ai-analysis/cached - Obtiene análisis cacheado
 
-### Notificaciones
+## API Endpoints - Notificaciones
 - GET /api/notifications/settings - Configuración de notificaciones
 - PUT /api/notifications/settings - Actualizar configuración
 - GET /api/notifications/today - Mensaje motivacional y estado del día
@@ -134,10 +110,12 @@ SinAdicciones es una aplicación móvil de apoyo a personas en recuperación de 
 - POST /api/notifications/send-reminders?hour=9 - Enviar recordatorios programados (para cron)
 - POST /api/professional/notify-patient - Profesional envía alerta a paciente
 
-### Admin
-- POST /api/admin/setup-demo-user - Crear/actualizar usuario demo
-- POST /api/admin/setup-paciente-demo - Crear usuario paciente demo (nuevo)
-- POST /api/admin/setup-demo-professional - Crear usuario profesional demo
+## versionCode History
+- v22: Plugin expo-notifications añadido, fix análisis IA, sistema Metas SMART semanales
+- v19: Fix bugs educación (crash "Entender adicción", "Manejo craving" sin contenido)
+- v18: Límites de tema para Nelson + Dashboard de Propósito con análisis de IA
+- v17: Corrección de bugs: KeyboardAvoidingView en Nelson, traducciones en perfil
+- v14: Agregado Nelson (terapeuta IA)
 
 ## Architecture
 
@@ -145,21 +123,24 @@ SinAdicciones es una aplicación móvil de apoyo a personas en recuperación de 
 ```
 /app
 ├── backend/
-│   ├── server.py          # Main FastAPI + Nelson endpoints
-│   └── scripts/
+│   ├── server.py          # Main FastAPI (6900+ líneas - necesita refactorización)
+│   └── tests/
+│       └── test_smart_goals.py
 ├── frontend/
-│   ├── app.config.js
+│   ├── app.config.js      # versionCode = 22
 │   ├── app/
 │   │   ├── (tabs)/
-│   │   │   ├── _layout.tsx    # Tab bar + Nelson
-│   │   │   ├── nelson.tsx     # NUEVO: Chat con Nelson
+│   │   │   ├── _layout.tsx
+│   │   │   ├── nelson.tsx
 │   │   │   ├── home.tsx
-│   │   │   ├── profile.tsx
+│   │   │   ├── profile.tsx (2500+ líneas - necesita refactorización)
 │   │   │   ├── habits.tsx
 │   │   │   └── emotional.tsx
 │   │   └── purpose/
+│   │       └── goals.tsx   # Metas SMART semanales + análisis mensual
 │   ├── components/
 │   │   ├── CalendarView.tsx
+│   │   ├── BottomNavigation.tsx
 │   │   ├── HabitsInsights.tsx
 │   │   └── EmotionalInsights.tsx
 │   └── utils/
@@ -167,6 +148,45 @@ SinAdicciones es una aplicación móvil de apoyo a personas en recuperación de 
 └── memory/
     └── PRD.md
 ```
+
+## DB Schema - Goals (NUEVO)
+```javascript
+{
+  goal_id: "goal_xxx",
+  user_id: "user_xxx",
+  area: "health|relationships|work|personal|spiritual|finances",
+  title: "string",
+  description: "string",
+  status: "active|completed|deleted",
+  progress: 0-100,
+  frequency: "weekly",
+  target_days: 1-7,  // días objetivo por semana
+  current_week: "YYYY-MM-DD",
+  weekly_progress: {
+    mon: false, tue: false, wed: false, thu: false, fri: false, sat: false, sun: false
+  },
+  week_history: [
+    { week_start: "YYYY-MM-DD", completed_days: 5, target_days: 5, achieved: true }
+  ],
+  created_at: datetime,
+  updated_at: datetime
+}
+```
+
+## Pending Tasks
+
+### P1 - Verificación Usuario
+- [ ] Notificaciones Push - Usuario debe compilar v22 y probar en dispositivo físico
+- [ ] Verificar fix del análisis de IA en producción (Railway)
+
+### P2 - Refactorización
+- [ ] Dividir server.py en FastAPI Routers (6900+ líneas)
+- [ ] Descomponer profile.tsx en componentes (2500+ líneas)
+
+### P3 - Futuro
+- [ ] Diario de voz para Nelson
+- [ ] Unificar Hábitos y Metas
+- [ ] Compartir resúmenes de IA con el terapeuta
 
 ## Build & Deploy Notes
 1. "Save to GitHub" en Emergent
