@@ -1118,7 +1118,7 @@ const styles = StyleSheet.create({
   modalHabitName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   modalAddBtn: {
     backgroundColor: '#10B981',
@@ -1144,12 +1144,12 @@ const styles = StyleSheet.create({
   },
   // Estilos para Contactos de Emergencia
   emergencySection: {
-    backgroundColor: '#FEF2F2',
+    backgroundColor: '#1A1A1A',
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#FECACA',
+    borderColor: '#EF444440',
   },
   emergencyHeader: {
     flexDirection: 'row',
@@ -1159,14 +1159,14 @@ const styles = StyleSheet.create({
   emergencyTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#991B1B',
+    color: '#EF4444',
     marginLeft: 8,
   },
   emergencyContact: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#0D0D0D',
     padding: 12,
     borderRadius: 10,
     marginBottom: 8,
@@ -1177,7 +1177,7 @@ const styles = StyleSheet.create({
   emergencyContactName: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   emergencyContactRelation: {
     fontSize: 13,
