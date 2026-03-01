@@ -838,8 +838,8 @@ export default function HomeScreen() {
               </View>
             )}
 
-            {/* Qué Esperar */}
-            {education.what_to_expect && (
+            {/* Qué Esperar - Los Primeros Días */}
+            {education.first_days && (
               <View style={styles.eduSection}>
                 <TouchableOpacity 
                   style={styles.eduSectionHeader}
@@ -856,15 +856,15 @@ export default function HomeScreen() {
                   />
                 </TouchableOpacity>
                 
-                {expandedEducation === 'expect' && (
+                {expandedEducation === 'expect' && education.first_days?.timeline && (
                   <View style={styles.eduActionsList}>
-                    {education.what_to_expect.phases.map((phase: any) => (
-                      <View key={phase.id} style={styles.eduActionItem}>
+                    {education.first_days.timeline.map((phase: any, index: number) => (
+                      <View key={phase.day_range || index} style={styles.eduActionItem}>
                         <View style={[styles.eduActionIcon, { backgroundColor: 'rgba(139, 92, 246, 0.2)' }]}>
-                          <Ionicons name={phase.icon as any} size={20} color="#8B5CF6" />
+                          <Ionicons name="calendar" size={20} color="#8B5CF6" />
                         </View>
                         <View style={styles.eduActionContent}>
-                          <Text style={styles.eduActionTitle}>{phase.title}</Text>
+                          <Text style={styles.eduActionTitle}>{phase.day_range}: {phase.title}</Text>
                           <Text style={styles.eduActionDescription}>{phase.description}</Text>
                         </View>
                       </View>
