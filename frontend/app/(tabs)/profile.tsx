@@ -131,6 +131,50 @@ export default function ProfileScreen() {
     }
   };
 
+  const loadNotificationSettings = async () => {
+    try {
+      const response = await authenticatedFetch(`${BACKEND_URL}/api/notifications/settings`);
+      if (response.ok) {
+        const data = await response.json();
+        setNotificationSettings(data);
+      }
+    } catch (error) {
+      console.error('Failed to load notification settings:', error);
+    }
+  };
+
+  const saveNotificationSettings = async () => {
+    setSavingNotifications(true);
+    try {
+      const response = await authenticatedFetch(`${BACKEND_URL}/api/notifications/settings`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(notificationSettings)
+      });
+      
+      if (response.ok) {
+        Alert.alert('Éxito', 'Configuración de notificaciones guardada');
+        setShowNotificationsModal(false);
+      } else {
+        Alert.alert('Error', 'No se pudo guardar la configuración');
+      }
+    } catch (error) {
+      console.error('Failed to save notification settings:', error);
+      Alert.alert('Error', 'Error de conexión');
+    } finally {
+      setSavingNotifications(false);
+    }
+  };
+
+  const toggleNotificationSetting = (key: keyof typeof notificationSettings) => {
+    if (key !== 'preferred_time') {
+      setNotificationSettings(prev => ({
+        ...prev,
+        [key]: !prev[key]
+      }));
+    }
+  };
+
   const pickImage = async () => {
     // En web, usar input de archivo nativo
     if (Platform.OS === 'web') {
