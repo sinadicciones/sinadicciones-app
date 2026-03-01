@@ -249,6 +249,79 @@ export default function ProfessionalOnboardingScreen() {
     </View>
   );
 
+  const renderStep4 = () => (
+    <View style={styles.stepContent}>
+      <Text style={styles.stepTitle}>Contacto y disponibilidad</Text>
+      <Text style={styles.stepSubtitle}>
+        Configura cómo los pacientes pueden contactarte
+      </Text>
+
+      <View style={styles.formGroup}>
+        <Text style={styles.formLabel}>WhatsApp para contacto</Text>
+        <View style={styles.inputContainer}>
+          <Ionicons name="logo-whatsapp" size={20} color="#25D366" style={styles.inputIcon} />
+          <TextInput
+            style={styles.input}
+            value={whatsapp}
+            onChangeText={setWhatsapp}
+            placeholder="+56 9 1234 5678"
+            placeholderTextColor="#9CA3AF"
+            keyboardType="phone-pad"
+          />
+        </View>
+        <Text style={styles.inputHelper}>
+          Los pacientes podrán contactarte directamente por WhatsApp
+        </Text>
+      </View>
+
+      <View style={styles.formGroup}>
+        <Text style={styles.formLabel}>Valor de consulta (opcional)</Text>
+        <View style={styles.inputContainer}>
+          <Ionicons name="cash" size={20} color="#9CA3AF" style={styles.inputIcon} />
+          <TextInput
+            style={styles.input}
+            value={consultationFee}
+            onChangeText={setConsultationFee}
+            placeholder="Ej: $50.000 CLP / sesión"
+            placeholderTextColor="#9CA3AF"
+          />
+        </View>
+      </View>
+
+      <TouchableOpacity 
+        style={styles.toggleOption}
+        onPress={() => setAcceptsPatients(!acceptsPatients)}
+      >
+        <View style={styles.toggleLeft}>
+          <Ionicons 
+            name={acceptsPatients ? "checkmark-circle" : "close-circle"} 
+            size={24} 
+            color={acceptsPatients ? "#10B981" : "#6B7280"} 
+          />
+          <View style={styles.toggleText}>
+            <Text style={styles.toggleTitle}>Aceptando nuevos pacientes</Text>
+            <Text style={styles.toggleDesc}>
+              {acceptsPatients 
+                ? "Los pacientes podrán encontrarte en la búsqueda" 
+                : "No aparecerás en búsquedas de profesionales"}
+            </Text>
+          </View>
+        </View>
+        <View style={[styles.toggle, acceptsPatients && styles.toggleActive]}>
+          <View style={[styles.toggleCircle, acceptsPatients && styles.toggleCircleActive]} />
+        </View>
+      </TouchableOpacity>
+
+      <View style={[styles.summaryCard, styles.finalCard]}>
+        <Ionicons name="shield-checkmark" size={32} color="#10B981" />
+        <Text style={styles.summaryTitle}>¡Listo para comenzar!</Text>
+        <Text style={styles.summaryText}>
+          Tu perfil estará disponible para que los pacientes te encuentren y puedan iniciar su proceso de recuperación contigo.
+        </Text>
+      </View>
+    </View>
+  );
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
