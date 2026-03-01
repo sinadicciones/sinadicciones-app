@@ -959,12 +959,13 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   input: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     padding: 14,
     borderRadius: 12,
     fontSize: 16,
+    color: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#2D2D2D',
     marginBottom: 12,
   },
   textArea: {
@@ -973,7 +974,7 @@ const styles = StyleSheet.create({
   toggleButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     padding: 14,
     borderRadius: 12,
     marginBottom: 12,

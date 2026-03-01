@@ -686,7 +686,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     fontSize: 18,
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   inputSuffix: {
     color: '#6B7280',
