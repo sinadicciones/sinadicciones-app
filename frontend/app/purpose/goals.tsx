@@ -276,48 +276,46 @@ export default function AllGoals() {
                       </View>
                     </View>
                     
-                    {/* Weekly Day Circles - Full width row */}
-                    <View style={styles.weekSection}>
-                      <Text style={styles.weekLabel}>Esta semana ({goal.target_days || 5} días meta):</Text>
-                      <View style={styles.weekDaysRow}>
-                        {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map((day, index) => {
-                          const dayLabels = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
-                          const isCompleted = goal.weekly_progress?.[day] || false;
-                          return (
-                            <TouchableOpacity
-                              key={day}
-                              style={[
-                                styles.dayCircle,
-                                isCompleted && { backgroundColor: areaInfo.color, borderColor: areaInfo.color }
-                              ]}
-                              onPress={async () => {
-                                try {
-                                  const response = await authenticatedFetch(
-                                    `${BACKEND_URL}/api/purpose/goals/${goal.goal_id}/toggle-day`,
-                                    {
-                                      method: 'POST',
-                                      headers: { 'Content-Type': 'application/json' },
-                                      body: JSON.stringify({ day })
-                                    }
-                                  );
-                                  if (response.ok) {
-                                    loadGoals();
+                    {/* Weekly Day Circles - Below title */}
+                    <Text style={styles.weekLabel}>Esta semana ({goal.target_days || 5} días meta):</Text>
+                    <View style={styles.weekDaysRow}>
+                      {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map((day, index) => {
+                        const dayLabels = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+                        const isCompleted = goal.weekly_progress?.[day] || false;
+                        return (
+                          <TouchableOpacity
+                            key={day}
+                            style={[
+                              styles.dayCircle,
+                              isCompleted && { backgroundColor: areaInfo.color, borderColor: areaInfo.color }
+                            ]}
+                            onPress={async () => {
+                              try {
+                                const response = await authenticatedFetch(
+                                  `${BACKEND_URL}/api/purpose/goals/${goal.goal_id}/toggle-day`,
+                                  {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ day })
                                   }
-                                } catch (error) {
-                                  console.error('Error toggling day:', error);
+                                );
+                                if (response.ok) {
+                                  loadGoals();
                                 }
-                              }}
-                            >
-                              <Text style={[
-                                styles.dayLabel,
-                                isCompleted && styles.dayLabelCompleted
-                              ]}>
-                                {dayLabels[index]}
-                              </Text>
-                            </TouchableOpacity>
-                          );
-                        })}
-                      </View>
+                              } catch (error) {
+                                console.error('Error toggling day:', error);
+                              }
+                            }}
+                          >
+                            <Text style={[
+                              styles.dayLabel,
+                              isCompleted && styles.dayLabelCompleted
+                            ]}>
+                              {dayLabels[index]}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      })}
                     </View>
                     
                     {/* Progress Bar */}
