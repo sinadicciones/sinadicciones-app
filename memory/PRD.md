@@ -98,6 +98,9 @@ SinAdicciones es una aplicación móvil de apoyo a personas en recuperación de 
 - [x] **Crash en pantalla de Perfil** - Error de tipo en input.onchange (e.target.files) corregido
 - [x] **KeyboardAvoidingView mejorado en Nelson** - Reestructurado para envolver ScrollView+Input
 - [x] **BottomNavigation sin Nelson** - Añadido tab de Nelson al componente personalizado
+- [x] **Crash en "Entender la adicción"** - Frontend usaba `topics` pero backend devuelve `sections`
+- [x] **"Manejo de craving" sin contenido** - Frontend usaba `techniques` pero backend devuelve `sections`
+- [x] **"Qué Esperar" sin contenido** - Frontend usaba `what_to_expect.phases` pero backend devuelve `first_days.timeline`
 
 ## Nuevas Funcionalidades (Mar 2026)
 - [x] **Límites de tema para Nelson**: Solo responde sobre adicciones, bienestar, motivación, familia
