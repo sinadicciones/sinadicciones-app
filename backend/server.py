@@ -2505,7 +2505,10 @@ async def get_purpose_stats(current_user: User = Depends(get_current_user)):
 @app.get("/api/purpose/ai-analysis")
 async def get_purpose_ai_analysis(current_user: User = Depends(get_current_user)):
     """Generate AI analysis of user's purpose test results and provide personalized recommendations"""
-    if not openai_client:
+    from emergentintegrations.llm.chat import LlmChat, UserMessage
+    
+    EMERGENT_LLM_KEY = os.getenv("EMERGENT_LLM_KEY")
+    if not EMERGENT_LLM_KEY:
         raise HTTPException(status_code=503, detail="AI service not available")
     
     try:
