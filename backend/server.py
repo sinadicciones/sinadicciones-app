@@ -2582,8 +2582,8 @@ IMPORTANTE:
 - Usa un tono cálido y esperanzador
 - Responde SOLO con el JSON, sin texto adicional"""
 
-        # Use sync call since OpenAI client is synchronous
-        response = openai_client.chat.completions.create(
+        # Use async call since OpenAI client is AsyncOpenAI
+        response = await openai_client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {"role": "system", "content": "Eres un experto en psicología positiva y propósito de vida, especializado en ayudar a personas en recuperación de adicciones a encontrar significado y dirección."},
