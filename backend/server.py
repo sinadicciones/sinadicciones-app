@@ -6160,8 +6160,8 @@ async def setup_paciente_demo():
     # CLEANUP: Delete any existing data for this user
     await db.users.delete_many({"email": demo_email})
     await db.users.delete_many({"user_id": demo_user_id})
-    await db.profiles.delete_many({"email": demo_email})
-    await db.profiles.delete_many({"user_id": demo_user_id})
+    await db.user_profiles.delete_many({"email": demo_email})
+    await db.user_profiles.delete_many({"user_id": demo_user_id})
     await db.habits.delete_many({"user_id": demo_user_id})
     await db.habit_logs.delete_many({"user_id": demo_user_id})
     await db.emotional_logs.delete_many({"user_id": demo_user_id})
