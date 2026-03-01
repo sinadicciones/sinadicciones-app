@@ -213,38 +213,86 @@ export default function AllGoals() {
 
                 {(areaGoals as any[]).map((goal: any) => (
                   <View key={goal.goal_id} style={styles.goalCard}>
-                    <View style={styles.goalStatus}>
-                      <Ionicons
-                        name={goal.status === 'completed' ? 'checkmark-circle' : 'ellipse-outline'}
-                        size={20}
-                        color={goal.status === 'completed' ? '#10B981' : areaInfo.color}
-                      />
-                    </View>
-                    <View style={styles.goalContent}>
-                      <Text
-                        style={[
-                          styles.goalTitle,
-                          goal.status === 'completed' && styles.goalTitleCompleted,
-                        ]}
-                      >
-                        {goal.title}
-                      </Text>
-                      {goal.description && (
-                        <Text style={styles.goalDescription} numberOfLines={2}>
-                          {goal.description}
-                        </Text>
-                      )}
-                      <View style={styles.goalMeta}>
-                        <View style={styles.progressBar}>
-                          <View
-                            style={[
-                              styles.progressFill,
-                              { width: `${goal.progress || 0}%`, backgroundColor: areaInfo.color },
-                            ]}
-                          />
-                        </View>
-                        <Text style={styles.progressText}>{goal.progress || 0}%</Text>
+                    <View style={styles.goalHeader}>
+                      <View style={styles.goalStatus}>
+                        <Ionicons
+                          name={goal.progress >= 100 ? 'checkmark-circle' : 'flag'}
+                          size={20}
+                          color={goal.progress >= 100 ? '#10B981' : areaInfo.color}
+                        />
                       </View>
+                      <View style={styles.goalContent}>
+                        <Text
+                          style={[
+                            styles.goalTitle,
+                            goal.progress >= 100 && styles.goalTitleCompleted,
+                          ]}
+                        >
+                          {goal.title}
+                        </Text>
+                        {goal.description && (
+                          <Text style={styles.goalDescription} numberOfLines={1}>
+                            {goal.description}
+                          </Text>
+                        )}
+                      </View>
+                      <Text style={styles.goalTarget}>{goal.target_days || 5} días/sem</Text>
+                    </View>
+                    
+                    {/* Weekly Day Circles */}
+                    <View style={styles.weekDaysContainer}>
+                      {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map((day, index) => {
+                        const dayLabels = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+                        const isCompleted = goal.weekly_progress?.[day] || false;
+                        return (
+                          <TouchableOpacity
+                            key={day}
+                            style={[
+                              styles.dayCircle,
+                              isCompleted && { backgroundColor: areaInfo.color, borderColor: areaInfo.color }
+                            ]}
+                            onPress={async () => {
+                              try {
+                                const response = await authenticatedFetch(
+                                  `${BACKEND_URL}/api/purpose/goals/${goal.goal_id}/toggle-day`,
+                                  {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ day })
+                                  }
+                                );
+                                if (response.ok) {
+                                  loadGoals(); // Refresh goals
+                                }
+                              } catch (error) {
+                                console.error('Error toggling day:', error);
+                              }
+                            }}
+                          >
+                            <Text style={[
+                              styles.dayLabel,
+                              isCompleted && styles.dayLabelCompleted
+                            ]}>
+                              {dayLabels[index]}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                    
+                    {/* Progress Bar */}
+                    <View style={styles.goalMeta}>
+                      <View style={styles.progressBar}>
+                        <View
+                          style={[
+                            styles.progressFill,
+                            { width: `${goal.progress || 0}%`, backgroundColor: areaInfo.color },
+                          ]}
+                        />
+                      </View>
+                      <Text style={styles.progressText}>
+                        {Object.values(goal.weekly_progress || {}).filter(Boolean).length}/{goal.target_days || 5} días
+                      </Text>
                     </View>
                   </View>
                 ))}
