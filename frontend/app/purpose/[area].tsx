@@ -35,7 +35,7 @@ export default function AreaDetail() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [newGoal, setNewGoal] = useState({ title: '', description: '' });
+  const [newGoal, setNewGoal] = useState<{ title: string; description: string; target_days?: number }>({ title: '', description: '', target_days: 5 });
   const [rating, setRating] = useState(5);
 
   const areaInfo = AREAS[area as string] || AREAS.health;
