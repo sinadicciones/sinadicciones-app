@@ -683,12 +683,12 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: '#2D2D2D',
     borderRadius: 12,
     paddingHorizontal: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    borderColor: '#3D3D3D',
   },
   inputIcon: {
     marginRight: 12,
@@ -698,6 +698,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     fontSize: 16,
     color: '#FFFFFF',
+    backgroundColor: 'transparent',
   },
   submitButton: {
     backgroundColor: '#FFFFFF',
