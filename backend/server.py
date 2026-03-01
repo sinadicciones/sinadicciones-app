@@ -6047,46 +6047,41 @@ async def setup_demo_user():
     # Hash password
     password_hash = hashlib.sha256(demo_password.encode()).hexdigest()
     
-    # Create/update user
-    await db.users.update_one(
-        {"email": demo_email},
-        {
-            "$set": {
-                "user_id": demo_user_id,
-                "email": demo_email,
-                "name": "Carlos Demo",
-                "password_hash": password_hash,
-                "created_at": datetime.now(timezone.utc)
-            }
-        },
-        upsert=True
-    )
+    # AGGRESSIVE CLEANUP: Delete ALL existing data for this email
+    await db.users.delete_many({"email": demo_email})
+    await db.profiles.delete_many({"email": demo_email})
+    await db.profiles.delete_many({"user_id": demo_user_id})
     
-    # Delete any existing profile with different user_id but same email
-    await db.profiles.delete_many({"email": demo_email, "user_id": {"$ne": demo_user_id}})
+    # Create fresh user
+    await db.users.insert_one({
+        "user_id": demo_user_id,
+        "email": demo_email,
+        "name": "Carlos Demo",
+        "password_hash": password_hash,
+        "created_at": datetime.now(timezone.utc)
+    })
     
-    # Create/update profile
-    await db.profiles.update_one(
-        {"email": demo_email},
-        {
-            "$set": {
-                "user_id": demo_user_id,
-                "name": "Carlos Demo",
-                "email": demo_email,
-                "role": "patient",
-                "addiction_type": "Alcohol",
-                "recovery_start_date": (datetime.now(timezone.utc) - timedelta(days=45)).isoformat(),
-                "days_clean": 45,
-                "my_why": "Por mi familia, especialmente mis hijos. Quiero ser el padre que ellos merecen y estar presente en sus vidas.",
-                "triggers": ["stress", "loneliness", "celebration", "boredom"],
-                "protective_factors": ["family", "friends", "sports", "spirituality"],
-                "support_network": ["Mi esposa María", "Padrino AA - Roberto", "Terapeuta Dr. García"],
-                "onboarding_completed": True,
-                "updated_at": datetime.now(timezone.utc)
-            }
-        },
-        upsert=True
-    )
+    # Create fresh profile
+    await db.profiles.insert_one({
+        "user_id": demo_user_id,
+        "name": "Carlos Demo",
+        "email": demo_email,
+        "role": "patient",
+        "addiction_type": "Alcohol",
+        "recovery_start_date": (datetime.now(timezone.utc) - timedelta(days=91)).isoformat(),
+        "days_clean": 91,
+        "my_why": "Por mi familia, especialmente mis hijos. Quiero ser el padre que ellos merecen y estar presente en sus vidas.",
+        "triggers": ["stress", "loneliness", "celebration", "boredom"],
+        "protective_factors": ["family", "friends", "sports", "spirituality"],
+        "support_network": ["Mi esposa María", "Padrino AA - Roberto", "Terapeuta Dr. García"],
+        "emergency_contacts": [
+            {"name": "María (esposa)", "phone": "+52 555 123 4567", "relationship": "Esposa"},
+            {"name": "Roberto (padrino AA)", "phone": "+52 555 987 6543", "relationship": "Padrino"}
+        ],
+        "profile_completed": True,
+        "onboarding_completed": True,
+        "updated_at": datetime.now(timezone.utc)
+    })
     
     # Create purpose test data
     await db.purpose_tests.update_one(
