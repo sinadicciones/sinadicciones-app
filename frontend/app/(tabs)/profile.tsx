@@ -25,7 +25,7 @@ import * as ImagePicker from 'expo-image-picker';
 const BACKEND_URL = getBackendURL();
 
 // Mapeo de traducciones para gatillos y factores protectores
-const TRANSLATIONS: Record<string, string> = {
+const TRANSLATIONS = {
   // Gatillos (de onboarding-active.tsx)
   'stress': 'Estrés',
   'anxiety': 'Ansiedad',
