@@ -573,7 +573,7 @@ export default function ProfileScreen() {
             {(profile?.role === 'patient' || profile?.role === 'active_user') && (
               <TouchableOpacity 
                 style={[styles.accountButton, styles.recoveryPlanButton]}
-                onPress={() => setShowRecoveryPlanModal(true)}
+                onPress={() => router.push('/recommendations')}
               >
                 <Ionicons name="map" size={20} color="#10B981" />
                 <Text style={[styles.accountButtonText, { color: '#10B981' }]}>
