@@ -1,0 +1,90 @@
+{
+  "summary": "Backend-only testing of SinAdicciones platform. All 24 API endpoint tests PASSED (100% success rate). Tested: login (patient/professional), emotional-logs (GET/POST), Nelson IA chat, professional/patients, professional/alerts, habits, profile, purpose/goals endpoints.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_main_endpoints.py",
+    "/app/test_reports/pytest/pytest_main_endpoints.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [
+    "/app/backend/tests/test_main_endpoints.py"
+  ],
+  "success_rate": {
+    "backend": "100% (24/24 tests passed)",
+    "frontend": "Not tested (backend-only request)"
+  },
+  "test_credentials": {
+    "patient": {"email": "paciente@sinadicciones.org", "password": "demo123"},
+    "professional": {"email": "profesional@sinadicciones.org", "password": "demopassword"}
+  },
+  "seed_data_creation": "Using existing demo accounts in database",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "All backend endpoints working correctly. Patient has 90 emotional logs, 5 habits, 7 SMART goals. Professional has 2 linked patients (Carlos Demo, Miguel Paciente). Nelson IA chat using emergentintegrations is functioning correctly with proper context awareness.",
+  "endpoints_tested": {
+    "POST /api/auth/login": {
+      "status": "PASS",
+      "notes": "Both patient and professional login work correctly, returns session_token"
+    },
+    "GET /api/emotional-logs": {
+      "status": "PASS", 
+      "notes": "Returns list of 90 emotional logs for patient"
+    },
+    "POST /api/emotional-logs": {
+      "status": "PASS",
+      "notes": "Creates new emotional log, updates if same date exists"
+    },
+    "POST /api/nelson/chat": {
+      "status": "PASS",
+      "notes": "Nelson IA responds with context-aware messages, detects anxiety mode correctly"
+    },
+    "GET /api/professional/patients": {
+      "status": "PASS",
+      "notes": "Returns 2 linked patients with recovery info (clean_since, addiction_type)"
+    },
+    "GET /api/professional/alerts": {
+      "status": "PASS",
+      "notes": "Returns empty list (no active alerts for linked patients)"
+    },
+    "GET /api/habits": {
+      "status": "PASS",
+      "notes": "Returns 5 habits with streak tracking and completion status"
+    },
+    "GET /api/profile": {
+      "status": "PASS",
+      "notes": "Patient profile has triggers (4), protective_factors (4), clean_since date"
+    },
+    "GET /api/purpose/goals": {
+      "status": "PASS",
+      "notes": "Returns 7 SMART goals with weekly_progress tracking and target_days"
+    }
+  },
+  "authentication_tests": {
+    "valid_credentials": "PASS",
+    "invalid_credentials": "PASS (returns 401)",
+    "missing_password": "PASS (returns 422)",
+    "unauthorized_access": "PASS (all protected endpoints return 401 without token)",
+    "role_based_access": "PASS (patient cannot access /api/professional/* endpoints)"
+  },
+  "demo_data_verified": {
+    "patient_user_id": "user_paciente_demo_2026",
+    "patient_name": "Miguel Paciente",
+    "patient_triggers": 4,
+    "patient_protective_factors": 4,
+    "patient_habits": 5,
+    "patient_emotional_logs": 90,
+    "patient_smart_goals": 7,
+    "professional_user_id": "user_demo_profesional", 
+    "professional_type": "Psicóloga Clínica",
+    "professional_linked_patients": 2
+  }
+}
