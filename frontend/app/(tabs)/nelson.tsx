@@ -40,7 +40,43 @@ const CRISIS_TOOLS: CrisisTool[] = [
   { id: 'contacts', name: 'Contactos', icon: 'call', description: 'Contactos de emergencia' },
 ];
 
-const QUICK_PROMPTS = [
+const QUICK_PROMPTS_BY_ROLE: Record<string, Array<{ id: string; text: string; icon: string }>> = {
+  patient: [
+    { id: 'progress', text: '¿Cómo voy en mi recuperación?', icon: 'trending-up' },
+    { id: 'craving', text: 'Tengo ganas de consumir', icon: 'flame' },
+    { id: 'triggers', text: 'Estoy cerca de un gatillo', icon: 'warning' },
+    { id: 'celebrate', text: 'Quiero celebrar mi progreso', icon: 'trophy' },
+    { id: 'anxiety', text: 'Tengo ansiedad', icon: 'pulse' },
+    { id: 'talk', text: 'Solo quiero hablar', icon: 'chatbubbles' },
+  ],
+  active_user: [
+    { id: 'motivation', text: '¿Cómo va mi reto?', icon: 'flag' },
+    { id: 'habits', text: 'Necesito motivación para mis hábitos', icon: 'fitness' },
+    { id: 'obstacle', text: 'Tengo un obstáculo', icon: 'alert-circle' },
+    { id: 'progress', text: 'Quiero ver mi progreso', icon: 'stats-chart' },
+    { id: 'tired', text: 'Estoy cansado del reto', icon: 'battery-dead' },
+    { id: 'talk', text: 'Solo quiero hablar', icon: 'chatbubbles' },
+  ],
+  professional: [
+    { id: 'burnout', text: 'Me siento agotado/a', icon: 'battery-dead' },
+    { id: 'patient_case', text: 'Tengo un caso difícil', icon: 'people' },
+    { id: 'selfcare', text: 'Necesito tips de autocuidado', icon: 'heart' },
+    { id: 'boundaries', text: 'Cómo poner límites profesionales', icon: 'shield' },
+    { id: 'resources', text: 'Recursos para mis pacientes', icon: 'book' },
+    { id: 'talk', text: 'Solo quiero desahogarme', icon: 'chatbubbles' },
+  ],
+  family: [
+    { id: 'helpfamily', text: '¿Cómo ayudo a mi familiar?', icon: 'people' },
+    { id: 'boundaries', text: 'Necesito poner límites', icon: 'shield' },
+    { id: 'enabling', text: '¿Estoy habilitando la adicción?', icon: 'help-circle' },
+    { id: 'selfcare', text: 'Yo también estoy agotado/a', icon: 'heart' },
+    { id: 'crisis', text: 'Mi familiar está en crisis', icon: 'warning' },
+    { id: 'talk', text: 'Solo quiero hablar', icon: 'chatbubbles' },
+  ],
+};
+
+// Default prompts for unknown roles
+const DEFAULT_QUICK_PROMPTS = [
   { id: 'anxiety', text: 'Tengo ansiedad', icon: 'pulse' },
   { id: 'craving', text: 'Tengo ganas de consumir', icon: 'flame' },
   { id: 'sad', text: 'Me siento triste', icon: 'sad' },
@@ -51,6 +87,7 @@ export default function NelsonChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [profile, setProfile] = useState<any>(null);
   const [showCrisisModal, setShowCrisisModal] = useState(false);
   const [showBreathingModal, setShowBreathingModal] = useState(false);
   const [showGroundingModal, setShowGroundingModal] = useState(false);
@@ -61,9 +98,27 @@ export default function NelsonChat() {
   const scrollViewRef = useRef<ScrollView>(null);
   const breathAnimation = useRef(new Animated.Value(1)).current;
 
+  // Get quick prompts based on user role
+  const quickPrompts = profile?.role 
+    ? (QUICK_PROMPTS_BY_ROLE[profile.role] || DEFAULT_QUICK_PROMPTS)
+    : DEFAULT_QUICK_PROMPTS;
+
   useEffect(() => {
     loadConversation();
+    loadProfile();
   }, []);
+
+  const loadProfile = async () => {
+    try {
+      const response = await authenticatedFetch('/api/profile');
+      if (response.ok) {
+        const data = await response.json();
+        setProfile(data);
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error);
+    }
+  };
 
   useEffect(() => {
     // Scroll to bottom when new messages arrive
