@@ -198,10 +198,6 @@ class UpdateNotificationSettingsRequest(BaseModel):
     goal_reminders: Optional[bool] = None
     preferred_time: Optional[str] = None
 
-class RegisterPushTokenRequest(BaseModel):
-    push_token: str
-    device_type: str = "expo"  # expo, fcm, apns
-
 # ============== AUTH HELPERS ==============
 
 async def get_current_user(request: Request) -> Optional[User]:
