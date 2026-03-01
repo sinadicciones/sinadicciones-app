@@ -5,7 +5,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('EXPO_PUBLIC_BACKEND_URL', 'https://nelson-triggers.preview.emergentagent.com')
+BASE_URL = os.environ.get('EXPO_PUBLIC_BACKEND_URL', 'https://mental-health-hub-76.preview.emergentagent.com')
 
 # Test credentials
 TEST_EMAIL = "demo@sinadicciones.org"

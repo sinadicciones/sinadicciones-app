@@ -1,176 +1,244 @@
 <analysis>**original_problem_statement:**
-El usuario solicitó inicialmente una serie de mejoras de UI y la implementación de un sistema de notificaciones. El enfoque luego cambió a solucionar bugs críticos, mejorar funcionalidades existentes y añadir nuevas características.
-
-Las solicitudes más recientes y el estado del proyecto son:
--   **Bugs Críticos (Solucionados):** Se reportaron y solucionaron múltiples bugs que rompían la aplicación, incluyendo un crash en la pantalla de Perfil, un problema con el teclado en el chat de IA, un error en el análisis de IA de Propósito y un menú de navegación inconsistente. También se arreglaron crashes en la sección Educación y Recursos.
--   **Gestión de Datos (Solucionado):** Se solucionaron problemas con los datos del usuario de demostración en producción mediante la creación de un nuevo usuario () y la vinculación con el profesional de demostración.
--   **Nuevas Funcionalidades (Implementadas):** Se creó un perfil de administrador especial (), se añadió la capacidad de subir hasta 5 fotos en la sección Mi para qué del onboarding, se reorganizó la pantalla de inicio para destacar las Estrategias para Gatillos y se unificó el Plan de Recuperación.
--   **Notificaciones Push (Pendiente de Verificación):** El sistema de notificaciones no funcionaba. Se aplicó un fix (añadir el plugin  y actualizar la versión a 22), pero se requiere que el usuario compile y pruebe la nueva versión en un dispositivo físico.
--   **Metas SMART (En Progreso):** El usuario solicitó una revisión completa de la sección Propósito, específicamente para que las Metas SMART funcionen como objetivos semanales con seguimiento diario (en lugar de metas de una sola vez).
+El usuario solicitó una revisión y corrección integral de la plataforma, abarcando múltiples áreas. Las solicitudes clave incluyen:
+1.  **Metas SMART Semanales:** Implementar un sistema de metas semanales con seguimiento diario (círculos de progreso L-D) y un análisis de rendimiento mensual.
+2.  **Unificación del Plan de Recuperación:** Consolidar las secciones Recomendaciones y Plan de Recuperación en una única pantalla completa y coherente en el perfil del usuario.
+3.  **Corrección de UI/UX (Modo Oscuro):** Arreglar de forma generalizada todos los problemas de UI, incluyendo textos negros sobre fondos oscuros en los inputs, tarjetas con fondos blancos en la app de modo oscuro, y elementos de layout que se cortan o se ven mal (ej. los círculos de progreso de las metas).
+4.  **Personalización de Nelson IA:** Adaptar los prompts del sistema y los prompts rápidos preestablecidos de la IA Nelson según el rol del usuario (Paciente, Reto, Profesional, Familiar).
+5.  **Chequeo de Lógica y Coherencia entre Perfiles:** Realizar una verificación completa para asegurar que:
+    *   Las funcionalidades implementadas (Plan de Recuperación, Hábitos, Metas) aplican correctamente a los perfiles Paciente y Reto.
+    *   El perfil Profesional puede visualizar correctamente todos los datos registrados por sus pacientes vinculados.
+    *   Todas las interacciones entre perfiles (ej. alertas de crisis, asignación de tareas) funcionan como se espera.
+6.  **Mejoras en el Plan de Recuperación:**
+    *   Mostrar estrategias para **todos** los gatillos del usuario, no solo para uno.
+    *   Recomendar hábitos nuevos de forma inteligente, sin repetir los que el usuario ya tiene.
+    *   Ampliar la sección de recursos con enlaces y teléfonos de ayuda relevantes para Chile (ej. Fono SENDA).
+7.  **Corrección de Bugs:**
+    *   Un objetivo recién creado no se visualizaba en la lista general Mis Objetivos.
+    *   Al hacer clic en una Estrategia de Gatillo en el home, el usuario quiere ver la información de inmediato en un modal, en lugar de navegar a otra página.
 
 **User's preferred language**: Spanish. The next agent MUST respond in Spanish.
 
 **what currently exists?**
--   Una aplicación full-stack con Expo (React Native) y FastAPI, desplegada en Railway.
--   Un tema oscuro global, la IA Nelson y un dashboard de Propósito de Vida.
--   Usuarios de prueba funcionales para paciente (), profesional () y administrador ().
--   El backend para notificaciones push está completo, incluyendo endpoints para pruebas y recordatorios programados. El usuario ha configurado un cron job externo.
--   La app tiene un indicador de versión visible en la pantalla de inicio/login. La última versión configurada es la .
--   La pantalla de onboarding permite subir fotos para la sección Mi para qué.
--   La pantalla de inicio muestra una sección de Estrategias para tus Gatillos y se ha unificado el Plan de Recuperación.
--   El backend para el análisis de IA de propósito () ha sido corregido.
--   La base de código sufre de un débito técnico considerable, con archivos monolíticos como  y .
+-   Una aplicación full-stack con Expo (React Native) para el frontend y FastAPI/MongoDB para el backend.
+-   El sistema de Metas SMART fue rediseñado para ser semanal con seguimiento diario y análisis mensual, aunque presentó varios problemas de UI que fueron iterativamente corregidos.
+-   La IA Nelson ha sido refactorizada para usar  y tiene prompts personalizados por rol de usuario (paciente, reto, profesional, familiar).
+-   Se unificó la pantalla Mi Plan de Recuperación, eliminando un modal y un botón duplicados en el perfil, y se enriqueció con más secciones (Tu Reto, Gatillos, Recursos de Chile, etc.) y se aplicó un tema oscuro.
+-   Se implementó un modal en la pantalla de inicio para mostrar las Estrategias de Gatillos directamente, sin navegar.
+-   Se han aplicado múltiples correcciones de UI para el modo oscuro y el layout, pero los problemas de inconsistencia persisten y son una queja recurrente del usuario.
+-   Existe un plan de chequeo completo, solicitado por el usuario, del cual solo se han completado las primeras partes (verificación de perfiles Paciente/Profesional y el arreglo de Nelson).
 
 **Last working item**:
--   **Last item agent was working:** El agente estaba trabajando en dos frentes simultáneamente:
-    1.  **Bug Fix:** Corrigió el endpoint  en , que fallaba en producción porque consultaba la colección  en lugar de .
-    2.  **Feature Overhaul:** Comenzó la implementación de la nueva lógica para las Metas SMART. Esto implicó modificar el modelo de datos en el backend para soportar seguimiento semanal (, ) y empezar a rediseñar la interfaz en  para mostrar círculos de progreso diario. También se inició la lógica para sugerir metas.
+-   **Last item agent was working:** El agente estaba ejecutando un plan de chequeo completo de la plataforma solicitado por el usuario. El último paso fue arreglar un bug crítico en la IA Nelson. El error (Incorrect API key provided) se debía a que el código usaba el SDK de  directamente con la API key de , lo cual es incompatible. El agente corrigió el código en  para usar la librería  (, ), solucionando el problema.
 -   **Status:** IN PROGRESS
--   **Agent Testing Done:** N
--   **Which testing method agent to use?** both. El backend requerirá pruebas con  para los nuevos endpoints de metas, y el frontend necesitará un  una vez que la UI esté completa.
+-   **Agent Testing Done:** Y (para el fix de Nelson, mediante ).
+-   **Which testing method agent to use?** backend testing agent. Usar  para verificar los endpoints pendientes del plan de chequeo. Para las verificaciones de UI, usar  después de iniciar sesión. Al finalizar todo el plan, usar  para una regresión completa.
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   Issue 1: (P1) Las notificaciones push no se reciben en el dispositivo del usuario.
--   Issue 2: (P0) Error de análisis de IA en producción.
+-   Issue 1: (P0) Chequeo completo de la plataforma está incompleto.
+-   Issue 2: (P1) Inconsistencias persistentes en la UI (Modo Oscuro y Layouts).
+-   Issue 3: (P2) Las notificaciones push no se reciben.
+-   Issue 4: (P3) Un objetivo nuevo no aparecía en la lista general Mis Objetivos SMART.
 
 **Issues Detail**:
--   **Issue 1: Las notificaciones push no se reciben en el dispositivo del usuario.**
-    -   **Attempted fixes:** Se diagnosticó que el token del dispositivo no se estaba registrando en el servidor. La causa raíz identificada fue la falta del plugin  en . El agente lo agregó y actualizó el  a  para que el usuario pueda generar un nuevo build.
+-   **Issue 1: Chequeo completo de la plataforma está incompleto.**
+    -   **Attempted fixes:** El agente creó un plan de chequeo detallado y comenzó a ejecutarlo. Verificó los perfiles de Paciente y Profesional, y arregló la IA Nelson.
     -   **Next debug checklist:**
-        1.  Instruir al usuario para que guarde los cambios en GitHub y espere el despliegue en Railway.
-        2.  Guiar al usuario para que compile e instale la **versión 22** de la app en su dispositivo físico.
-        3.  Pedirle que inicie sesión para que la app intente registrar el token.
-        4.  Verificar si el token se registró usando el endpoint de debug: .
-        5.  Si el token se registra (), enviar una notificación de prueba.
-    -   **Why fix this issue and what will be achieved with the fix?** Es una funcionalidad clave de engagement que actualmente no funciona.
+        1.  Continuar con el plan de chequeo presentado al usuario en el  de la .
+        2.  Crear usuarios de prueba para los perfiles Reto y Familiar si no existen.
+        3.  Verificar las funcionalidades de Registro de emociones y Análisis emocional.
+        4.  Probar el flujo de Alertas de crisis (de Nelson al Profesional).
+        5.  Verificar la UI del modo oscuro en todas las pantallas restantes (, , , ).
+    -   **Why fix this issue and what will be achieved with the fix?** Es la tarea principal solicitada por el usuario para asegurar la estabilidad y coherencia de toda la aplicación.
+    -   **Status:** IN PROGRESS
+    -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?** both
+    -   **Blocked on other issue:** No.
+
+-   **Issue 2: Inconsistencias persistentes en la UI (Modo Oscuro y Layouts).**
+    -   **Attempted fixes:** El agente ha realizado múltiples  para cambiar fondos de tarjetas a colores oscuros, cambiar el color de texto de los  a blanco (usando  y luego ), y ajustar  de  a  para corregir layouts.
+    -   **Next debug checklist:**
+        1.  Durante el chequeo completo (Issue 1), revisar sistemáticamente CADA pantalla (, , , , , , , , , ) en busca de cualquier elemento que no respete el modo oscuro.
+        2.  Verificar que los  en TODAS las pantallas tengan el texto blanco. El fix de  debe ser validado.
+        3.  Revisar los layouts reportados anteriormente ( en  y ) para confirmar que la solución es robusta y no se rompe en diferentes vistas.
+    -   **Why fix this issue and what will be achieved with the fix?** El usuario ha reportado este problema repetidamente. Solucionarlo mejorará drásticamente la experiencia de usuario y la calidad percibida de la app.
+    -   **Status:** IN PROGRESS
+    -   **Is recurring issue?** Y
+    -   **Should Test frontend/backend/both after fix?** frontend
+
+-   **Issue 3: Las notificaciones push no se reciben.**
+    -   **Attempted fixes:** (De un fork anterior) Se añadió el plugin  en  y se subió el  a .
+    -   **Next debug checklist:**
+        1.  Instruir al usuario para que compile e instale la **versión 22** de la app en un dispositivo físico.
+        2.  Pedirle que inicie sesión para registrar el token.
+        3.  Verificar el registro del token con el endpoint .
+        4.  Si el token se registra, enviar una notificación de prueba.
+    -   **Why fix this issue and what will be achieved with the fix?** Es una funcionalidad clave de engagement que no funciona.
     -   **Status:** USER VERIFICATION PENDING
     -   **Is recurring issue?** Y
-    -   **Should Test frontend/backend/both after fix?** Both.
+    -   **Should Test frontend/backend/both after fix?** both
 
--   **Issue 2: Error de análisis de IA en producción en la sección Propósito.**
-    -   **Attempted fixes:** El agente identificó que el endpoint  en  usaba la colección incorrecta (). Se aplicó un  para cambiarla a .
+-   **Issue 4: Un objetivo nuevo no aparecía en la lista general Mis Objetivos SMART.**
+    -   **Attempted fixes:** El agente sospechó que era un problema de caché y sugirió al usuario hacer pull to refresh. No se implementó una solución en el código.
     -   **Next debug checklist:**
-        1.  Confirmar con el usuario que ha desplegado los últimos cambios en Railway.
-        2.  Pedir al usuario que pruebe la funcionalidad de nuevo en la aplicación.
-    -   **Why fix this issue and what will be achieved with the fix?** Repara una funcionalidad importante que está rota en el entorno de producción.
-    -   **Status:** IN PROGRESS (Fix aplicado, pendiente de despliegue y verificación).
+        1.  Reproducir el bug: Crear un nuevo objetivo en una sub-área (ej. Finanzas) y verificar si aparece inmediatamente en la pantalla general Mis Objetivos SMART.
+        2.  Si no aparece, investigar el manejo de estado en .
+        3.  Considerar usar  de React Navigation para forzar una recarga de datos () cada vez que la pantalla obtiene el foco.
+    -   **Why fix this issue and what will be achieved with the fix?** Asegura que los datos mostrados al usuario sean consistentes y actualizados, evitando confusión.
+    -   **Status:** NOT STARTED
     -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** Both.
+    -   **Should Test frontend/backend/both after fix?** frontend
 
 **In progress Task List**:
--   **Task 1: Implementar el nuevo sistema de Metas SMART semanales (P0).**
-    -   **Where to resume:**
-        1.  **Backend ():** Revisar y completar las modificaciones al modelo . Implementar el endpoint para marcar un día como completado (). Crear la lógica o el cron job para reiniciar el progreso de las metas cada semana.
-        2.  **Frontend ():** Completar el rediseño de la UI para mostrar las metas semanales con los círculos de progreso diario. Implementar la lógica para que al tocar un círculo se llame al endpoint del backend y se actualice el estado visualmente.
-        3.  **Frontend/Backend:** Implementar la funcionalidad de Metas Sugeridas basada en el Tipo de Propósito del usuario, tanto en el backend para generar las sugerencias como en el frontend para mostrarlas.
-    -   **What will be achieved with this?** Las Metas SMART funcionarán como objetivos semanales con seguimiento diario, alineándose con la visión del usuario y separándolas de los hábitos diarios.
+-   **Task 1: Ejecutar el Plan de Chequeo Completo (P0)**
+    -   **Where to resume:** Continuar desde el plan presentado en la . El siguiente paso es verificar los perfiles Reto y Familiar, seguido de las funcionalidades y pantallas pendientes (emociones, alertas, UI modo oscuro, etc.).
+    -   **What will be achieved with this?** Garantizar que toda la plataforma funciona de manera coherente, que los datos fluyen correctamente entre perfiles y que la UI es consistente, cumpliendo con la solicitud principal del usuario.
     -   **Status:** IN PROGRESS
-    -   **Should Test frontend/backend/both after fix?** Both.
-    -   **Blocked on something:** Nada.
+    -   **Should Test frontend/backend/both after fix?** both
+    -   **Blocked on something:** No.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks**:
-    -   (P1) **Verificar sistema de Notificaciones Push de extremo a extremo:** Una vez que el usuario confirme que el token se registra, probar todos los escenarios (recordatorios diarios del cron job, alertas de terapeuta, etc.).
-    -   (P2) **Verificar funcionalidades del perfil Profesional:** Revisar la UI de búsqueda de pacientes y el dashboard completo del profesional.
+    -   (P1) **Implementar lógica de hábitos recomendados inteligentes**: En , asegurar que las recomendaciones de hábitos no incluyan los que el usuario ya tiene.
+    -   (P2) **Verificar flujo de vinculación Paciente-Profesional**: Probar el flujo completo de cómo un paciente se vincula con un profesional.
 -   **Future Tasks**:
-    -   (P2) **Refactorización de archivos monolíticos:** Priorizar la división de  (usando FastAPI Routers) y  (en componentes React) para mejorar la mantenibilidad.
+    -   (P2) **Refactorización de archivos monolíticos:** Priorizar la división de  y .
     -   (P3) **Diario de voz para Nelson:** Permitir la interacción por voz con la IA.
-    -   (P4) **Unificar Hábitos y Metas:** Explorar la fusión de ambas secciones en una sola vista de Compromisos.
-    -   (P4) **Compartir resúmenes de IA con el terapeuta.**
+    -   (P4) **Unificar Hábitos y Metas:** Explorar la fusión de ambas secciones.
 
 **Completed work in this session**
--   Se solucionaron múltiples bugs críticos (crash en Perfil, teclado en Nelson, errores en Educación y Recursos).
--   Se creó un nuevo usuario demo de paciente () y se vinculó con el profesional para resolver conflictos de datos.
--   Se creó un perfil de administrador especial ().
--   Se implementó la subida de hasta 5 fotos en la sección Mi para qué del onboarding.
--   Se rediseñó la pantalla de inicio para incluir una sección de Estrategias para Gatillos.
--   Se unificaron las secciones de Recomendaciones y Plan de Recuperación.
--   Se añadió un indicador de versión visible en la UI y se actualizó el  a .
--   Se corrigió el bug del endpoint de análisis de IA.
--   Se identificó el problema de las notificaciones y se aplicó un fix pendiente de verificación (añadir plugin ).
+-   **Funcionalidad de Metas SMART Semanales:** Implementado el sistema de seguimiento diario y análisis mensual en  y .
+-   **Unificación del Plan de Recuperación:** Se consolidó todo en la pantalla , se eliminaron elementos duplicados y se aplicó un diseño de modo oscuro.
+-   **Mejora de UX en Estrategias de Gatillos:** Se cambió la navegación por un modal en la pantalla .
+-   **Personalización de Nelson IA:** Se implementaron prompts y mensajes de bienvenida personalizados por rol de usuario en  y .
+-   **Fix Crítico de Nelson IA:** Se corrigió el uso de la API de  en , reemplazando  por .
+-   **Fix de Endpoint para Profesional:** Se corrigió el endpoint  que fallaba por serialización de .
+-   **Múltiples Fixes de UI:** Se realizaron numerosos ajustes de estilos en varios archivos (, , , , ) para corregir problemas de modo oscuro y layout.
 
 **Earlier issues found/mentioned but not fixed**
 -   Ninguno.
 
 **Known issue recurrence from previous fork**
--   **Issue recurrence in previous fork:** Bug del teclado que ocultaba el input en el chat de Nelson.
--   **Recurrence count:** 2+
--   **Status:** RESOLVED. El agente aplicó un fix más robusto envolviendo todo el contenido con .
+-   **Issue recurrence in previous fork:** Problemas de UI (layout, modo oscuro, colores de texto).
+-   **Recurrence count:** 3+
+-   **Status:** IN PROGRESS. Aunque se han aplicado muchos parches, la naturaleza recurrente del problema indica que podría ser necesaria una refactorización de los estilos globales o de los componentes base.
 
 **Code Architecture**
-expo-notifications
+
 
 **Key Technical Concepts**
 -   Expo React Native (Frontend), FastAPI (Backend), MongoDB (DB).
--   **Despliegue:** Railway.
--   **IA:**  para llamadas a OpenAI (Nelson, Análisis de Propósito).
--   **Notificaciones Push:** A través de Expo. El sistema está implementado pero la registración de tokens estaba fallando.
--   **Refactorización de Metas SMART:** El trabajo actual consiste en cambiar el modelo de datos y la UI para que las metas sean semanales con seguimiento diario.
+-   **IA:** Uso de  (, ) es MANDATORIO para llamadas a LLM con la clave de Emergent.
+-   **MongoDB:** Errores recurrentes por serialización de . Requiere atención al proyectar () o convertir a .
+-   **React Native Styling:** Problemas persistentes con la aplicación de estilos (especialmente color) en React Native Web, requiriendo workarounds como estilos inline.
+-   **Manejo de Estado/Caché:** Potenciales problemas de datos desactualizados que sugieren la necesidad de una estrategia de recarga de datos más robusta (ej. ).
 
 **key DB schema**
--   : Almacena datos de perfil. Se añadieron  y .
--   : Almacena metas SMART. **El esquema está siendo modificado** para añadir campos como , , y .
--   : Almacena los tokens de Expo Push por usuario.
+-   : Contiene datos del perfil, incluyendo  ('patient', 'active_user', 'professional', 'family'), , etc.
+-   : Esquema modificado para incluir  (días objetivo de la semana) y  (tracking diario).
+-   : Contiene  para calcular rachas.
 
 **changes in tech stack**
 -   Ninguno.
 
 **All files of reference**
--    (para la lógica de metas y el fix de IA)
--    (para la UI de metas)
--    (para la configuración de notificaciones)
--    (donde se registra el token de notificación)
+-    (Lógica de Nelson, metas, perfiles, endpoint de profesional)
+-    (UI de Metas SMART)
+-    (UI de Metas por área)
+-    (Pantalla unificada Mi Plan de Recuperación)
+-    (Botón unificado y eliminación de modal)
+-    (Modal para estrategias de gatillos)
+-    (Fixes de UI en análisis)
+-    (Prompts personalizados por rol)
 
 **Areas that need refactoring**:
--   **CRÍTICO:** . Su tamaño hace que el mantenimiento y la adición de nuevas características sean extremadamente difíciles y propensos a errores. Debe dividirse en Routers de FastAPI.
--   **CRÍTICO:** . Es un archivo de más de 2500 líneas que debe ser descompuesto en componentes más pequeños y manejables.
+-   **CRÍTICO:** .
+-   **CRÍTICO:** .
+-   **ALTA RECOMENDACIÓN:** Crear un sistema de estilos global (Theme) para el modo oscuro para evitar los parches manuales en cada componente. Estandarizar el componente .
 
 **key api endpoints**
--   : (Corregido) Genera el análisis de IA.
--   : (Siendo modificado) Crea una nueva meta SMART.
--   : (Nuevo/En progreso) Endpoint para marcar un día como completado en una meta semanal.
--   : (Nuevo) Endpoint de debug para verificar si un usuario tiene un token push registrado.
--   : Crea el perfil de administrador.
+-   : (Corregido) Endpoint principal de la IA.
+-   : (Corregido) Obtiene los datos detallados de un paciente para el profesional.
+-   : Obtiene el resumen mensual de progreso de metas.
+-   : Marca un día como completado en una meta.
+-   : Endpoint para verificar el registro del token push.
 
 **Critical Info for New Agent**
--   Tu prioridad es **finalizar la revisión de las Metas SMART**. Esto incluye completar la lógica del backend (reset semanal, endpoint de actualización) y la UI del frontend (círculos de progreso, metas sugeridas).
--   La segunda prioridad es guiar al usuario para que **pruebe el fix de las Notificaciones Push**. Necesita compilar e instalar la **versión 22** en un dispositivo físico. Prepárate para depurar si el problema persiste.
--   El error del análisis de IA en producción ha sido corregido en el código. **Confirma con el usuario que ha desplegado los cambios** antes de marcarlo como resuelto.
--   El débito técnico es alto. Una vez que las tareas actuales estén completas, es crucial proponer un plan de refactorización al usuario para  y .
+-   Tu tarea principal es **continuar y completar el plan de chequeo** iniciado por el agente anterior. La lista de pendientes está en la .
+-   Los problemas de UI (modo oscuro, layout, color de texto) son la queja más recurrente del usuario. Presta máxima atención a estos detalles en todas las pantallas que verifiques. Sé proactivo en la búsqueda de inconsistencias.
+-   El fix de Nelson (usar  en lugar del SDK de usage: openai [-h] [-v] [-b API_BASE] [-k API_KEY] [-p PROXY [PROXY ...]]
+              [-o ORGANIZATION] [-t {openai,azure}]
+              [--api-version API_VERSION] [--azure-endpoint AZURE_ENDPOINT]
+              [--azure-ad-token AZURE_AD_TOKEN] [-V]
+              {api,tools,migrate,grit} ...
+
+positional arguments:
+  {api,tools,migrate,grit}
+    api                 Direct API calls
+    tools               Client side tools for convenience
+
+options:
+  -h, --help            show this help message and exit
+  -v, --verbose         Set verbosity.
+  -b API_BASE, --api-base API_BASE
+                        What API base url to use.
+  -k API_KEY, --api-key API_KEY
+                        What API key to use.
+  -p PROXY [PROXY ...], --proxy PROXY [PROXY ...]
+                        What proxy to use.
+  -o ORGANIZATION, --organization ORGANIZATION
+                        Which organization to run as (will use your default
+                        organization if not specified)
+  -t {openai,azure}, --api-type {openai,azure}
+                        The backend API to call, must be `openai` or `azure`
+  --api-version API_VERSION
+                        The Azure API version, e.g.
+                        'https://learn.microsoft.com/en-us/azure/ai-
+                        services/openai/reference#rest-api-versioning'
+  --azure-endpoint AZURE_ENDPOINT
+                        The Azure endpoint, e.g.
+                        'https://endpoint.openai.azure.com'
+  --azure-ad-token AZURE_AD_TOKEN
+                        A token from Azure Active Directory,
+                        https://www.microsoft.com/en-
+                        us/security/business/identity-access/microsoft-entra-
+                        id
+  -V, --version         show program's version number and exit) es un patrón crítico a seguir para cualquier interacción con LLMs.
+-   Ten en cuenta los problemas de caché de la app de Expo. Recomienda siempre al usuario hacer un hard refresh (Ctrl+Shift+R en web) o cerrar y reabrir completamente la app móvil.
+-   Para el , investiga y soluciona el problema de los datos que no se actualizan en la UI, preferiblemente implementando una solución de código como  en lugar de solo sugerir un refresh manual.
 
 **documents and test reports created in this job**
--    (actualizado varias veces)
--   
+-    (actualizado al finalizar la implementación de Metas SMART)
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User (P):** Aprueba el plan de Metas SMART semanales y reporta que el análisis de IA en producción no funciona. (IN PROGRESS)
-2.  **User:** Define su visión para las Metas SMART: semanales con seguimiento diario, separadas de los hábitos. (IN PROGRESS)
-3.  **User:** Pide una explicación detallada de cómo funciona la sección Propósito y un plan para mejorarla. (IN PROGRESS)
-4.  **User:** Pide fusionar Recomendaciones en Mi Plan de Recuperación y añadir una sección de Estrategias para Gatillos en la pantalla de inicio para todos los perfiles relevantes. (DONE)
-5.  **User:** Confirma que el plan propuesto es correcto y debe aplicarse a todos los perfiles de usuario. (DONE)
-6.  **User:** Pide resetear su perfil de administrador para probar de nuevo el onboarding. (DONE)
-7.  **User:** Reporta que no vio la opción de subir fotos en el onboarding. (ADDRESSED)
-8.  **User:** Pide revisar los cambios en el preview antes de generar un build. (DONE)
-9.  **User:** Define los detalles para su perfil de administrador y solicita la funcionalidad de subir hasta 5 fotos en Mi para qué. (DONE)
-10. **User:** Pide un plan para crear su perfil de administrador personal. (DONE)
+10. **User:** Pide continuar con el chequeo completo. (PENDING)
+9.  **User:** Pregunta qué más falta por chequear. (ADDRESSED)
+8.  **User:** Confirma que Nelson está funcionando y pide un resumen del chequeo. (ADDRESSED)
+7.  **User:** Pide seguir adelante con el debugging de Nelson. (ADDRESSED)
+6.  **User:** Pide aplicar los cambios para arreglar los gráficos de hábitos y la UI. (DONE)
+5.  **User:** Reporta que el gráfico de rendimiento tapa el texto y pide clarificar la lógica de las rachas y los periodos (semanal/mensual). (ADDRESSED)
+4.  **User:** Reporta que al hacer clic en una estrategia, navega a otra página y quiere que la info se muestre de inmediato. (DONE)
+3.  **User:** Confirma el plan de mejoras para Mi Plan de Recuperación. (DONE)
+2.  **User:** Pide un plan detallado para aplicar mejoras al Plan de Recuperación (estrategias para todos los gatillos, hábitos inteligentes, más recursos, modo oscuro, fotos). (ADDRESSED)
+1.  **User:** Reporta que los textos en los inputs y otros campos se ven en negro sobre fondo negro, y pide un chequeo completo de la lógica de la plataforma y las interacciones entre perfiles. (IN PROGRESS)
 
 **Project Health Check:**
 -   **Broken:**
-    -   Las notificaciones push probablemente sigan rotas hasta que el usuario pruebe la v22 con el fix del plugin.
+    -   La UI tiene inconsistencias visuales graves (modo oscuro, textos, layouts) que el usuario ha reportado varias veces.
+    -   Las notificaciones push no están confirmadas como funcionales.
 -   **Mocked:** N/A
 
 **3rd Party Integrations**
--   **OpenAI GPT-4o:** Usado vía  para la IA Nelson y el análisis de propósito.
--   **Railway:** Plataforma de hosting para el backend y la base de datos.
+-   **OpenAI GPT-4o:** Usado vía  para la IA Nelson. **Usa Emergent LLM Key**.
+-   **Railway:** Plataforma de hosting.
 -   **Expo (EAS):** Servicio de build para la app React Native.
--   **cron-job.org:** Servicio externo que el usuario configuró para llamar al endpoint de recordatorios.
+-   **cron-job.org:** Servicio externo configurado por el usuario.
 
 **Testing status**
--   **Testing agent used after significant changes:** Sí, para identificar un bug de importación.
+-   **Testing agent used after significant changes:** Sí, para chequear la plataforma, lo que reveló el bug del color de texto en los inputs.
 -   **Troubleshoot agent used after agent stuck in loop:** No.
 -   **Test files created:** Ninguno.
--   **Known regressions:** Las notificaciones push, que están pendientes de verificación tras un fix.
+-   **Known regressions:** Problemas de UI (layout/estilo) que reaparecen en diferentes contextos después de ser arreglados puntualmente.
 
 **Credentials to test flow:**
 -   **Paciente Demo:**  / 
@@ -178,4 +246,6 @@ expo-notifications
 -   **Admin:**  / 
 
 **What agent forgot to execute**
--   El agente planeó pero aún no ha implementado la lógica del backend para el reinicio semanal automático (cron job) de las Metas SMART. Esto debe ser parte de la finalización de la tarea en curso.</analysis>
+-   **Ejecutar el plan de chequeo completo:** El agente creó un plan detallado pero solo completó una parte. Faltan por verificar los perfiles Reto y Familiar, las funcionalidades de emociones, las alertas de crisis y la UI de varias pantallas.
+-   **Implementar la lógica de hábitos recomendados inteligentes:** El plan del agente incluía recomendar hábitos nuevos sin repetir los que el usuario ya tiene, pero no hay evidencia de que esta lógica de filtrado se haya implementado en .
+-   **Crear usuarios de prueba:** Para verificar los perfiles Reto y Familiar, el agente necesita crear nuevos usuarios con esos roles.</analysis>
