@@ -1178,6 +1178,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
+    color: '#FFFFFF',
     marginBottom: 12,
   },
   inputMultiline: {
@@ -1186,11 +1187,13 @@ const styles = StyleSheet.create({
   },
   smartReminder: {
     flexDirection: 'row',
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#1A1A1A',
     padding: 12,
     borderRadius: 12,
     gap: 10,
     marginTop: 8,
+    borderWidth: 1,
+    borderColor: '#2D2D2D',
   },
   smartReminderText: {
     flex: 1,
