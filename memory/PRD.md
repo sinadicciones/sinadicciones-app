@@ -82,6 +82,7 @@ SinAdicciones es una aplicación móvil de apoyo a personas en recuperación de 
 - GET /api/ai/status - Verificar configuración de IA
 
 ## versionCode History
+- v18: Límites de tema para Nelson + Dashboard de Propósito con análisis de IA
 - v17: Corrección de bugs: KeyboardAvoidingView en Nelson, traducciones en perfil, protección contra crash en craving
 - v16: (pendiente de build)
 - v14: Agregado Nelson (terapeuta IA)
@@ -94,6 +95,21 @@ SinAdicciones es una aplicación móvil de apoyo a personas en recuperación de 
 - [x] Crash en "Manejo de craving" - Protección contra undefined
 - [x] Menú inconsistente en Propósito - Estilo unificado
 - [x] Texto ilegible en Test de propósito - Contraste mejorado
+
+## Nuevas Funcionalidades (Mar 2026)
+- [x] **Límites de tema para Nelson**: Solo responde sobre adicciones, bienestar, motivación, familia
+- [x] **Dashboard de Propósito con IA**: Análisis completo del test de propósito
+  - Declaración de propósito personalizada
+  - Identidad esencial
+  - Insights clave
+  - Afirmación diaria
+  - Acciones recomendadas
+  - Oportunidades de crecimiento
+- [x] **Caché de análisis**: El análisis se guarda para no regenerar
+
+## API Endpoints Nuevos - Propósito IA
+- GET /api/purpose/ai-analysis - Genera análisis de IA del propósito
+- GET /api/purpose/ai-analysis/cached - Obtiene análisis cacheado
 
 ## Architecture
 
