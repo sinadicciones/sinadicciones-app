@@ -1376,4 +1376,219 @@ const styles = StyleSheet.create({
     marginTop: 6,
     marginBottom: 12,
   },
+  // Header actions styles
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  monthlyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1A1A1A',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    gap: 6,
+  },
+  monthlyButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#F59E0B',
+  },
+  // Monthly Analysis Modal styles
+  summaryCard: {
+    backgroundColor: '#1A1A1A',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    borderWidth: 2,
+    borderColor: '#2D2D2D',
+  },
+  summaryExcelente: {
+    borderColor: '#F59E0B',
+    backgroundColor: '#F59E0B10',
+  },
+  summaryBueno: {
+    borderColor: '#10B981',
+    backgroundColor: '#10B98110',
+  },
+  summaryRegular: {
+    borderColor: '#3B82F6',
+    backgroundColor: '#3B82F610',
+  },
+  summaryAtencion: {
+    borderColor: '#EF4444',
+    backgroundColor: '#EF444410',
+  },
+  summaryHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    marginBottom: 12,
+  },
+  summaryPercentage: {
+    fontSize: 48,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  summaryMessage: {
+    fontSize: 15,
+    color: '#E5E5E5',
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 16,
+  },
+  summaryStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#2D2D2D',
+  },
+  summaryStat: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  summaryStatValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  summaryStatLabel: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    marginTop: 4,
+  },
+  summaryStatDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: '#2D2D2D',
+  },
+  monthlyGoalsTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 12,
+  },
+  monthlyGoalCard: {
+    backgroundColor: '#1A1A1A',
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#2D2D2D',
+  },
+  monthlyGoalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 10,
+  },
+  monthlyGoalIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  monthlyGoalInfo: {
+    flex: 1,
+  },
+  monthlyGoalTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  monthlyGoalArea: {
+    fontSize: 12,
+    color: '#9CA3AF',
+  },
+  monthlyGoalBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    backgroundColor: '#2D2D2D',
+  },
+  monthlyGoalBadgeSuccess: {
+    backgroundColor: '#10B98120',
+  },
+  monthlyGoalBadgePartial: {
+    backgroundColor: '#F59E0B20',
+  },
+  monthlyGoalBadgeLow: {
+    backgroundColor: '#EF444420',
+  },
+  monthlyGoalBadgeText: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#EF4444',
+  },
+  monthlyGoalBadgeTextSuccess: {
+    color: '#10B981',
+  },
+  monthlyGoalBadgeTextPartial: {
+    color: '#F59E0B',
+  },
+  monthlyGoalStats: {
+    flexDirection: 'row',
+    gap: 16,
+    marginBottom: 10,
+  },
+  monthlyGoalStat: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  monthlyGoalStatText: {
+    fontSize: 12,
+    color: '#9CA3AF',
+  },
+  weekDetailsRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 4,
+  },
+  weekMini: {
+    flex: 1,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: '#2D2D2D',
+    alignItems: 'center',
+  },
+  weekMiniAchieved: {
+    backgroundColor: '#10B98130',
+  },
+  weekMiniCurrent: {
+    borderWidth: 1,
+    borderColor: '#F59E0B',
+  },
+  weekMiniText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#9CA3AF',
+  },
+  weekMiniTextAchieved: {
+    color: '#10B981',
+  },
+  emptyAnalysis: {
+    alignItems: 'center',
+    padding: 32,
+  },
+  emptyAnalysisText: {
+    fontSize: 14,
+    color: '#9CA3AF',
+    textAlign: 'center',
+    marginTop: 12,
+  },
+  loadingAnalysis: {
+    padding: 32,
+    alignItems: 'center',
+  },
+  loadingAnalysisText: {
+    fontSize: 14,
+    color: '#9CA3AF',
+  },
 });
