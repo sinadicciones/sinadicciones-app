@@ -5218,15 +5218,15 @@ async def nelson_chat(
         message_lower = user_message.lower()
         crisis_detected = any(keyword in message_lower for keyword in CRISIS_KEYWORDS)
         
-        # Get user context
-        user_context = await get_nelson_user_context(current_user.user_id)
+        # Get user context (now returns tuple of context and role_context)
+        user_context, role_context = await get_nelson_user_context(current_user.user_id)
         
         # Get conversation history
         conversation = await db.nelson_conversations.find_one({"user_id": current_user.user_id})
         messages_history = conversation.get("messages", [])[-10:] if conversation else []
         
         # Build messages for OpenAI
-        system_prompt = NELSON_SYSTEM_PROMPT.format(user_context=user_context)
+        system_prompt = NELSON_SYSTEM_PROMPT.format(user_context=user_context, role_context=role_context)
         
         openai_messages = [{"role": "system", "content": system_prompt}]
         
