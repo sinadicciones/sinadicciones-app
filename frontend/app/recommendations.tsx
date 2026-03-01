@@ -31,6 +31,18 @@ const TRIGGER_RECOMMENDATIONS: Record<string, any> = {
     ],
     habit: { name: 'Meditación anti-estrés', icon: '🧘', frequency: 'daily' },
   },
+  'Estrés laboral': {
+    title: 'Estrés Laboral',
+    icon: 'briefcase',
+    color: '#EF4444',
+    tips: [
+      'Establece límites claros entre trabajo y vida personal',
+      'Toma pausas activas cada 2 horas',
+      'Practica técnicas de respiración en momentos de presión',
+      'Habla con tu jefe sobre carga de trabajo si es necesario',
+    ],
+    habit: { name: 'Pausa activa laboral', icon: '💼', frequency: 'daily' },
+  },
   'Soledad': {
     title: 'Combatir la Soledad',
     icon: 'people',
@@ -54,6 +66,18 @@ const TRIGGER_RECOMMENDATIONS: Record<string, any> = {
       'Considera terapia de pareja o familiar si es necesario',
     ],
     habit: { name: 'Escribir antes de reaccionar', icon: '📝', frequency: 'daily' },
+  },
+  'Discusiones familiares': {
+    title: 'Manejo de Conflictos Familiares',
+    icon: 'home',
+    color: '#F59E0B',
+    tips: [
+      'Aléjate de la situación antes de reaccionar impulsivamente',
+      'Practica la escucha activa sin interrumpir',
+      'Expresa tus sentimientos usando "yo siento" en lugar de acusar',
+      'Considera terapia familiar para mejorar la comunicación',
+    ],
+    habit: { name: 'Tiempo de calma familiar', icon: '🏠', frequency: 'daily' },
   },
   'Emociones negativas': {
     title: 'Regulación Emocional',
@@ -91,6 +115,18 @@ const TRIGGER_RECOMMENDATIONS: Record<string, any> = {
     ],
     habit: { name: 'Plan de salida', icon: '🚪', frequency: 'weekly' },
   },
+  'Fiestas y celebraciones': {
+    title: 'Fiestas y Celebraciones',
+    icon: 'balloon',
+    color: '#8B5CF6',
+    tips: [
+      'Llega con un plan claro y hora de salida definida',
+      'Lleva tu propia bebida sin alcohol',
+      'Ten un "compañero de recuperación" en el evento',
+      'Prepara respuestas para ofrecer cuando te ofrezcan alcohol',
+    ],
+    habit: { name: 'Preparar eventos sociales', icon: '🎉', frequency: 'weekly' },
+  },
   'Ciertos lugares': {
     title: 'Evitar Lugares de Riesgo',
     icon: 'location',
@@ -114,6 +150,42 @@ const TRIGGER_RECOMMENDATIONS: Record<string, any> = {
       'Comunica tus necesidades de forma clara',
     ],
     habit: { name: 'Evaluar relaciones', icon: '👥', frequency: 'weekly' },
+  },
+  'Ansiedad': {
+    title: 'Manejo de la Ansiedad',
+    icon: 'pulse',
+    color: '#EC4899',
+    tips: [
+      'Practica la técnica de respiración 4-7-8',
+      'Usa la técnica de grounding 5-4-3-2-1',
+      'Limita el consumo de cafeína',
+      'Establece una rutina de sueño regular',
+    ],
+    habit: { name: 'Ejercicio de respiración', icon: '🌬️', frequency: 'daily' },
+  },
+  'Depresión': {
+    title: 'Afrontando la Depresión',
+    icon: 'cloudy-night',
+    color: '#6366F1',
+    tips: [
+      'Mantén una rutina diaria aunque no tengas ganas',
+      'Sal a caminar aunque sea 10 minutos al día',
+      'Busca apoyo profesional si los síntomas persisten',
+      'No te aísles, mantén contacto con tu red de apoyo',
+    ],
+    habit: { name: 'Caminata diaria', icon: '🚶', frequency: 'daily' },
+  },
+  'Problemas económicos': {
+    title: 'Estrés Financiero',
+    icon: 'cash',
+    color: '#F59E0B',
+    tips: [
+      'Crea un presupuesto simple y síguelo',
+      'Busca apoyo en organizaciones de ayuda económica',
+      'No tomes decisiones financieras cuando estés estresado',
+      'Recuerda que el consumo empeora los problemas económicos',
+    ],
+    habit: { name: 'Revisar finanzas', icon: '💰', frequency: 'weekly' },
   },
 };
 
