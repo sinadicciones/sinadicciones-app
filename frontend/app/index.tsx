@@ -358,7 +358,7 @@ export default function WelcomeScreen() {
                     <View style={styles.inputContainer}>
                       <Ionicons name="person" size={20} color="#9CA3AF" style={styles.inputIcon} />
                       <TextInput
-                        style={[styles.input, { backgroundColor: 'transparent', color: '#FFFFFF' }]}
+                        style={styles.input}
                         placeholder="Tu nombre"
                         placeholderTextColor="#9CA3AF"
                         value={name}
@@ -368,10 +368,10 @@ export default function WelcomeScreen() {
                     </View>
                   )}
 
-                  <View style={[styles.inputContainer, { backgroundColor: 'rgba(255, 255, 255, 0.1)' }]}>
+                  <View style={styles.inputContainer}>
                     <Ionicons name="mail" size={20} color="#9CA3AF" style={styles.inputIcon} />
                     <TextInput
-                      style={[styles.input, { backgroundColor: 'transparent', color: '#FFFFFF' }]}
+                      style={styles.input}
                       placeholder="Email"
                       placeholderTextColor="#9CA3AF"
                       value={email}
@@ -381,10 +381,10 @@ export default function WelcomeScreen() {
                     />
                   </View>
 
-                  <View style={[styles.inputContainer, { backgroundColor: 'rgba(255, 255, 255, 0.1)' }]}>
+                  <View style={styles.inputContainer}>
                     <Ionicons name="lock-closed" size={20} color="#9CA3AF" style={styles.inputIcon} />
                     <TextInput
-                      style={[styles.input, { backgroundColor: 'transparent', color: '#FFFFFF' }]}
+                      style={styles.input}
                       placeholder="Contraseña"
                       placeholderTextColor="#9CA3AF"
                       value={password}
