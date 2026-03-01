@@ -218,6 +218,7 @@ export default function OnboardingScreen() {
         triggers: triggers,
         protective_factors: protectiveFactors,
         my_why: myWhy,
+        my_why_photos: myWhyPhotos,
         initial_mood: initialMood,
         frequent_emotions: frequentEmotions,
         in_treatment: inTreatment,
