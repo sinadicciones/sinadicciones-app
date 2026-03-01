@@ -28,10 +28,96 @@ export default function HabitsScreen() {
   const [selectedColor, setSelectedColor] = useState(COLORS[0]);
   const [refreshing, setRefreshing] = useState(false);
   const [showInsights, setShowInsights] = useState(false);
+  const [userProfile, setUserProfile] = useState<any>(null);
+
+  // Hábitos sugeridos por tipo de adicción
+  const SUGGESTED_HABITS: Record<string, { name: string; icon: string; color: string }[]> = {
+    'alcohol': [
+      { name: 'Reunión AA/Grupo de apoyo', icon: 'people', color: '#8B5CF6' },
+      { name: 'Llamar a padrino/madrina', icon: 'call', color: '#10B981' },
+      { name: 'Leer literatura de recuperación', icon: 'book', color: '#3B82F6' },
+      { name: 'Meditación 10 min', icon: 'leaf', color: '#10B981' },
+      { name: 'Ejercicio físico', icon: 'fitness', color: '#EF4444' },
+      { name: 'Escribir diario de gratitud', icon: 'journal', color: '#F59E0B' },
+    ],
+    'drogas': [
+      { name: 'Reunión NA/Grupo de apoyo', icon: 'people', color: '#8B5CF6' },
+      { name: 'Terapia individual', icon: 'medical', color: '#EC4899' },
+      { name: 'Ejercicio físico', icon: 'fitness', color: '#EF4444' },
+      { name: 'Meditación/Mindfulness', icon: 'leaf', color: '#10B981' },
+      { name: 'Contactar red de apoyo', icon: 'call', color: '#3B82F6' },
+      { name: 'Practicar hobby saludable', icon: 'color-palette', color: '#F59E0B' },
+    ],
+    'tabaco': [
+      { name: 'Ejercicio de respiración', icon: 'water', color: '#06B6D4' },
+      { name: 'Caminar 20 minutos', icon: 'walk', color: '#10B981' },
+      { name: 'Beber agua (8 vasos)', icon: 'water', color: '#3B82F6' },
+      { name: 'Registrar antojos', icon: 'document-text', color: '#F59E0B' },
+      { name: 'Mascar chicle sin azúcar', icon: 'checkmark-circle', color: '#8B5CF6' },
+    ],
+    'juego': [
+      { name: 'Reunión Jugadores Anónimos', icon: 'people', color: '#8B5CF6' },
+      { name: 'Revisar finanzas del día', icon: 'wallet', color: '#10B981' },
+      { name: 'Actividad alternativa (hobby)', icon: 'game-controller', color: '#3B82F6' },
+      { name: 'Hablar con sponsor', icon: 'call', color: '#F59E0B' },
+    ],
+    'default': [
+      { name: 'Meditación 10 min', icon: 'leaf', color: '#10B981' },
+      { name: 'Ejercicio físico', icon: 'fitness', color: '#EF4444' },
+      { name: 'Leer 15 minutos', icon: 'book', color: '#3B82F6' },
+      { name: 'Escribir diario', icon: 'journal', color: '#F59E0B' },
+      { name: 'Contactar ser querido', icon: 'call', color: '#8B5CF6' },
+      { name: 'Dormir 8 horas', icon: 'moon', color: '#6366F1' },
+    ],
+    'reto': [
+      { name: 'Levantarse temprano', icon: 'sunny', color: '#F59E0B' },
+      { name: 'Ejercicio 30 min', icon: 'fitness', color: '#EF4444' },
+      { name: 'Sin redes sociales 2h', icon: 'phone-portrait', color: '#8B5CF6' },
+      { name: 'Leer 20 páginas', icon: 'book', color: '#3B82F6' },
+      { name: 'Meditar 10 min', icon: 'leaf', color: '#10B981' },
+      { name: 'Planificar el día', icon: 'calendar', color: '#EC4899' },
+    ],
+  };
 
   useEffect(() => {
     loadHabits();
+    loadProfile();
   }, []);
+
+  const loadProfile = async () => {
+    try {
+      const response = await authenticatedFetch(`${BACKEND_URL}/api/profile`);
+      if (response.ok) {
+        const data = await response.json();
+        setUserProfile(data);
+      }
+    } catch (error) {
+      console.error('Failed to load profile:', error);
+    }
+  };
+
+  const getSuggestedHabits = () => {
+    if (!userProfile) return SUGGESTED_HABITS['default'];
+    
+    // Si es usuario de reto (active_user)
+    if (userProfile.role === 'active_user') {
+      return SUGGESTED_HABITS['reto'];
+    }
+    
+    // Si tiene tipo de adicción específico
+    const addictionType = userProfile.addiction_type?.toLowerCase() || '';
+    if (addictionType.includes('alcohol')) return SUGGESTED_HABITS['alcohol'];
+    if (addictionType.includes('droga') || addictionType.includes('sustancia')) return SUGGESTED_HABITS['drogas'];
+    if (addictionType.includes('tabaco') || addictionType.includes('cigarr') || addictionType.includes('fumar')) return SUGGESTED_HABITS['tabaco'];
+    if (addictionType.includes('juego') || addictionType.includes('apuesta')) return SUGGESTED_HABITS['juego'];
+    
+    return SUGGESTED_HABITS['default'];
+  };
+
+  const selectSuggestedHabit = (habit: { name: string; color: string }) => {
+    setHabitName(habit.name);
+    setSelectedColor(habit.color);
+  };
 
   const loadHabits = async () => {
     try {
