@@ -6062,9 +6062,12 @@ async def setup_demo_user():
         upsert=True
     )
     
+    # Delete any existing profile with different user_id but same email
+    await db.profiles.delete_many({"email": demo_email, "user_id": {"$ne": demo_user_id}})
+    
     # Create/update profile
     await db.profiles.update_one(
-        {"user_id": demo_user_id},
+        {"email": demo_email},
         {
             "$set": {
                 "user_id": demo_user_id,
