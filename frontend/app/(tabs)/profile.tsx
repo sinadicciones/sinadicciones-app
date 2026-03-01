@@ -62,7 +62,7 @@ const TRANSLATIONS = {
 };
 
 // Función para traducir
-const translateItem = (item: string): string => {
+const translateItem = (item) => {
   return TRANSLATIONS[item.toLowerCase()] || item;
 };
 
