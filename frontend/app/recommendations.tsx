@@ -730,17 +730,18 @@ export default function RecommendationsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#0D0D0D',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#0D0D0D',
   },
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#6B7280',
+    color: '#9CA3AF',
   },
   header: {
     paddingTop: 50,
@@ -777,12 +778,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   whyCard: {
-    backgroundColor: '#FEF2F2',
+    backgroundColor: '#1A1A1A',
     margin: 16,
     padding: 16,
     borderRadius: 16,
     borderLeftWidth: 4,
-    borderLeftColor: '#EF4444',
+    borderLeftColor: '#EC4899',
   },
   whyHeader: {
     flexDirection: 'row',
@@ -793,17 +794,17 @@ const styles = StyleSheet.create({
   whyTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#991B1B',
+    color: '#EC4899',
   },
   whyText: {
     fontSize: 16,
-    color: '#1F2937',
+    color: '#E5E5E5',
     fontStyle: 'italic',
     lineHeight: 24,
   },
   whyReminder: {
     fontSize: 12,
-    color: '#6B7280',
+    color: '#9CA3AF',
     marginTop: 8,
   },
   section: {
@@ -812,17 +813,17 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
     marginBottom: 4,
   },
   sectionSubtitle: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#9CA3AF',
     marginBottom: 16,
   },
   analysisCard: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     padding: 14,
     borderRadius: 12,
     marginBottom: 10,
@@ -836,17 +837,17 @@ const styles = StyleSheet.create({
   analysisTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   analysisDesc: {
     fontSize: 13,
-    color: '#6B7280',
+    color: '#9CA3AF',
     marginTop: 4,
     lineHeight: 18,
   },
   triggerCard: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     padding: 14,
     borderRadius: 12,
     marginBottom: 10,
