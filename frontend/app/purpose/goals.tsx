@@ -158,9 +158,19 @@ export default function AllGoals() {
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.infoButton} onPress={() => setShowInfoModal(true)}>
-            <Ionicons name="information-circle-outline" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
+          <View style={styles.headerActions}>
+            <TouchableOpacity 
+              style={styles.monthlyButton} 
+              onPress={loadMonthlyAnalysis}
+              disabled={loadingAnalysis}
+            >
+              <Ionicons name="calendar" size={18} color="#F59E0B" />
+              <Text style={styles.monthlyButtonText}>Mensual</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.infoButton} onPress={() => setShowInfoModal(true)}>
+              <Ionicons name="information-circle-outline" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+          </View>
         </View>
         <View style={styles.headerTitleRow}>
           <Text style={styles.headerTitle}>Mis Objetivos SMART</Text>
