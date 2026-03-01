@@ -1317,7 +1317,8 @@ const styles = StyleSheet.create({
   // Weekly day circles styles
   goalHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    marginBottom: 4,
   },
   goalTarget: {
     fontSize: 12,
