@@ -104,6 +104,7 @@ export default function ProfileScreen() {
 
   useEffect(() => {
     loadProfile();
+    loadNotificationSettings();
   }, []);
 
   const loadProfile = async () => {
