@@ -324,13 +324,29 @@ export default function HabitsScreen() {
               </TouchableOpacity>
             </View>
 
+            {/* Sugerencias de hábitos */}
+            <Text style={styles.suggestionsLabel}>Sugeridos para ti</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.suggestionsContainer}>
+              {getSuggestedHabits().map((habit, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[styles.suggestionChip, { borderColor: habit.color }]}
+                  onPress={() => selectSuggestedHabit(habit)}
+                >
+                  <Ionicons name={habit.icon as any} size={16} color={habit.color} />
+                  <Text style={[styles.suggestionText, { color: habit.color }]}>{habit.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
+            <Text style={styles.orText}>o escribe el tuyo</Text>
+
             <TextInput
               style={styles.input}
               placeholder="Nombre del hábito (ej. Meditación 5 min)"
               placeholderTextColor="#9CA3AF"
               value={habitName}
               onChangeText={setHabitName}
-              autoFocus
             />
 
             <Text style={styles.colorLabel}>Color</Text>
