@@ -735,6 +735,67 @@ export default function PurposeDashboard() {
           </TouchableOpacity>
         )}
 
+        {/* AI Analysis Section */}
+        {stats.test_completed && (
+          <View style={styles.aiAnalysisCard}>
+            <View style={styles.aiAnalysisHeader}>
+              <View style={styles.aiIconContainer}>
+                <Ionicons name="sparkles" size={24} color="#8B5CF6" />
+              </View>
+              <View style={styles.aiHeaderText}>
+                <Text style={styles.aiAnalysisTitle}>Análisis de IA</Text>
+                <Text style={styles.aiAnalysisSubtitle}>
+                  {aiAnalysis ? 'Tu propósito analizado por IA' : 'Descubre insights personalizados'}
+                </Text>
+              </View>
+            </View>
+            
+            {aiAnalysis ? (
+              <>
+                {/* Purpose Statement Preview */}
+                <View style={styles.purposeStatementPreview}>
+                  <Text style={styles.purposeStatementLabel}>Tu declaración de propósito:</Text>
+                  <Text style={styles.purposeStatementText} numberOfLines={3}>
+                    "{aiAnalysis.purpose_statement}"
+                  </Text>
+                </View>
+                
+                {/* Affirmation */}
+                <View style={styles.affirmationBox}>
+                  <Ionicons name="heart" size={18} color="#EC4899" />
+                  <Text style={styles.affirmationText}>{aiAnalysis.affirmation}</Text>
+                </View>
+                
+                <TouchableOpacity
+                  style={styles.viewAnalysisButton}
+                  onPress={() => setShowAnalysisModal(true)}
+                >
+                  <Text style={styles.viewAnalysisButtonText}>Ver análisis completo</Text>
+                  <Ionicons name="arrow-forward" size={18} color="#8B5CF6" />
+                </TouchableOpacity>
+              </>
+            ) : (
+              <TouchableOpacity
+                style={[styles.generateAnalysisButton, loadingAnalysis && styles.buttonDisabled]}
+                onPress={generateAIAnalysis}
+                disabled={loadingAnalysis}
+              >
+                {loadingAnalysis ? (
+                  <>
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                    <Text style={styles.generateButtonText}>Analizando...</Text>
+                  </>
+                ) : (
+                  <>
+                    <Ionicons name="flash" size={20} color="#FFFFFF" />
+                    <Text style={styles.generateButtonText}>Generar Análisis con IA</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+
         {/* Wheel of Life */}
         <View style={styles.wheelCard}>
           <Text style={styles.cardTitle}>🎯 Rueda de la Vida</Text>
