@@ -99,22 +99,19 @@ SinAdicciones es una aplicación móvil de apoyo a personas en recuperación de 
 ## Nuevas Funcionalidades (Mar 2026)
 - [x] **Límites de tema para Nelson**: Solo responde sobre adicciones, bienestar, motivación, familia
 - [x] **Dashboard de Propósito con IA**: Análisis completo del test de propósito
-  - Declaración de propósito personalizada
-  - Identidad esencial
-  - Insights clave
-  - Afirmación diaria
-  - Acciones recomendadas
-  - Oportunidades de crecimiento
 - [x] **Caché de análisis**: El análisis se guarda para no regenerar
 - [x] **Nelson coherente con perfil**: Prompts mejorados según rol (paciente, reto, profesional, familia)
 - [x] **Nelson con contexto de propósito**: Accede al análisis de IA para respuestas más personalizadas
-- [x] **Sistema de Notificaciones Push**:
-  - Mensajes motivacionales diarios
-  - Recordatorios de hábitos
-  - Recordatorios de emociones
-  - Recordatorios de metas
-  - Configuración de hora preferida (default 9:00 AM)
-  - Panel de administración en Perfil
+- [x] **Sistema de Notificaciones Push**: Configuración en Perfil
+- [x] **Hábitos con sugerencias preestablecidas**: Según tipo de adicción y perfil
+- [x] **"Ver mi Plan de Recuperación"**: Modal en Perfil con gatillos, protectores, red de apoyo
+- [x] **Onboarding Profesional mejorado**: 
+  - Paso 4 con WhatsApp, valor consulta, disponibilidad
+  - Toggle para aceptar nuevos pacientes
+- [x] **Usuario Demo Profesional**:
+  - Email: profesional@sinadicciones.org
+  - Password: demopassword
+  - Vinculado automáticamente con paciente demo (Carlos)
 
 ## API Endpoints Nuevos
 
