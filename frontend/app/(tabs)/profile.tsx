@@ -167,7 +167,7 @@ export default function ProfileScreen() {
     }
   };
 
-  const toggleNotificationSetting = (key: keyof typeof notificationSettings) => {
+  const toggleNotificationSetting = (key) => {
     if (key !== 'preferred_time') {
       setNotificationSettings(prev => ({
         ...prev,
