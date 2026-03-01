@@ -986,7 +986,7 @@ export default function HomeScreen() {
 
           {/* Indicador de Versión */}
           <View style={styles.versionContainer}>
-            <Text style={styles.versionText}>Versión 19</Text>
+            <Text style={styles.versionText}>Versión 20</Text>
           </View>
 
           <View style={{ height: 100 }} />
