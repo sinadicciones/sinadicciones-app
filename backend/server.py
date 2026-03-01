@@ -5847,6 +5847,224 @@ async def get_nelson_summary(current_user: User = Depends(get_current_user)):
         return {"summary": "Error generando resumen."}
 
 
+# ============== NOTIFICATIONS ENDPOINTS ==============
+
+# Motivational messages library
+MOTIVATIONAL_MESSAGES = {
+    "patient": [
+        "Cada día que eliges tu bienestar es una victoria. ¡Sigue así! 💪",
+        "Tu recuperación inspira más de lo que imaginas. Hoy es un nuevo comienzo.",
+        "Los días difíciles construyen personas fuertes. Estás más cerca de tu mejor versión.",
+        "Tu 'para qué' es más fuerte que cualquier obstáculo. Recuérdalo hoy.",
+        "Celebra tu progreso, por pequeño que parezca. Cada paso cuenta.",
+        "Hoy tienes la oportunidad de ser mejor que ayer. ¡Aprovéchala!",
+        "Tu familia y tus sueños te esperan del otro lado. Sigue adelante.",
+        "El pasado no define tu futuro. Hoy escribes una nueva historia.",
+    ],
+    "active_user": [
+        "¡Buenos días, campeón! Tu reto de 21 días te espera. ¿Listo para ganar?",
+        "Cada hábito completado es un ladrillo en tu nueva vida. ¡A construir!",
+        "Los ganadores se levantan cuando es difícil. Hoy es tu día.",
+        "Tu mejor versión está a solo un hábito de distancia. ¡Vamos!",
+        "21 días pueden cambiar tu vida. ¿Qué esperas?",
+    ],
+    "family": [
+        "Cuidarte a ti mismo es la mejor forma de ayudar a tu ser querido.",
+        "Tu amor y paciencia hacen la diferencia. No estás solo en esto.",
+        "Recuerda: no puedes controlar la recuperación de otros, pero sí tu bienestar.",
+        "Hoy es un buen día para establecer límites sanos con amor.",
+    ],
+    "professional": [
+        "Tu trabajo transforma vidas. Recuerda también cuidar la tuya.",
+        "El autocuidado del terapeuta es parte esencial del proceso terapéutico.",
+        "Gracias por tu dedicación. El mundo necesita más personas como tú.",
+    ]
+}
+
+@app.get("/api/notifications/settings")
+async def get_notification_settings(current_user: User = Depends(get_current_user)):
+    """Get user's notification settings"""
+    settings = await db.notification_settings.find_one(
+        {"user_id": current_user.user_id},
+        {"_id": 0}
+    )
+    
+    if not settings:
+        # Return default settings
+        return {
+            "motivational": True,
+            "habit_reminders": True,
+            "emotion_reminders": True,
+            "goal_reminders": True,
+            "preferred_time": "09:00"
+        }
+    
+    return {
+        "motivational": settings.get("motivational", True),
+        "habit_reminders": settings.get("habit_reminders", True),
+        "emotion_reminders": settings.get("emotion_reminders", True),
+        "goal_reminders": settings.get("goal_reminders", True),
+        "preferred_time": settings.get("preferred_time", "09:00")
+    }
+
+@app.put("/api/notifications/settings")
+async def update_notification_settings(
+    request: UpdateNotificationSettingsRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Update user's notification settings"""
+    update_data = {}
+    
+    if request.motivational is not None:
+        update_data["motivational"] = request.motivational
+    if request.habit_reminders is not None:
+        update_data["habit_reminders"] = request.habit_reminders
+    if request.emotion_reminders is not None:
+        update_data["emotion_reminders"] = request.emotion_reminders
+    if request.goal_reminders is not None:
+        update_data["goal_reminders"] = request.goal_reminders
+    if request.preferred_time is not None:
+        update_data["preferred_time"] = request.preferred_time
+    
+    if update_data:
+        update_data["updated_at"] = datetime.now(timezone.utc)
+        
+        await db.notification_settings.update_one(
+            {"user_id": current_user.user_id},
+            {
+                "$set": update_data,
+                "$setOnInsert": {"user_id": current_user.user_id, "created_at": datetime.now(timezone.utc)}
+            },
+            upsert=True
+        )
+    
+    return {"success": True, "message": "Configuración actualizada"}
+
+@app.post("/api/notifications/register-token")
+async def register_push_token(
+    request: RegisterPushTokenRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Register user's push notification token"""
+    await db.push_tokens.update_one(
+        {"user_id": current_user.user_id},
+        {
+            "$set": {
+                "push_token": request.push_token,
+                "device_type": request.device_type,
+                "updated_at": datetime.now(timezone.utc)
+            },
+            "$setOnInsert": {
+                "user_id": current_user.user_id,
+                "created_at": datetime.now(timezone.utc)
+            }
+        },
+        upsert=True
+    )
+    
+    return {"success": True, "message": "Token registrado"}
+
+@app.delete("/api/notifications/unregister")
+async def unregister_push_token(current_user: User = Depends(get_current_user)):
+    """Unregister user's push notification token"""
+    await db.push_tokens.delete_one({"user_id": current_user.user_id})
+    return {"success": True, "message": "Token eliminado"}
+
+@app.get("/api/notifications/today")
+async def get_today_notification(current_user: User = Depends(get_current_user)):
+    """Get today's motivational message and pending reminders"""
+    import random
+    
+    # Get user profile for role
+    profile = await db.profiles.find_one(
+        {"user_id": current_user.user_id},
+        {"_id": 0, "role": 1}
+    )
+    role = profile.get("role", "patient") if profile else "patient"
+    
+    # Get random motivational message for role
+    messages = MOTIVATIONAL_MESSAGES.get(role, MOTIVATIONAL_MESSAGES["patient"])
+    motivational = random.choice(messages)
+    
+    # Check pending habits for today
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
+    habits = await db.habits.find(
+        {"user_id": current_user.user_id, "is_active": True},
+        {"_id": 0, "habit_id": 1, "name": 1}
+    ).to_list(20)
+    
+    habit_ids = [h["habit_id"] for h in habits]
+    
+    completed_logs = await db.habit_logs.find({
+        "user_id": current_user.user_id,
+        "habit_id": {"$in": habit_ids},
+        "date": today,
+        "completed": True
+    }).to_list(100)
+    
+    completed_habit_ids = {log["habit_id"] for log in completed_logs}
+    pending_habits = [h for h in habits if h["habit_id"] not in completed_habit_ids]
+    
+    # Check if emotion logged today
+    emotion_logged = await db.emotional_logs.find_one({
+        "user_id": current_user.user_id,
+        "date": today
+    }) is not None
+    
+    return {
+        "motivational_message": motivational,
+        "pending_habits": len(pending_habits),
+        "pending_habit_names": [h["name"] for h in pending_habits[:3]],
+        "emotion_logged": emotion_logged,
+        "date": today
+    }
+
+# Helper function to send push notification via Expo
+async def send_expo_push_notification(push_token: str, title: str, body: str, data: dict = None):
+    """Send a push notification via Expo Push API"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "https://exp.host/--/api/v2/push/send",
+                json={
+                    "to": push_token,
+                    "title": title,
+                    "body": body,
+                    "data": data or {},
+                    "sound": "default"
+                },
+                headers={"Content-Type": "application/json"}
+            )
+            return response.json()
+    except Exception as e:
+        print(f"Error sending push notification: {e}")
+        return None
+
+@app.post("/api/notifications/send-test")
+async def send_test_notification(current_user: User = Depends(get_current_user)):
+    """Send a test notification to the current user"""
+    token_doc = await db.push_tokens.find_one(
+        {"user_id": current_user.user_id},
+        {"_id": 0}
+    )
+    
+    if not token_doc:
+        raise HTTPException(status_code=404, detail="No push token registered. Please enable notifications in the app first.")
+    
+    result = await send_expo_push_notification(
+        push_token=token_doc["push_token"],
+        title="¡Hola desde SinAdicciones! 👋",
+        body="Las notificaciones están funcionando correctamente.",
+        data={"type": "test"}
+    )
+    
+    if result:
+        return {"success": True, "message": "Notificación de prueba enviada"}
+    else:
+        raise HTTPException(status_code=500, detail="Error enviando notificación")
+
+
 
 
 if __name__ == "__main__":
