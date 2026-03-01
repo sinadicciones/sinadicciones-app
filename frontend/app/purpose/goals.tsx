@@ -78,6 +78,23 @@ export default function AllGoals() {
     loadGoals();
   };
 
+  const loadMonthlyAnalysis = async () => {
+    setLoadingAnalysis(true);
+    try {
+      const response = await authenticatedFetch(`${BACKEND_URL}/api/purpose/goals/monthly-analysis`);
+      if (response.ok) {
+        const data = await response.json();
+        setMonthlyAnalysis(data);
+        setShowMonthlyModal(true);
+      }
+    } catch (error) {
+      console.error('Failed to load monthly analysis:', error);
+      Alert.alert('Error', 'No se pudo cargar el análisis mensual');
+    } finally {
+      setLoadingAnalysis(false);
+    }
+  };
+
   const handleCreateGoal = async () => {
     if (!selectedArea) {
       Alert.alert('Error', 'Por favor selecciona un área de vida');
