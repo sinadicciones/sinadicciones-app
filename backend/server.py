@@ -2497,6 +2497,155 @@ async def get_purpose_stats(current_user: User = Depends(get_current_user)):
         "days_working_on_vision": days_working
     }
 
+@app.get("/api/purpose/ai-analysis")
+async def get_purpose_ai_analysis(current_user: User = Depends(get_current_user)):
+    """Generate AI analysis of user's purpose test results and provide personalized recommendations"""
+    if not openai_client:
+        raise HTTPException(status_code=503, detail="AI service not available")
+    
+    try:
+        # Get test results
+        tests = await db.purpose_tests.find(
+            {"user_id": current_user.user_id},
+            {"_id": 0}
+        ).sort("completed_at", -1).to_list(1)
+        
+        if not tests:
+            raise HTTPException(status_code=404, detail="No purpose test found. Please complete the test first.")
+        
+        test = tests[0]
+        answers = test.get("answers", {})
+        profile = test.get("profile", {})
+        
+        # Get user profile for context
+        user_profile = await db.profiles.find_one(
+            {"user_id": current_user.user_id},
+            {"_id": 0}
+        )
+        
+        # Get goals
+        goals = await db.purpose_goals.find(
+            {"user_id": current_user.user_id, "status": "active"},
+            {"_id": 0}
+        ).to_list(50)
+        
+        # Build context for AI
+        analysis_prompt = f"""Analiza las respuestas del test de propósito de vida de este usuario y genera un análisis profundo y personalizado.
+
+RESPUESTAS DEL TEST:
+- Valores más importantes: {answers.get('values', [])}
+- Lo que le hacía feliz antes: {answers.get('happyBefore', 'No especificado')}
+- Cualidades que lo definen: {answers.get('qualities', [])}
+- Talentos naturales: {answers.get('strengths', [])}
+- Lo que la gente le pide: {answers.get('peopleAsk', 'No especificado')}
+- Lo que haría gratis: {answers.get('enjoyFree', 'No especificado')}
+- Visión a 5 años: {answers.get('futureVision', 'No especificado')}
+- Lo que quiere que digan de él: {answers.get('whatTheySay', 'No especificado')}
+- Lo que intentaría sin miedo al fracaso: {answers.get('noFailure', 'No especificado')}
+- Problema del mundo que quiere resolver: {answers.get('worldProblem', 'No especificado')}
+- A quién quiere ayudar: {answers.get('helpWho', 'No especificado')}
+- Su legado: {answers.get('legacy', 'No especificado')}
+
+PERFIL DETECTADO:
+- Tipo de propósito: {profile.get('purpose_type', 'No determinado')}
+- Valores principales: {profile.get('top_values', [])}
+- Fortalezas principales: {profile.get('top_strengths', [])}
+
+CONTEXTO DE RECUPERACIÓN:
+- Tipo de adicción: {user_profile.get('addiction_type', 'No especificado') if user_profile else 'No especificado'}
+- Días limpio: {user_profile.get('days_clean', 0) if user_profile else 0}
+- Su "Para Qué": {user_profile.get('my_why', 'No especificado') if user_profile else 'No especificado'}
+
+OBJETIVOS ACTUALES: {len(goals)} objetivos activos
+
+Genera un análisis en formato JSON con la siguiente estructura:
+{{
+    "purpose_statement": "Una declaración de propósito personalizada de 2-3 oraciones que resuma su misión de vida",
+    "core_identity": "Descripción de quién es esta persona en su esencia (3-4 oraciones)",
+    "key_insights": ["3-4 insights profundos sobre sus respuestas"],
+    "how_recovery_connects": "Cómo su proceso de recuperación se conecta con su propósito (2-3 oraciones)",
+    "recommended_actions": ["5 acciones específicas y prácticas que puede tomar esta semana"],
+    "affirmation": "Una afirmación personalizada poderosa para repetir diariamente",
+    "warning_areas": ["1-2 áreas donde debe tener cuidado de no caer en viejos patrones"],
+    "growth_opportunities": ["3 oportunidades de crecimiento basadas en sus fortalezas"]
+}}
+
+IMPORTANTE: 
+- Sé empático y motivador
+- Relaciona todo con su proceso de recuperación
+- Las acciones deben ser específicas y alcanzables
+- Usa un tono cálido y esperanzador
+- Responde SOLO con el JSON, sin texto adicional"""
+
+        response = await asyncio.to_thread(
+            openai_client.chat.completions.create,
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "Eres un experto en psicología positiva y propósito de vida, especializado en ayudar a personas en recuperación de adicciones a encontrar significado y dirección."},
+                {"role": "user", "content": analysis_prompt}
+            ],
+            temperature=0.7,
+            max_tokens=1500
+        )
+        
+        ai_response = response.choices[0].message.content
+        
+        # Parse JSON response
+        import json
+        # Clean response if needed
+        if ai_response.startswith("```json"):
+            ai_response = ai_response[7:]
+        if ai_response.startswith("```"):
+            ai_response = ai_response[3:]
+        if ai_response.endswith("```"):
+            ai_response = ai_response[:-3]
+        
+        analysis = json.loads(ai_response.strip())
+        
+        # Save analysis to database
+        await db.purpose_analyses.update_one(
+            {"user_id": current_user.user_id},
+            {
+                "$set": {
+                    "user_id": current_user.user_id,
+                    "analysis": analysis,
+                    "generated_at": datetime.now(timezone.utc),
+                    "test_id": test.get("test_id")
+                }
+            },
+            upsert=True
+        )
+        
+        return {
+            "success": True,
+            "analysis": analysis,
+            "generated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+    except json.JSONDecodeError as e:
+        print(f"Error parsing AI response: {e}")
+        raise HTTPException(status_code=500, detail="Error processing AI analysis")
+    except Exception as e:
+        print(f"Error generating purpose analysis: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/purpose/ai-analysis/cached")
+async def get_cached_purpose_analysis(current_user: User = Depends(get_current_user)):
+    """Get cached AI analysis if available"""
+    analysis = await db.purpose_analyses.find_one(
+        {"user_id": current_user.user_id},
+        {"_id": 0}
+    )
+    
+    if not analysis:
+        return {"cached": False, "analysis": None}
+    
+    return {
+        "cached": True,
+        "analysis": analysis.get("analysis"),
+        "generated_at": analysis.get("generated_at").isoformat() if analysis.get("generated_at") else None
+    }
+
 # ============== CENTERS SCRAPING ==============
 
 import re
