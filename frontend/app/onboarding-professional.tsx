@@ -83,6 +83,9 @@ export default function ProfessionalOnboardingScreen() {
           license_number: licenseNumber || null,
           institution: institution || null,
           bio: bio || null,
+          whatsapp: whatsapp || null,
+          consultation_fee: consultationFee || null,
+          accepts_patients: acceptsPatients,
         }),
       });
 
