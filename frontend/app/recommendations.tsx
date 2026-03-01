@@ -872,18 +872,20 @@ const styles = StyleSheet.create({
   triggerTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   triggerTip: {
     fontSize: 12,
-    color: '#6B7280',
+    color: '#9CA3AF',
     marginTop: 2,
   },
   protectiveCard: {
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#1A1A1A',
     padding: 14,
     borderRadius: 12,
     marginBottom: 10,
+    borderLeftWidth: 3,
+    borderLeftColor: '#10B981',
   },
   protectiveHeader: {
     flexDirection: 'row',
@@ -893,11 +895,11 @@ const styles = StyleSheet.create({
   protectiveName: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#065F46',
+    color: '#10B981',
   },
   protectiveBoost: {
     fontSize: 13,
-    color: '#047857',
+    color: '#9CA3AF',
     marginTop: 8,
     lineHeight: 18,
   },
@@ -908,7 +910,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: '#A7F3D0',
+    borderTopColor: '#2D2D2D',
   },
   protectiveGoalText: {
     fontSize: 12,
@@ -917,13 +919,13 @@ const styles = StyleSheet.create({
   },
   habitRecCard: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A1A',
     padding: 14,
     borderRadius: 12,
     marginBottom: 10,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#2D2D2D',
   },
   habitRecIcon: {
     fontSize: 28,
@@ -935,16 +937,16 @@ const styles = StyleSheet.create({
   habitRecName: {
     fontSize: 15,
     fontWeight: '500',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   habitRecFor: {
     fontSize: 12,
-    color: '#6B7280',
+    color: '#9CA3AF',
   },
   habitExistsBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#10B98120',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 16,
