@@ -5981,7 +5981,7 @@ async def nelson_chat(
         if crisis_detected:
             full_message += "\n\n[ALERTA: El usuario podría estar en crisis. Responde con máxima empatía]"
         
-        nelson_response = chat.send_message(full_message)
+        nelson_response = await chat.send_message(full_message)
         
         # Determine mode
         mode = "crisis" if crisis_detected else "normal"
