@@ -130,10 +130,14 @@ SinAdicciones es una aplicación móvil de apoyo a personas en recuperación de 
 - GET /api/notifications/settings - Configuración de notificaciones
 - PUT /api/notifications/settings - Actualizar configuración
 - GET /api/notifications/today - Mensaje motivacional y estado del día
-- POST /api/notifications/send-test - Enviar notificación de prueba
+- POST /api/notifications/test - Enviar notificación de prueba (requiere auth)
+- POST /api/notifications/send-reminders?hour=9 - Enviar recordatorios programados (para cron)
+- POST /api/professional/notify-patient - Profesional envía alerta a paciente
 
 ### Admin
-- POST /api/admin/setup-demo-user - Crear/actualizar usuario demo en cualquier ambiente
+- POST /api/admin/setup-demo-user - Crear/actualizar usuario demo
+- POST /api/admin/setup-paciente-demo - Crear usuario paciente demo (nuevo)
+- POST /api/admin/setup-demo-professional - Crear usuario profesional demo
 
 ## Architecture
 
