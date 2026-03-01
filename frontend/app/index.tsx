@@ -308,6 +308,10 @@ export default function WelcomeScreen() {
                     <Text style={styles.emailButtonText}>Continuar con Email</Text>
                   </TouchableOpacity>
                 </View>
+
+                <View style={styles.versionContainer}>
+                  <Text style={styles.versionText}>Versión 21</Text>
+                </View>
               </>
             ) : (
               <>
