@@ -163,6 +163,7 @@ export default function AllGoals() {
               style={styles.monthlyButton} 
               onPress={loadMonthlyAnalysis}
               disabled={loadingAnalysis}
+              data-testid="monthly-analysis-btn"
             >
               <Ionicons name="calendar" size={18} color="#F59E0B" />
               <Text style={styles.monthlyButtonText}>Mensual</Text>
