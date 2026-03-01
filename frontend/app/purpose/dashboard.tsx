@@ -415,6 +415,11 @@ export default function PurposeDashboard() {
   const [areaRatings, setAreaRatings] = useState<any>({});
   const [showPurposeModal, setShowPurposeModal] = useState(false);
   const [showGuideModal, setShowGuideModal] = useState(false);
+  
+  // AI Analysis states
+  const [aiAnalysis, setAiAnalysis] = useState<any>(null);
+  const [loadingAnalysis, setLoadingAnalysis] = useState(false);
+  const [showAnalysisModal, setShowAnalysisModal] = useState(false);
 
   useEffect(() => {
     loadData();
