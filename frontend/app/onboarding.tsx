@@ -10,12 +10,14 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { authenticatedFetch, getBackendURL } from '../utils/api';
 import Slider from '@react-native-community/slider';
+import * as ImagePicker from 'expo-image-picker';
 
 const BACKEND_URL = getBackendURL();
 const TOTAL_STEPS = 10;
