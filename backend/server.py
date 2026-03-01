@@ -6294,7 +6294,7 @@ async def setup_demo_professional():
     demo_email = "profesional@sinadicciones.org"
     demo_password = "demopassword"
     demo_user_id = "user_demo_profesional"
-    patient_demo_id = "user_demo_carlos"
+    patient_demo_id = "user_paciente_demo_2026"  # New patient demo
     
     # Hash password
     password_hash = hashlib.sha256(demo_password.encode()).hexdigest()
