@@ -338,6 +338,26 @@ export default function AreaDetail() {
               numberOfLines={3}
             />
 
+            <Text style={styles.inputLabel}>¿Cuántos días por semana?</Text>
+            <View style={styles.daysSelector}>
+              {[1, 2, 3, 4, 5, 6, 7].map((num) => (
+                <TouchableOpacity
+                  key={num}
+                  style={[
+                    styles.dayOption,
+                    (newGoal.target_days || 5) === num && { borderColor: areaInfo.color, backgroundColor: areaInfo.color + '15' }
+                  ]}
+                  onPress={() => setNewGoal({ ...newGoal, target_days: num })}
+                >
+                  <Text style={[
+                    styles.dayOptionText,
+                    (newGoal.target_days || 5) === num && { color: areaInfo.color }
+                  ]}>{num}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <Text style={styles.daysHint}>días por semana</Text>
+
             <TouchableOpacity
               style={[styles.saveButton, { backgroundColor: areaInfo.color }]}
               onPress={handleAddGoal}
