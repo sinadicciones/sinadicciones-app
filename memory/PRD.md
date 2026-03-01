@@ -106,6 +106,15 @@ SinAdicciones es una aplicación móvil de apoyo a personas en recuperación de 
   - Acciones recomendadas
   - Oportunidades de crecimiento
 - [x] **Caché de análisis**: El análisis se guarda para no regenerar
+- [x] **Nelson coherente con perfil**: Prompts mejorados según rol (paciente, reto, profesional, familia)
+- [x] **Nelson con contexto de propósito**: Accede al análisis de IA para respuestas más personalizadas
+- [x] **Sistema de Notificaciones Push**:
+  - Mensajes motivacionales diarios
+  - Recordatorios de hábitos
+  - Recordatorios de emociones
+  - Recordatorios de metas
+  - Configuración de hora preferida (default 9:00 AM)
+  - Panel de administración en Perfil
 
 ## API Endpoints Nuevos - Propósito IA
 - GET /api/purpose/ai-analysis - Genera análisis de IA del propósito
