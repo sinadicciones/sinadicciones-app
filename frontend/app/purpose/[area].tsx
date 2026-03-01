@@ -134,6 +134,24 @@ export default function AreaDetail() {
     );
   };
 
+  const handleToggleDay = async (goal: any, day: string) => {
+    try {
+      const response = await authenticatedFetch(
+        `${BACKEND_URL}/api/purpose/goals/${goal.goal_id}/toggle-day`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ day })
+        }
+      );
+      if (response.ok) {
+        loadGoals();
+      }
+    } catch (error) {
+      console.error('Error toggling day:', error);
+    }
+  };
+
   const activeGoals = goals.filter((g) => g.status === 'active');
   const completedGoals = goals.filter((g) => g.status === 'completed');
 
