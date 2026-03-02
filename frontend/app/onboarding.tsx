@@ -222,6 +222,20 @@ export default function OnboardingScreen() {
     setMyWhyPhotos(myWhyPhotos.filter((_, i) => i !== index));
   };
 
+  const pickNegativePhoto = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets[0].base64) {
+      setNegativePhoto(`data:image/jpeg;base64,${result.assets[0].base64}`);
+    }
+  };
+
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('es-CL', {
       day: 'numeric',
