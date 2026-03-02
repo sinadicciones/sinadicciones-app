@@ -687,6 +687,90 @@ export default function OnboardingScreen() {
         return (
           <View style={styles.stepContent}>
             <View style={styles.stepHeader}>
+              <Ionicons name="eye-off" size={40} color="#EF4444" />
+              <Text style={styles.stepTitle}>Tu Recordatorio</Text>
+              <View style={styles.titleWithInfo}>
+                <Text style={styles.stepSubtitle}>Una imagen de las consecuencias</Text>
+                <TouchableOpacity 
+                  style={styles.infoButton}
+                  onPress={() => setShowNegativePhotoInfo(true)}
+                >
+                  <Ionicons name="help-circle" size={24} color="#9CA3AF" />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.warningBox}>
+              <Ionicons name="information-circle" size={20} color="#F59E0B" />
+              <Text style={styles.warningText}>
+                Esta foto te recordará por qué quieres mantenerte en recuperación. La verás solo cuando tú decidas, en tu Plan de Recuperación. Es opcional pero puede ser una herramienta poderosa en momentos difíciles.
+              </Text>
+            </View>
+
+            <View style={styles.negativePhotoSection}>
+              {negativePhoto ? (
+                <View style={styles.negativePhotoWrapper}>
+                  <Image source={{ uri: negativePhoto }} style={styles.negativePhoto} />
+                  <TouchableOpacity 
+                    style={styles.removeNegativePhotoButton}
+                    onPress={() => setNegativePhoto(null)}
+                  >
+                    <Ionicons name="trash" size={20} color="#FFFFFF" />
+                    <Text style={styles.removeNegativePhotoText}>Eliminar</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <TouchableOpacity style={styles.addNegativePhotoButton} onPress={pickNegativePhoto}>
+                  <Ionicons name="camera" size={40} color="#EF4444" />
+                  <Text style={styles.addNegativePhotoText}>Agregar foto</Text>
+                  <Text style={styles.addNegativePhotoSubtext}>Toca para seleccionar</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            <View style={styles.optionalNote}>
+              <Ionicons name="checkmark-circle" size={18} color="#9CA3AF" />
+              <Text style={styles.optionalText}>
+                Este paso es opcional. Puedes continuar sin agregar una foto.
+              </Text>
+            </View>
+
+            {/* Modal de información */}
+            <Modal
+              visible={showNegativePhotoInfo}
+              transparent
+              animationType="fade"
+              onRequestClose={() => setShowNegativePhotoInfo(false)}
+            >
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalContent}>
+                  <Ionicons name="information-circle" size={48} color="#F59E0B" />
+                  <Text style={styles.modalTitle}>¿Por qué una foto negativa?</Text>
+                  <Text style={styles.modalText}>
+                    En momentos de tentación, recordar las consecuencias negativas de la adicción puede ayudarte a mantenerte firme en tu decisión.{'\n\n'}
+                    Puede ser una foto de:{'\n'}
+                    • Un momento difícil que viviste{'\n'}
+                    • Las consecuencias en tu salud{'\n'}
+                    • El impacto en tus relaciones{'\n'}
+                    • Algo que perdiste por la adicción{'\n\n'}
+                    Esta foto estará oculta y solo la verás cuando tú decidas, nunca se mostrará automáticamente.
+                  </Text>
+                  <TouchableOpacity 
+                    style={styles.modalButton}
+                    onPress={() => setShowNegativePhotoInfo(false)}
+                  >
+                    <Text style={styles.modalButtonText}>Entendido</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+          </View>
+        );
+
+      case 8:
+        return (
+          <View style={styles.stepContent}>
+            <View style={styles.stepHeader}>
               <Ionicons name="rocket" size={40} color="#6366F1" />
               <Text style={styles.stepTitle}>Tu plan</Text>
               <Text style={styles.stepSubtitle}>Selecciona hábitos y áreas a mejorar</Text>
