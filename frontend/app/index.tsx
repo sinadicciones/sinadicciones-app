@@ -322,7 +322,7 @@ export default function WelcomeScreen() {
                 </View>
 
                 <View style={styles.versionContainer}>
-                  <Text style={styles.versionText}>Versión 22</Text>
+                  <Text style={styles.versionText}>Versión 24</Text>
                 </View>
               </>
             ) : (
@@ -436,7 +436,7 @@ export default function WelcomeScreen() {
             </Text>
 
             <View style={styles.versionContainer}>
-              <Text style={styles.versionText}>Versión 22</Text>
+              <Text style={styles.versionText}>Versión 24</Text>
             </View>
           </View>
         </ScrollView>
