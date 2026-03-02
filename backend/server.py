@@ -4216,6 +4216,8 @@ class ActiveUserOnboardingRequest(BaseModel):
     triggers: list = []
     protective_factors: list = []  # NEW: Factores protectores
     why_quit: str  # Their motivation
+    my_why_photos: list = []  # NEW: Fotos de motivación
+    negative_photo: Optional[str] = None  # NEW: Foto recordatorio negativo
     support_person: Optional[dict] = None  # {name, phone, relationship}
     country: Optional[str] = None
     identification: Optional[str] = None
