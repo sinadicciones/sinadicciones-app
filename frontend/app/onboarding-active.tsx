@@ -9,11 +9,14 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  Image,
+  Modal,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { authenticatedFetch } from '../utils/api';
+import * as ImagePicker from 'expo-image-picker';
 
 const SUBSTANCES = [
   { id: 'alcohol', label: 'Alcohol', icon: 'wine' },
@@ -73,12 +76,21 @@ export default function OnboardingActiveScreen() {
   const [frequency, setFrequency] = useState('');
   const [selectedTriggers, setSelectedTriggers] = useState<string[]>([]);
   const [selectedProtective, setSelectedProtective] = useState<string[]>([]);
+  
+  // Tu Para Qué
   const [whyQuit, setWhyQuit] = useState('');
+  const [myWhyPhotos, setMyWhyPhotos] = useState<string[]>([]);
+  
+  // Foto negativa
+  const [negativePhoto, setNegativePhoto] = useState<string | null>(null);
+  const [showNegativePhotoInfo, setShowNegativePhotoInfo] = useState(false);
+  
+  // Contacto de apoyo
   const [supportName, setSupportName] = useState('');
   const [supportPhone, setSupportPhone] = useState('');
   const [supportRelationship, setSupportRelationship] = useState('');
 
-  const totalSteps = 6; // Added one more step for protective factors
+  const totalSteps = 7;
 
   const toggleSubstance = (id: string) => {
     if (selectedSubstances.includes(id)) {
@@ -106,6 +118,40 @@ export default function OnboardingActiveScreen() {
     }
   };
 
+  const pickMyWhyImage = async () => {
+    if (myWhyPhotos.length >= 3) return;
+    
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets[0].base64) {
+      setMyWhyPhotos([...myWhyPhotos, `data:image/jpeg;base64,${result.assets[0].base64}`]);
+    }
+  };
+
+  const removeMyWhyPhoto = (index: number) => {
+    setMyWhyPhotos(myWhyPhotos.filter((_, i) => i !== index));
+  };
+
+  const pickNegativePhoto = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets[0].base64) {
+      setNegativePhoto(`data:image/jpeg;base64,${result.assets[0].base64}`);
+    }
+  };
+
   const canContinue = () => {
     switch (step) {
       case 1: return selectedSubstances.length > 0 && primarySubstance;
@@ -113,7 +159,8 @@ export default function OnboardingActiveScreen() {
       case 3: return selectedTriggers.length > 0;
       case 4: return selectedProtective.length > 0;
       case 5: return whyQuit.length >= 10;
-      case 6: return true; // Support person is optional
+      case 6: return true; // Foto negativa es opcional
+      case 7: return true; // Contacto de apoyo es opcional
       default: return false;
     }
   };
@@ -126,11 +173,25 @@ export default function OnboardingActiveScreen() {
     }
   };
 
+  const handleBack = () => {
+    if (step > 1) {
+      setStep(step - 1);
+    }
+  };
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
     setError('');
 
     try {
+      // Convertir triggers y factores protectores a labels para el Plan de Recuperación
+      const triggersLabels = selectedTriggers.map(id => 
+        TRIGGERS.find(t => t.id === id)?.label || id
+      );
+      const protectiveLabels = selectedProtective.map(id => 
+        PROTECTIVE_FACTORS.find(p => p.id === id)?.label || id
+      );
+
       const response = await authenticatedFetch('/api/profile/active-onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -139,9 +200,11 @@ export default function OnboardingActiveScreen() {
           primary_substance: primarySubstance,
           years_using: parseInt(yearsUsing) || 0,
           frequency,
-          triggers: selectedTriggers,
-          protective_factors: selectedProtective,
+          triggers: triggersLabels, // Enviar labels en español
+          protective_factors: protectiveLabels, // Enviar labels en español
           why_quit: whyQuit,
+          my_why_photos: myWhyPhotos,
+          negative_photo: negativePhoto,
           support_person: supportName ? {
             name: supportName,
             phone: supportPhone,
@@ -326,7 +389,7 @@ export default function OnboardingActiveScreen() {
           <View style={styles.stepContent}>
             <View style={styles.stepHeader}>
               <Ionicons name="shield-checkmark" size={40} color="#10B981" />
-              <Text style={styles.stepTitle}>Factores Protectores</Text>
+              <Text style={styles.stepTitle}>Tu fortaleza</Text>
               <Text style={styles.stepSubtitle}>¿Qué te ayuda a mantenerte bien?</Text>
             </View>
 
@@ -362,7 +425,7 @@ export default function OnboardingActiveScreen() {
             <View style={styles.tipBoxGreen}>
               <Ionicons name="bulb" size={20} color="#10B981" />
               <Text style={styles.tipTextGreen}>
-                Estos son tus recursos para enfrentar los momentos difíciles. ¡Cultívalos!
+                Estos factores te protegen. Fortalécelos durante el reto.
               </Text>
             </View>
           </View>
@@ -372,9 +435,16 @@ export default function OnboardingActiveScreen() {
         return (
           <View style={styles.stepContent}>
             <View style={styles.stepHeader}>
-              <Ionicons name="heart" size={40} color="#F59E0B" />
-              <Text style={styles.stepTitle}>Tu porqué</Text>
-              <Text style={styles.stepSubtitle}>¿Por qué quieres dejar de consumir?</Text>
+              <Ionicons name="heart" size={40} color="#EC4899" />
+              <Text style={styles.stepTitle}>Tu "Para Qué"</Text>
+              <Text style={styles.stepSubtitle}>Tu razón más profunda para dejar de consumir</Text>
+            </View>
+
+            <View style={styles.tipBox}>
+              <Ionicons name="bulb" size={20} color="#F59E0B" />
+              <Text style={styles.tipText}>
+                No es "dejar la droga", sino lo que quieres ganar: estar presente para tus hijos, recuperar tu salud, volver a ser tú mismo.
+              </Text>
             </View>
 
             <View style={styles.textAreaContainer}>
@@ -382,19 +452,34 @@ export default function OnboardingActiveScreen() {
                 style={styles.textArea}
                 value={whyQuit}
                 onChangeText={setWhyQuit}
-                placeholder="Escribe tu motivación... &#10;&#10;Ejemplos:&#10;• Por mi familia&#10;• Por mi salud&#10;• Quiero recuperar mi vida&#10;• Por mis hijos"
-                placeholderTextColor="#6B7280"
+                placeholder="Escribe tu motivación más profunda..."
+                placeholderTextColor="#9CA3AF"
                 multiline
-                numberOfLines={6}
-                textAlignVertical="top"
+                numberOfLines={5}
               />
             </View>
 
-            <View style={styles.tipBox}>
-              <Ionicons name="bulb" size={20} color="#F59E0B" />
-              <Text style={styles.tipText}>
-                Tu "porqué" será tu ancla cuando las cosas se pongan difíciles. Sé honesto contigo mismo.
-              </Text>
+            <Text style={styles.photoSectionTitle}>Agrega fotos de tu motivación (opcional)</Text>
+            <Text style={styles.photoSectionSubtitle}>Tu familia, metas, sueños... lo que te inspira</Text>
+            
+            <View style={styles.photosContainer}>
+              {myWhyPhotos.map((photo, index) => (
+                <View key={index} style={styles.photoWrapper}>
+                  <Image source={{ uri: photo }} style={styles.photo} />
+                  <TouchableOpacity 
+                    style={styles.removePhotoButton}
+                    onPress={() => removeMyWhyPhoto(index)}
+                  >
+                    <Ionicons name="close-circle" size={24} color="#EF4444" />
+                  </TouchableOpacity>
+                </View>
+              ))}
+              {myWhyPhotos.length < 3 && (
+                <TouchableOpacity style={styles.addPhotoButton} onPress={pickMyWhyImage}>
+                  <Ionicons name="camera" size={32} color="#9CA3AF" />
+                  <Text style={styles.addPhotoText}>Agregar</Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         );
@@ -403,20 +488,104 @@ export default function OnboardingActiveScreen() {
         return (
           <View style={styles.stepContent}>
             <View style={styles.stepHeader}>
-              <Ionicons name="people" size={40} color="#F59E0B" />
-              <Text style={styles.stepTitle}>Tu persona de apoyo</Text>
-              <Text style={styles.stepSubtitle}>Alguien a quien puedas llamar en momentos difíciles</Text>
+              <Ionicons name="eye-off" size={40} color="#EF4444" />
+              <Text style={styles.stepTitle}>Tu Recordatorio</Text>
+              <View style={styles.titleWithInfo}>
+                <Text style={styles.stepSubtitle}>Una imagen de las consecuencias</Text>
+                <TouchableOpacity 
+                  style={styles.infoButton}
+                  onPress={() => setShowNegativePhotoInfo(true)}
+                >
+                  <Ionicons name="help-circle" size={24} color="#9CA3AF" />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.warningBox}>
+              <Ionicons name="information-circle" size={20} color="#F59E0B" />
+              <Text style={styles.warningText}>
+                Esta foto te recordará por qué quieres dejar de consumir. La verás solo cuando tú decidas, en tu Plan de Recuperación. Es opcional pero puede ser una herramienta poderosa en momentos difíciles.
+              </Text>
+            </View>
+
+            <View style={styles.negativePhotoSection}>
+              {negativePhoto ? (
+                <View style={styles.negativePhotoWrapper}>
+                  <Image source={{ uri: negativePhoto }} style={styles.negativePhoto} />
+                  <TouchableOpacity 
+                    style={styles.removeNegativePhotoButton}
+                    onPress={() => setNegativePhoto(null)}
+                  >
+                    <Ionicons name="trash" size={20} color="#FFFFFF" />
+                    <Text style={styles.removeNegativePhotoText}>Eliminar</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <TouchableOpacity style={styles.addNegativePhotoButton} onPress={pickNegativePhoto}>
+                  <Ionicons name="camera" size={40} color="#EF4444" />
+                  <Text style={styles.addNegativePhotoText}>Agregar foto</Text>
+                  <Text style={styles.addNegativePhotoSubtext}>Toca para seleccionar</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            <View style={styles.optionalNote}>
+              <Ionicons name="checkmark-circle" size={18} color="#9CA3AF" />
+              <Text style={styles.optionalText}>
+                Este paso es opcional. Puedes continuar sin agregar una foto.
+              </Text>
+            </View>
+
+            {/* Modal de información */}
+            <Modal
+              visible={showNegativePhotoInfo}
+              transparent
+              animationType="fade"
+              onRequestClose={() => setShowNegativePhotoInfo(false)}
+            >
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalContent}>
+                  <Ionicons name="information-circle" size={48} color="#F59E0B" />
+                  <Text style={styles.modalTitle}>¿Por qué una foto negativa?</Text>
+                  <Text style={styles.modalText}>
+                    En momentos de tentación, recordar las consecuencias negativas de la adicción puede ayudarte a mantenerte firme en tu decisión.{'\n\n'}
+                    Puede ser una foto de:{'\n'}
+                    • Un momento difícil que viviste{'\n'}
+                    • Las consecuencias en tu salud{'\n'}
+                    • El impacto en tus relaciones{'\n'}
+                    • Algo que perdiste por la adicción{'\n\n'}
+                    Esta foto estará oculta y solo la verás cuando tú decidas, nunca se mostrará automáticamente.
+                  </Text>
+                  <TouchableOpacity 
+                    style={styles.modalButton}
+                    onPress={() => setShowNegativePhotoInfo(false)}
+                  >
+                    <Text style={styles.modalButtonText}>Entendido</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+          </View>
+        );
+
+      case 7:
+        return (
+          <View style={styles.stepContent}>
+            <View style={styles.stepHeader}>
+              <Ionicons name="call" size={40} color="#10B981" />
+              <Text style={styles.stepTitle}>Contacto de apoyo</Text>
+              <Text style={styles.stepSubtitle}>Alguien a quien llamar en momentos difíciles</Text>
             </View>
 
             <View style={styles.inputSection}>
               <Text style={styles.inputLabel}>Nombre</Text>
               <View style={styles.inputContainerWhite}>
-                <Ionicons name="person" size={20} color="#9CA3AF" />
+                <Ionicons name="person" size={20} color="#6B7280" />
                 <TextInput
                   style={styles.inputWhite}
                   value={supportName}
                   onChangeText={setSupportName}
-                  placeholder="Nombre de la persona"
+                  placeholder="Ej: Mi hermano Juan"
                   placeholderTextColor="#9CA3AF"
                 />
               </View>
@@ -425,7 +594,7 @@ export default function OnboardingActiveScreen() {
             <View style={styles.inputSection}>
               <Text style={styles.inputLabel}>Teléfono</Text>
               <View style={styles.inputContainerWhite}>
-                <Ionicons name="call" size={20} color="#9CA3AF" />
+                <Ionicons name="call" size={20} color="#6B7280" />
                 <TextInput
                   style={styles.inputWhite}
                   value={supportPhone}
@@ -440,12 +609,12 @@ export default function OnboardingActiveScreen() {
             <View style={styles.inputSection}>
               <Text style={styles.inputLabel}>Relación</Text>
               <View style={styles.inputContainerWhite}>
-                <Ionicons name="heart" size={20} color="#9CA3AF" />
+                <Ionicons name="heart" size={20} color="#6B7280" />
                 <TextInput
                   style={styles.inputWhite}
                   value={supportRelationship}
                   onChangeText={setSupportRelationship}
-                  placeholder="Ej: Mamá, amigo, padrino"
+                  placeholder="Ej: Hermano, amigo, padrino AA"
                   placeholderTextColor="#9CA3AF"
                 />
               </View>
@@ -454,7 +623,7 @@ export default function OnboardingActiveScreen() {
             <View style={styles.optionalNote}>
               <Ionicons name="information-circle" size={18} color="#9CA3AF" />
               <Text style={styles.optionalText}>
-                Este paso es opcional pero muy recomendado. Tener apoyo aumenta significativamente las probabilidades de éxito.
+                Este paso es opcional. Podrás agregarlo después desde tu perfil.
               </Text>
             </View>
           </View>
@@ -466,72 +635,70 @@ export default function OnboardingActiveScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <LinearGradient
-        colors={['#1A1A1A', '#2D2D2D', '#1A1A1A']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.gradient}
+    <LinearGradient colors={['#1A1A1A', '#2D2D2D']} style={styles.container}>
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardView}
       >
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          {/* Progress Bar */}
-          <View style={styles.progressContainer}>
-            <View style={styles.progressBar}>
-              <View style={[styles.progressFill, { width: `${(step / totalSteps) * 100}%` }]} />
-            </View>
-            <Text style={styles.progressText}>Paso {step} de {totalSteps}</Text>
+        {/* Progress bar */}
+        <View style={styles.progressContainer}>
+          <View style={styles.progressBar}>
+            <View style={[styles.progressFill, { width: `${(step / totalSteps) * 100}%` }]} />
           </View>
+          <Text style={styles.progressText}>Paso {step} de {totalSteps}</Text>
+        </View>
 
-          {/* Back Button */}
-          {step > 1 && (
-            <TouchableOpacity style={styles.backButton} onPress={() => setStep(step - 1)}>
-              <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-              <Text style={styles.backText}>Atrás</Text>
-            </TouchableOpacity>
-          )}
-
+        <ScrollView 
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
           {renderStep()}
 
-          {/* Error */}
           {error ? (
             <View style={styles.errorContainer}>
-              <Ionicons name="alert-circle" size={18} color="#EF4444" />
+              <Ionicons name="alert-circle" size={20} color="#FCA5A5" />
               <Text style={styles.errorText}>{error}</Text>
             </View>
           ) : null}
 
-          {/* Continue Button */}
           <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={[
-                styles.continueButton,
-                !canContinue() && styles.continueButtonDisabled,
-              ]}
-              onPress={handleNext}
-              disabled={!canContinue() || isSubmitting}
-            >
-              {isSubmitting ? (
-                <ActivityIndicator size="small" color="#1A1A1A" />
-              ) : (
-                <>
-                  <Text style={styles.continueButtonText}>
-                    {step === totalSteps ? 'Crear mi Plan' : 'Continuar'}
-                  </Text>
-                  <Ionicons 
-                    name={step === totalSteps ? 'rocket' : 'arrow-forward'} 
-                    size={20} 
-                    color="#1A1A1A" 
-                  />
-                </>
+            <View style={styles.buttonsRow}>
+              {step > 1 && (
+                <TouchableOpacity
+                  style={styles.backButton}
+                  onPress={handleBack}
+                >
+                  <Ionicons name="arrow-back" size={20} color="#FFFFFF" />
+                  <Text style={styles.backButtonText}>Atrás</Text>
+                </TouchableOpacity>
               )}
-            </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={[
+                  styles.continueButton,
+                  !canContinue() && styles.continueButtonDisabled,
+                  step === 1 && { flex: 1 },
+                ]}
+                onPress={handleNext}
+                disabled={!canContinue() || isSubmitting}
+              >
+                {isSubmitting ? (
+                  <ActivityIndicator color="#1A1A1A" />
+                ) : (
+                  <>
+                    <Text style={styles.continueButtonText}>
+                      {step === totalSteps ? 'Comenzar Reto' : 'Continuar'}
+                    </Text>
+                    <Ionicons name={step === totalSteps ? "rocket" : "arrow-forward"} size={20} color="#1A1A1A" />
+                  </>
+                )}
+              </TouchableOpacity>
+            </View>
           </View>
         </ScrollView>
-      </LinearGradient>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </LinearGradient>
   );
 }
 
@@ -539,61 +706,65 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  gradient: {
+  keyboardView: {
     flex: 1,
   },
-  scrollContent: {
-    flexGrow: 1,
-    padding: 20,
-    paddingTop: 50,
-  },
   progressContainer: {
-    marginBottom: 20,
+    paddingTop: 60,
+    paddingHorizontal: 20,
+    paddingBottom: 10,
   },
   progressBar: {
-    height: 6,
+    height: 4,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 3,
+    borderRadius: 2,
     marginBottom: 8,
   },
   progressFill: {
     height: '100%',
     backgroundColor: '#F59E0B',
-    borderRadius: 3,
+    borderRadius: 2,
   },
   progressText: {
     color: '#9CA3AF',
     fontSize: 12,
     textAlign: 'center',
   },
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 16,
+  scrollView: {
+    flex: 1,
   },
-  backText: {
-    color: '#FFFFFF',
-    fontSize: 16,
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
   },
   stepContent: {
-    flex: 1,
+    marginTop: 10,
   },
   stepHeader: {
     alignItems: 'center',
     marginBottom: 24,
   },
   stepTitle: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#FFFFFF',
     marginTop: 12,
-    marginBottom: 8,
+    textAlign: 'center',
   },
   stepSubtitle: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#9CA3AF',
+    marginTop: 8,
     textAlign: 'center',
+  },
+  titleWithInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 8,
+  },
+  infoButton: {
+    padding: 4,
   },
   optionsGrid: {
     gap: 10,
@@ -678,9 +849,11 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 12,
     paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   input: {
     flex: 1,
@@ -689,22 +862,24 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   inputSuffix: {
-    color: '#6B7280',
+    color: '#9CA3AF',
     fontSize: 16,
   },
   inputContainerWhite: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 12,
     paddingHorizontal: 16,
     gap: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   inputWhite: {
     flex: 1,
     paddingVertical: 14,
     fontSize: 16,
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   frequencyOptions: {
     gap: 10,
@@ -733,19 +908,6 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
     fontSize: 13,
   },
-  textAreaContainer: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 4,
-    marginBottom: 16,
-  },
-  textArea: {
-    minHeight: 150,
-    padding: 12,
-    fontSize: 16,
-    color: '#1F2937',
-    textAlignVertical: 'top',
-  },
   tipBox: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -753,6 +915,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 14,
     gap: 10,
+    marginBottom: 20,
   },
   tipText: {
     flex: 1,
@@ -775,6 +938,132 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18,
   },
+  textAreaContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 12,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  textArea: {
+    minHeight: 120,
+    padding: 16,
+    fontSize: 16,
+    color: '#FFFFFF',
+    textAlignVertical: 'top',
+  },
+  photoSectionTitle: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  photoSectionSubtitle: {
+    color: '#9CA3AF',
+    fontSize: 14,
+    marginBottom: 16,
+  },
+  photosContainer: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  photoWrapper: {
+    position: 'relative',
+  },
+  photo: {
+    width: 90,
+    height: 90,
+    borderRadius: 12,
+  },
+  removePhotoButton: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    backgroundColor: '#1A1A1A',
+    borderRadius: 12,
+  },
+  addPhotoButton: {
+    width: 90,
+    height: 90,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    borderStyle: 'dashed',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addPhotoText: {
+    color: '#9CA3AF',
+    fontSize: 12,
+    marginTop: 4,
+  },
+  warningBox: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+    borderRadius: 12,
+    padding: 14,
+    gap: 10,
+    marginBottom: 24,
+  },
+  warningText: {
+    flex: 1,
+    color: '#F59E0B',
+    fontSize: 13,
+    lineHeight: 20,
+  },
+  negativePhotoSection: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  negativePhotoWrapper: {
+    alignItems: 'center',
+  },
+  negativePhoto: {
+    width: 200,
+    height: 200,
+    borderRadius: 16,
+    borderWidth: 3,
+    borderColor: '#EF4444',
+  },
+  removeNegativePhotoButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EF4444',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    marginTop: 12,
+    gap: 8,
+  },
+  removeNegativePhotoText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  addNegativePhotoButton: {
+    width: 200,
+    height: 200,
+    borderRadius: 16,
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    borderWidth: 2,
+    borderColor: 'rgba(239, 68, 68, 0.3)',
+    borderStyle: 'dashed',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addNegativePhotoText: {
+    color: '#EF4444',
+    fontSize: 16,
+    fontWeight: '600',
+    marginTop: 8,
+  },
+  addNegativePhotoSubtext: {
+    color: '#9CA3AF',
+    fontSize: 12,
+    marginTop: 4,
+  },
   optionalNote: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -786,6 +1075,46 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
     fontSize: 13,
     lineHeight: 18,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#2D2D2D',
+    borderRadius: 20,
+    padding: 24,
+    alignItems: 'center',
+    maxWidth: 350,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginTop: 16,
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  modalText: {
+    color: '#D1D5DB',
+    fontSize: 14,
+    lineHeight: 22,
+    textAlign: 'left',
+  },
+  modalButton: {
+    backgroundColor: '#F59E0B',
+    paddingHorizontal: 32,
+    paddingVertical: 12,
+    borderRadius: 12,
+    marginTop: 20,
+  },
+  modalButtonText: {
+    color: '#1A1A1A',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   errorContainer: {
     flexDirection: 'row',
@@ -805,7 +1134,27 @@ const styles = StyleSheet.create({
     marginTop: 24,
     marginBottom: 20,
   },
+  buttonsRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    gap: 8,
+  },
+  backButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
   continueButton: {
+    flex: 1,
     backgroundColor: '#F59E0B',
     paddingVertical: 16,
     borderRadius: 12,
