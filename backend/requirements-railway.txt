@@ -23,5 +23,6 @@ pydantic==2.12.5
 # Web scraping
 beautifulsoup4==4.12.3
 
-# AI Integration - Using OpenAI directly
+# AI Integration - Using emergentintegrations for Emergent LLM Key
 openai==1.99.9
+emergentintegrations @ https://d33sy5i8bnduwe.cloudfront.net/simple/emergentintegrations/emergentintegrations-0.1.0-py3-none-any.whl
