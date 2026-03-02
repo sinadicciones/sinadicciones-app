@@ -259,7 +259,8 @@ export default function OnboardingScreen() {
       case 4: return selectedTriggers.length > 0;
       case 5: return selectedProtective.length > 0;
       case 6: return myWhy.length >= 10;
-      case 7: return selectedHabits.length > 0 || selectedAreas.length > 0;
+      case 7: return true; // Foto negativa es opcional
+      case 8: return selectedHabits.length > 0 || selectedAreas.length > 0;
       default: return false;
     }
   };
