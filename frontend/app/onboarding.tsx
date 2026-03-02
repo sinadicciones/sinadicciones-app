@@ -326,6 +326,7 @@ export default function OnboardingScreen() {
           protective_factors: protectiveLabels,
           my_why: myWhy,
           my_why_photos: myWhyPhotos,
+          negative_photo: negativePhoto,
           selected_habits: habitsToCreate,
           life_areas: areasLabels,
           initial_mood: 5,
