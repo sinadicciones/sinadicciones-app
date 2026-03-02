@@ -232,6 +232,7 @@ export default function RecommendationsScreen() {
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [habits, setHabits] = useState<any[]>([]);
+  const [showNegativePhoto, setShowNegativePhoto] = useState(false);
 
   useEffect(() => {
     loadData();
