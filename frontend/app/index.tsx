@@ -172,7 +172,7 @@ export default function WelcomeScreen() {
             <View style={styles.header}>
               <Text style={styles.title}>Sinadicciones.org</Text>
               <Text style={styles.subtitle}>Tu primer paso en tu recuperación</Text>
-              <Text style={styles.versionBadge}>v24</Text>
+              <Text style={styles.versionBadge}>v25</Text>
             </View>
 
             {!showEmailForm ? (
@@ -322,7 +322,7 @@ export default function WelcomeScreen() {
                 </View>
 
                 <View style={styles.versionContainer}>
-                  <Text style={styles.versionText}>Versión 24</Text>
+                  <Text style={styles.versionText}>Versión 25</Text>
                 </View>
               </>
             ) : (
@@ -436,7 +436,7 @@ export default function WelcomeScreen() {
             </Text>
 
             <View style={styles.versionContainer}>
-              <Text style={styles.versionText}>Versión 24</Text>
+              <Text style={styles.versionText}>Versión 25</Text>
             </View>
           </View>
         </ScrollView>
