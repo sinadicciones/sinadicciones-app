@@ -4328,25 +4328,28 @@ async def get_openai_client():
     return openai_client
 
 async def generate_ai_response(system_message: str, user_prompt: str) -> str:
-    """Generate AI response using OpenAI GPT-4"""
-    client = await get_openai_client()
-    if not client:
-        print("ERROR: OpenAI client not available")
-        return '{"error": "AI no configurada. Por favor configure OPENAI_API_KEY."}'
-    
+    """Generate AI response using emergentintegrations"""
     try:
-        response = await client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": system_message},
-                {"role": "user", "content": user_prompt}
-            ],
-            temperature=0.7,
-            max_tokens=2000
-        )
-        return response.choices[0].message.content
+        from emergentintegrations.llm.chat import LlmChat, UserMessage
+        import uuid
+        
+        api_key = os.getenv("EMERGENT_LLM_KEY")
+        if not api_key:
+            print("ERROR: EMERGENT_LLM_KEY not configured")
+            return '{"error": "AI no configurada. Por favor configure EMERGENT_LLM_KEY."}'
+        
+        session_id = f"analysis_{uuid.uuid4().hex[:8]}"
+        chat = LlmChat(
+            api_key=api_key,
+            session_id=session_id,
+            system_message=system_message
+        ).with_model("openai", "gpt-4o")
+        
+        user_msg = UserMessage(text=user_prompt)
+        response = await chat.send_message(user_msg)
+        return response
     except Exception as e:
-        print(f"Error calling OpenAI: {e}")
+        print(f"Error calling AI: {e}")
         return f'{{"error": "Error generando análisis: {str(e)}"}}'
 
 class AnalysisPeriod(str, Enum):
