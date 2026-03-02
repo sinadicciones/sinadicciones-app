@@ -6047,11 +6047,15 @@ async def nelson_chat(
         }
         
     except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
         print(f"Error in Nelson chat: {e}")
+        print(f"Error details: {error_details}")
         return {
             "response": "Lo siento, tuve un problema. ¿Puedes intentar de nuevo? Si necesitas ayuda urgente, usa el botón rojo de Crisis.",
             "mode": "error",
-            "crisis_detected": False
+            "crisis_detected": False,
+            "debug_error": str(e)
         }
 
 async def get_nelson_user_context(user_id: str) -> tuple[str, str]:
