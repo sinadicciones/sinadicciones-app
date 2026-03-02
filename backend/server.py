@@ -4302,10 +4302,10 @@ async def complete_active_user_onboarding(data: ActiveUserOnboardingRequest, cur
 # ============== AI WELLNESS ANALYSIS ==============
 from openai import AsyncOpenAI
 
-# For production: Use OPENAI_API_KEY
-# For development with Emergent: Use EMERGENT_LLM_KEY
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or os.getenv("EMERGENT_LLM_KEY")
-print(f"OpenAI API Key configured: {'Yes' if OPENAI_API_KEY else 'No'}")
+# For production: Use EMERGENT_LLM_KEY (priority) or fallback to OPENAI_API_KEY
+EMERGENT_KEY = os.getenv("EMERGENT_LLM_KEY")
+OPENAI_API_KEY = EMERGENT_KEY or os.getenv("OPENAI_API_KEY")
+print(f"AI Key configured: {'EMERGENT' if EMERGENT_KEY else 'OPENAI' if OPENAI_API_KEY else 'No'}")
 
 # Initialize OpenAI client
 openai_client = None
