@@ -401,6 +401,52 @@ export default function RecommendationsScreen() {
           </View>
         )}
 
+        {/* Foto Negativa - Recordatorio Colapsable */}
+        {profile?.negative_photo && (
+          <View style={styles.negativePhotoSection}>
+            <TouchableOpacity 
+              style={styles.negativePhotoHeader}
+              onPress={() => setShowNegativePhoto(!showNegativePhoto)}
+            >
+              <View style={styles.negativePhotoTitleRow}>
+                <Ionicons name="eye-off" size={20} color="#EF4444" />
+                <Text style={styles.negativePhotoTitle}>Mi Recordatorio</Text>
+              </View>
+              <View style={styles.negativePhotoToggle}>
+                <Text style={styles.negativePhotoToggleText}>
+                  {showNegativePhoto ? 'Ocultar' : 'Ver'}
+                </Text>
+                <Ionicons 
+                  name={showNegativePhoto ? "chevron-up" : "chevron-down"} 
+                  size={20} 
+                  color="#9CA3AF" 
+                />
+              </View>
+            </TouchableOpacity>
+            
+            {!showNegativePhoto && (
+              <Text style={styles.negativePhotoHint}>
+                Toca para ver tu recordatorio de las consecuencias
+              </Text>
+            )}
+            
+            {showNegativePhoto && (
+              <View style={styles.negativePhotoContent}>
+                <View style={styles.negativePhotoWarning}>
+                  <Ionicons name="warning" size={16} color="#F59E0B" />
+                  <Text style={styles.negativePhotoWarningText}>
+                    Recuerda: esto te ayuda a mantenerte firme en momentos difíciles
+                  </Text>
+                </View>
+                <Image 
+                  source={{ uri: profile.negative_photo }} 
+                  style={styles.negativePhotoImage} 
+                />
+              </View>
+            )}
+          </View>
+        )}
+
         {/* Contactos de Emergencia */}
         {profile?.emergency_contacts && profile.emergency_contacts.length > 0 && (
           <View style={styles.emergencySection}>
