@@ -4237,6 +4237,8 @@ async def complete_active_user_onboarding(data: ActiveUserOnboardingRequest, cur
         "triggers": data.triggers,
         "protective_factors": data.protective_factors,
         "my_why": data.why_quit,
+        "my_why_photos": data.my_why_photos,
+        "negative_photo": data.negative_photo,
         "country": data.country,
         "identification": data.identification,
         "profile_completed": True,
