@@ -4357,11 +4357,16 @@ class AnalysisPeriod(str, Enum):
 async def get_ai_status():
     """Check if AI is properly configured"""
     client = await get_openai_client()
-    api_key = os.getenv("OPENAI_API_KEY") or os.getenv("EMERGENT_LLM_KEY")
+    emergent_key = os.getenv("EMERGENT_LLM_KEY")
+    openai_key = os.getenv("OPENAI_API_KEY")
+    # Priority: EMERGENT > OPENAI
+    api_key = emergent_key or openai_key
+    key_source = "EMERGENT" if emergent_key else "OPENAI" if openai_key else None
     return {
         "ai_configured": client is not None,
         "api_key_present": api_key is not None,
-        "api_key_prefix": api_key[:10] + "..." if api_key else None
+        "api_key_source": key_source,
+        "api_key_prefix": api_key[:15] + "..." if api_key else None
     }
 
 
