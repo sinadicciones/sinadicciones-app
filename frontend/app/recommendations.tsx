@@ -1370,4 +1370,69 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '500',
   },
+  // Estilos para foto negativa colapsable
+  negativePhotoSection: {
+    backgroundColor: '#1F1F1F',
+    borderRadius: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#EF444430',
+    overflow: 'hidden',
+  },
+  negativePhotoHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+  },
+  negativePhotoTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  negativePhotoTitle: {
+    color: '#EF4444',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  negativePhotoToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  negativePhotoToggleText: {
+    color: '#9CA3AF',
+    fontSize: 14,
+  },
+  negativePhotoHint: {
+    color: '#6B7280',
+    fontSize: 13,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
+  negativePhotoContent: {
+    padding: 16,
+    paddingTop: 0,
+  },
+  negativePhotoWarning: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+    gap: 8,
+  },
+  negativePhotoWarningText: {
+    flex: 1,
+    color: '#F59E0B',
+    fontSize: 12,
+  },
+  negativePhotoImage: {
+    width: '100%',
+    height: 250,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#EF4444',
+  },
 });
