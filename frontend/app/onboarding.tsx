@@ -135,11 +135,15 @@ export default function OnboardingScreen() {
   const [myWhy, setMyWhy] = useState('');
   const [myWhyPhotos, setMyWhyPhotos] = useState<string[]>([]);
   
-  // Step 7: Hábitos y Áreas
+  // Step 7: Foto Negativa
+  const [negativePhoto, setNegativePhoto] = useState<string | null>(null);
+  const [showNegativePhotoInfo, setShowNegativePhotoInfo] = useState(false);
+  
+  // Step 8: Hábitos y Áreas
   const [selectedHabits, setSelectedHabits] = useState<string[]>([]);
   const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
 
-  const totalSteps = 7;
+  const totalSteps = 8;
 
   const toggleSubstance = (id: string) => {
     if (selectedSubstances.includes(id)) {
