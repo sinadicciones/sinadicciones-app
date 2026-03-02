@@ -4320,7 +4320,8 @@ async def get_openai_client():
     global openai_client, OPENAI_API_KEY
     if openai_client is None:
         # Try to get the key again (in case it was set after startup)
-        OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or os.getenv("EMERGENT_LLM_KEY")
+        # Priority: EMERGENT_LLM_KEY > OPENAI_API_KEY
+        OPENAI_API_KEY = os.getenv("EMERGENT_LLM_KEY") or os.getenv("OPENAI_API_KEY")
         if OPENAI_API_KEY:
             openai_client = AsyncOpenAI(api_key=OPENAI_API_KEY)
             print("OpenAI client initialized on demand")
