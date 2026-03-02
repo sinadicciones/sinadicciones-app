@@ -4222,6 +4222,81 @@ class ActiveUserOnboardingRequest(BaseModel):
     country: Optional[str] = None
     identification: Optional[str] = None
 
+# Patient (Recovery) Onboarding Request
+class PatientOnboardingRequest(BaseModel):
+    addiction_type: str
+    substances: list = []
+    years_using: int = 0
+    clean_since: str  # Date string YYYY-MM-DD
+    has_dual_diagnosis: bool = False
+    diagnoses: list = []
+    triggers: list = []
+    protective_factors: list = []
+    my_why: str
+    my_why_photos: list = []
+    negative_photo: Optional[str] = None
+    selected_habits: list = []
+    life_areas: list = []
+    initial_mood: int = 5
+    frequent_emotions: list = []
+
+@app.post("/api/profile/onboarding")
+async def complete_patient_onboarding(data: PatientOnboardingRequest, current_user: User = Depends(get_current_user)):
+    """Complete onboarding for patient (in recovery)"""
+    
+    user_id = current_user.user_id
+    
+    # Parse clean_since date
+    try:
+        clean_since_date = datetime.strptime(data.clean_since, "%Y-%m-%d")
+    except:
+        clean_since_date = datetime.now(timezone.utc)
+    
+    update_data = {
+        "role": "patient",
+        "addiction_type": data.addiction_type,
+        "secondary_addictions": data.substances,
+        "years_using": data.years_using,
+        "clean_since": clean_since_date,
+        "has_dual_diagnosis": data.has_dual_diagnosis,
+        "dual_diagnoses": data.diagnoses,
+        "triggers": data.triggers,
+        "protective_factors": data.protective_factors,
+        "my_why": data.my_why,
+        "my_why_photos": data.my_why_photos,
+        "negative_photo": data.negative_photo,
+        "life_areas": data.life_areas,
+        "current_mood": data.initial_mood,
+        "frequent_emotions": data.frequent_emotions,
+        "profile_completed": True,
+        "onboarding_completed": True,
+        "updated_at": datetime.now(timezone.utc)
+    }
+    
+    result = await db.user_profiles.update_one(
+        {"user_id": user_id},
+        {"$set": update_data},
+        upsert=True
+    )
+    
+    # Create habits from selected_habits
+    if data.selected_habits:
+        for habit_data in data.selected_habits:
+            habit = {
+                "habit_id": f"habit_{uuid.uuid4().hex[:12]}",
+                "user_id": user_id,
+                "name": habit_data.get("name", "Hábito"),
+                "icon": habit_data.get("icon", "checkmark"),
+                "color": habit_data.get("color", "#F59E0B"),
+                "frequency": habit_data.get("frequency", "daily"),
+                "completed_dates": [],
+                "created_at": datetime.now(timezone.utc),
+                "is_active": True
+            }
+            await db.habits.insert_one(habit)
+    
+    return {"success": True, "message": "Onboarding completado"}
+
 @app.post("/api/profile/active-onboarding")
 async def complete_active_user_onboarding(data: ActiveUserOnboardingRequest, current_user: User = Depends(get_current_user)):
     """Complete onboarding for active user (wants to quit)"""
