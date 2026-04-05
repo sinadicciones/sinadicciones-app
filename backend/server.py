@@ -5328,6 +5328,19 @@ async def debug_push_token(current_user: User = Depends(get_current_user)):
         }
     return {"has_token": False, "user_id": current_user.user_id}
 
+@app.get("/api/notifications/debug-all-tokens")
+async def debug_all_push_tokens():
+    """Debug: Ver todos los tokens registrados (temporal para debugging)"""
+    tokens = await db.push_tokens.find({}, {"_id": 0, "user_id": 1, "platform": 1, "push_token": 1}).to_list(100)
+    result = []
+    for t in tokens:
+        result.append({
+            "user_id": t.get("user_id"),
+            "platform": t.get("platform"),
+            "token_preview": t.get("push_token", "")[:40] + "..." if t.get("push_token") else None
+        })
+    return {"total": len(result), "tokens": result}
+
 @app.post("/api/notifications/unregister-token")
 async def unregister_push_token(current_user: User = Depends(get_current_user)):
     """Eliminar token de push notification (logout)"""
