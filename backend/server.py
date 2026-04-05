@@ -5401,6 +5401,7 @@ async def send_test_notification(current_user: User = Depends(get_current_user))
 
 
 @app.post("/api/notifications/send-reminders")
+@app.get("/api/notifications/send-reminders")
 async def send_scheduled_reminders(hour: int = 9):
     """
     Endpoint para enviar recordatorios programados.
