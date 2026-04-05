@@ -53,12 +53,17 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   // Registrar para push notifications
   useEffect(() => {
     if (isAuthenticated && user) {
+      console.log('NotificationContext: Usuario autenticado, registrando para push...', user.user_id);
       registerForPushNotificationsAsync().then(async (token) => {
+        console.log('NotificationContext: Token obtenido:', token ? token.substring(0, 30) + '...' : 'null');
         if (token) {
           setExpoPushToken(token);
           // Registrar token en el servidor
-          await registerPushTokenWithServer(user.user_id, token);
+          const success = await registerPushTokenWithServer(user.user_id, token);
+          console.log('NotificationContext: Token registrado en servidor:', success);
         }
+      }).catch(err => {
+        console.error('NotificationContext: Error registrando push:', err);
       });
 
       // Listener para notificaciones recibidas mientras la app está abierta

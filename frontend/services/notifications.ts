@@ -70,9 +70,12 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
 // Registrar el token en el servidor
 export async function registerPushTokenWithServer(userId: string, token: string): Promise<boolean> {
   try {
+    console.log('registerPushTokenWithServer: Iniciando registro para', userId);
     const sessionToken = await AsyncStorage.getItem('session_token');
+    console.log('registerPushTokenWithServer: Session token:', sessionToken ? 'existe' : 'NO EXISTE');
     if (!sessionToken) return false;
 
+    console.log('registerPushTokenWithServer: Enviando a', `${API_URL}/api/notifications/register-token`);
     const response = await fetch(`${API_URL}/api/notifications/register-token`, {
       method: 'POST',
       headers: {
@@ -86,6 +89,7 @@ export async function registerPushTokenWithServer(userId: string, token: string)
       }),
     });
 
+    console.log('registerPushTokenWithServer: Response status:', response.status);
     return response.ok;
   } catch (error) {
     console.error('Error registrando push token:', error);
